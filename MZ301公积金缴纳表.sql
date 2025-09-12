@@ -142,7 +142,7 @@ from smart('MZ301_03') t1
 left join smart('MZ301_04') t2
 on  t1.pk_psndoc=t2.pk_psndoc
 
-MZ301 MZ301公积金缴纳表
+-- MZ301 MZ301公积金缴纳表
 -- t_1
 select t1.* from smart('MZ301_05') t1 where round(substr(t1.qj,1,4),0)-round(substr(t1.rzks_date,1,4),0)=0 and round(substr(t1.qj,6,7),0)<=06 and 
 t1.sr_ksdate=(select min(m.sr_ksdate) zx from smart('MZ301_05') m where round(substr(t1.qj,6,7),0)<=06 and t1.qj=m.qj and t1.pk_psndoc=m.pk_psndoc group by m.pk_psndoc,m.qj)
