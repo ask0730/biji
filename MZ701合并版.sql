@@ -68,6 +68,9 @@ left outer join hi_psndoc_glbdef2 T3
 left outer join bd_defdoc bd_defdoc_zzlx -- 组织类型
     on org_adminorg.def2 = bd_defdoc_zzlx.pk_defdoc
 
+left outer join bd_defdoc bd_defdoc_dy -- 地域
+    on org_adminorg.def4 = bd_defdoc_dy.pk_defdoc
+
 where 1 = 1 
     -- AND org_adminorg.name = '高压管网分公司'
     and (hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0) 
@@ -77,4 +80,7 @@ where 1 = 1
     and T1.pk_postseries in ('10011T100000000098AS', '10011T100000000098B2', '10011T100000000098B3', '10011T100000000098B4', '10011T100000000098B5', '10011T100000000098B6')
     and T1.begindate <= datefmt(parameter('param2'), 'yyyy-mm-dd') 
     and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'), 'yyyy-mm-dd')
-    and bd_psncl.name in (parameter('rylb')) 
+    and bd_psncl.name in (parameter('rylb'))
+    -- 京内子公司筛选条件（取消注释下面两行来查询京内子公司）
+    -- and bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司')
+    -- and bd_defdoc_dy.name = '京内' 
