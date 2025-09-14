@@ -1,4 +1,4 @@
-# 1.数据抓取抓取到的是窗口名称（新闻公告 -上海图书馆-Microsoft Edge），不是自己选取到的元素
+# 1.数据抓取抓取到的是窗口名称（如：新闻公告 -上海图书馆-Microsoft Edge），不是自己选取到的元素
 
 ## 原因分析：
 目标中缺失了{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}

@@ -1,0 +1,89 @@
+# 1.相关节点：
+## 收回报表权限（删除报表权限）：
+按应用查角色节点，左上角输入报表的名字
+依次点进角色编码
+在已分配职责里找，N415，箭头移到左边
+（职责和角色编码都可以）
+
+## 职责和角色：
+职责：报表就是一个职责
+角色：在某个公司的某个用户有某个职责
+
+## 手册：
+报表节点-学习手册20250825v1.0
+
+## 节点名称：
+分析模型-全局，生产技能人员结构报表
+报表设计-全局
+模板设置-集团，点击修改，选中子集查表名
+
+## 写报表：
+（1）确定在前台怎么搜索，要查询哪些字段，有哪些筛选条件
+（2）确定对应的表
+（3）怎样查看表里的值
+
+## 改报表：
+（1）导出旧报表到测试环境
+（2）确定查询条件，找出有问题的数据
+（3）打印并分析
+
+# 2.京内子公司人数统计缺失：
+
+## 关键差异分析
+
+### 1. 去重逻辑的差异
+
+**原版 (MZ702原版.sql)**：
+```sql
+select distinct bd_psndoc.pk_psndoc,
+-- ... 其他字段
+from (select distinct bd_psndoc.pk_psndoc, ...)
+```
+
+**修改版 (MZ702人员年龄、技能等级、学历报表.sql)**：
+```sql
+select bd_psndoc.pk_psndoc,
+-- ... 其他字段
+,ROW_NUMBER() OVER (PARTITION BY bd_psndoc.pk_psndoc ORDER BY T1.begindate DESC) as rn
+from (select bd_psndoc.pk_psndoc, ...)
+-- 然后在最外层添加
+where rn = 1
+```
+
+### 2. 计数方式的差异
+
+**原版**：
+```sql
+,count(hz) hz,count(bshz) bshz
+,count(nan) nan ,count(nv) nv
+```
+
+**修改版**：
+```sql
+,count(distinct case when hz = 1 then pk_psndoc end) hz,count(distinct case when bshz = 1 then pk_psndoc end) bshz
+,count(distinct case when nan = 1 then pk_psndoc end) nan ,count(distinct case when nv = 1 then pk_psndoc end) nv
+```
+
+## 根本原因
+
+**原版的问题**：
+- 原版在子查询中使用了 `select distinct bd_psndoc.pk_psndoc`
+- 如果同一个人员有多条记录，`distinct` 可能会随机选择一条，而不是按时间排序选择最新的
+- 这可能导致选择了错误的工作记录（比如选择了已结束的工作记录）
+
+**修改版的改进**：
+- 修改版使用 `ORDER BY T1.begindate DESC` 确保选择最新的工作记录
+- 通过 `where rn = 1` 确保每个人员只取一条记录，但这条记录是最新的
+
+## 具体场景示例
+
+可能存在一个人员：
+- 在指定时间范围内有两条工作记录
+- 第一条记录：`begindate` 较早，组织类型不是"京内子公司"
+- 第二条记录：`begindate` 较晚，组织类型是"京内子公司"
+- 原版的 `distinct` 可能随机选择了第一条记录，导致该人员被错误分类
+- 修改版的 `ROW_NUMBER()` 会正确选择第二条记录，将该人员正确归类为"京内子公司"
+
+## 结论
+
+原版比修改版少一个的原因是原版使用的 `distinct` 去重方法不够精确，可能随机选择了不是最新的工作记录，导致某个应该归类为"京内子公司"的人员被错误分类。修改版通过使用 `ROW_NUMBER()` 按时间排序选择最新记录，确保了数据统计的准确性，因此多统计了一个人员。
