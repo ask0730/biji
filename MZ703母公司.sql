@@ -49,7 +49,7 @@ on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
 and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
 and T3.glbdef8 = '10011T10000000001XG7' --是否聘任专业技术职务为'已聘任该项专业技术职务'
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构')
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部')
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
@@ -111,7 +111,7 @@ and T3.glbdef8 = '10011T10000000001XG7' --是否聘任专业技术职务为'已�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构')
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部')
 order by T1.showorder
 )a
 
@@ -172,7 +172,7 @@ and T3.glbdef8 = '10011T10000000001XG7' --是否聘任专业技术职务为'已�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构')
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部')
 order by T1.showorder
 )a
 
@@ -233,7 +233,7 @@ and T3.glbdef8 = '10011T10000000001XG7' --是否聘任专业技术职务为'已�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构')
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部')
 order by T1.showorder
 )a
 
@@ -298,7 +298,7 @@ and T3.glbdef8 = '10011T10000000001XG7' --是否聘任专业技术职务为'已�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构')
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部')
 order by T1.showorder
 )a
 
@@ -340,6 +340,6 @@ and T3.glbdef8 = '10011T10000000001XG7' --是否聘任专业技术职务为'已�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构')
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部')
 order by T1.showorder
 )a
