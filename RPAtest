@@ -1,34 +1,273 @@
-Dim data
 Try
-Dim iRet,hWeb,arrElement,sRet,arrayData
+Dim hWeb,arrayData,arrElement,arrRet,objExcelWorkBook,strOriginal,arrParts,item,strDate,keywords,pattern,titleRow
 
  Dim folderPath
-    folderPath = "C:\\Users\\Administrator\\Desktop\\图书馆\\年报下载"
+    folderPath = "C:\\Users\\Administrator\\Desktop\\图书馆\\服务通知查询"
     If Not File.FolderExists(folderPath)
         File.CreateFolder(folderPath)
     End If
 
-hWeb = WebBrowser.Create("innerbrowser","https://www.nlc.cn/",30000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
-Mouse.Action(@ui"链接<a>_信息公开1","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+hWeb = WebBrowser.Create("edge","https://www.nlc.cn/",30000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
 
-Rem 获取去年
-dTime = Time.Date()
-currentYear = CInt(Time.Format(dTime, "yyyy"))
-lastYear = currentYear - 1
-sLastYear = CStr(lastYear)
-sName=sLastYear+"年度部门决算"
+Mouse.Action(@ui"段落<p>_最新公告1","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
 
-Rem 点击对应的年报
-Text.Click(@ui"块级元素<div>_·国家图书馆2024年度部门决算·国家图书馆2025年度部门预算·2022年国家1",sName,"instr",1,"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+Rem 获取标题
 
-Mouse.Action(@ui"分组","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+arrayTitle = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"UL","css-selector":"body>div>div>div>div>div>ul"}]},{"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"li"},{"tag":"a","idx":0},{"tag":"span","idx":0}],"exact":true,"vprops":["text"]},"props":["text"]}]},{"objNextLinkElement":'',"iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":False})
+Rem 获取链接
 
+arrayHref = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"UL","css-selector":"body>div>div>div>div>div>ul"}]},{"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"li"},{"tag":"a","idx":0}],"exact":true,"vprops":["text"]},"props":["url"]}]},{"objNextLinkElement":'',"iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":False})
+Rem 获取日期
 
-Keyboard.InputText(@ui"窗口_地址:下载1","C:\\Users\\Administrator\\Desktop\\图书馆\\年报下载",true,300,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "simulate", "bValidate": false, "bClickBeforeInput": true})
-Mouse.Action(@ui"窗口_ad77d431(2)","left","dbclick",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
-sRet=sLastYear+"年国家图书馆年报"
-Keyboard.InputText(@ui"窗口_ad77d431",sRet,true,300,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": false})
-Mouse.Action(@ui"窗口_保存(S)","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+arrayDate = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"UL","css-selector":"body>div>div>div>div>div>ul"}]},{"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"li"},{"tag":"a","idx":0},{"tag":"b","idx":0}],"exact":true,"vprops":["text"]},"props":["text"]}]},{"objNextLinkElement":'',"iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":False})
+Rem 合并数组
+resultArray = []
+For i = 0 To UBound(arrayTitle) - 1
+    newItem = [
+        arrayTitle[i][0],  
+        arrayHref[i][0],   
+        arrayDate[i][0]   
+    ]
+    push(resultArray, newItem)
+Next
+TracePrint(resultArray)
+
+Rem 过滤数组
+resultArray1 = []
+pattern = "(?:调整\\S*?(?:服务|时间)|扩大\\S*?区域|优化\\S*?|新增\\S*?|(?:开馆|恢复开馆|临时闭馆)|(?:公告|通告)|通知|开放|服务调整|预约参观)"
+For Each item In resultArray
+    strTitle = item[0]
+        matchResult = Regex.Find(strTitle, pattern)
+    
+    If Len(matchResult) > 0 
+        push(resultArray1, item)
+    End If
+Next
+
+Rem 关键信息
+For Each item In resultArray
+    keywords = []
+    For Each element In item
+        pattern = "(?:文献外借服务|卡证服务|费用免除服务|未成年人|老年人)"
+        arrRet = Regex.FindAll(element, pattern)
+        For Each match In arrRet
+            If InStr(1, Join(keywords, ","), match, true) = 0 
+                Push(keywords, match)
+            End If
+        Next
+    Next
+    
+    If Len(keywords) > 0 
+        Push(item, Join(keywords, "，"))  
+    Else
+        Push(item, "")  
+    End If
+Next
+
+Rem 输出前七天的数据（7天前到昨天）
+// 获取日期范围并格式化（保留格式化步骤，避免数值格式）
+currentDate = Time.Date()  
+yesterday = Time.DateAdd("d", -1, currentDate)  
+sevenDaysAgo = Time.DateAdd("d", -7, currentDate)  
+
+// 格式化日期为字符串（避免数值格式），用于后续转换对比
+sYesterday = Time.Format(yesterday, "yyyy-mm-dd")  
+sSevenDaysAgo = Time.Format(sevenDaysAgo, "yyyy-mm-dd")  
+
+// 测试数据
+// resultArray1 = [
+//     [
+//         "关于暂停国家数字图书馆APP在线办证功能的通知",
+//         "https://www.nlc.cn/web/dsb_zx/zxgg/20250731_2647288.shtml",
+//         "2025-07-31"
+//     ],
+//     [
+//         "测试记录1",
+//         "https://example.com/1",
+//         "2025/08/07"
+//     ],
+//     [
+//         "测试记录2",
+//         "https://example.com/2",
+//         "2025/8/7"
+//     ],
+//     [
+//         "测试记录3",
+//         "https://example.com/3",
+//         "2024-09-05"
+//     ],
+//     [
+//         "匹配记录1",
+//         "https://example.com/4",
+//         "2025-08-06"
+//     ],
+//     [
+//         "匹配记录2",
+//         "https://example.com/5",
+//         "2025.08.07"
+//     ],
+//     [
+//         "匹配记录3",
+//         "https://example.com/6",
+//         "2025/8/6"
+//     ]
+// ]
+
+resultArray2 = []
+
+For Each item In resultArray1
+    If IsArray(item) And UBound(item) >= 2 
+        dateStr = Trim(item[2])
+        isMatch = False
+        formattedRecordDate = ""  
+        
+        // 格式1: yyyy-mm-dd
+        If Regex.Test(dateStr, "^\\d{4}-\\d{1,2}-\\d{1,2}$") 
+            parts = Split(dateStr, "-")
+            If UBound(parts) = 2 
+                year = parts[0]
+                month = Right("0" + parts[1], 2)  //补零（如8→08）
+                day = Right("0" + parts[2], 2)    //补零（如7→07）
+                formattedRecordDate = year & "-" & month & "-" & day
+            End If
+        //格式2: yyyy/mm/dd
+        ElseIf Regex.Test(dateStr, "^\\d{4}/\\d{1,2}/\\d{1,2}$") 
+            parts = Split(dateStr, "/")
+            If UBound(parts) = 2 
+                year = parts[0]
+                month = Right("0" + parts[1], 2)
+                day = Right("0" + parts[2], 2)
+                formattedRecordDate = year & "-" & month & "-" & day // 转换为yyyy-mm-dd
+            End If
+        // 格式3: yyyy.mm.dd
+        ElseIf Regex.Test(dateStr, "^\\d{4}\\.\\d{1,2}\\.\\d{1,2}$") 
+            parts = Split(dateStr, ".")
+            If UBound(parts) = 2 
+                year = parts[0]
+                month = Right("0" + parts[1], 2)
+                day = Right("0" + parts[2], 2)
+                formattedRecordDate = year & "-" & month & "-" & day  //转换为yyyy-mm-dd
+            End If
+        End If
+        
+        //判断标准化后的记录日期是否在7天前到昨天之间
+        If formattedRecordDate <> "" 
+            // 字符串格式对比（yyyy-mm-dd可直接比较大小）
+            If formattedRecordDate >= sSevenDaysAgo And formattedRecordDate <= sYesterday 
+                isMatch = True
+            End If
+        End If
+
+        If isMatch 
+            resultArray2 = Push(resultArray2, item)
+        End If
+    End If
+Next
+
+TracePrint(resultArray2) 
+
+Rem 新增图书馆列
+// 测试数据
+// resultArray2 = [
+//     [
+//         "关于暂停国家数字图书馆APP在线办证功能的通知",
+//         "https://www.nlc.cn/web/dsb_zx/zxgg/20250731_2647288.shtml",
+//         "2025-07-31",
+//         "guanjianxinxi"
+
+//     ],
+//     [
+//         "测试记录1",
+//         "https://example.com/1",
+//         "2025/08/07",
+//         "guanjianxinxi"
+
+//     ],
+//     [
+//         "测试记录2",
+//         "https://example.com/2",
+//         "2025/8/7",
+//         "guanjianxinxi"
+
+//     ],
+//     [
+//         "测试记录3",
+//         "https://example.com/3",
+//         "2024-09-05",
+//         "guanjianxinxi"
+
+//     ],
+//     [
+//         "匹配记录1",
+//         "https://example.com/4",
+//         "2025-08-06",
+//         "guanjianxinxi"
+
+//     ],
+//     [
+//         "匹配记录2",
+//         "https://example.com/5",
+//         "2025.08.07",
+//         "guanjianxinxi"
+
+//     ],
+//     [
+//         "匹配记录3",
+//         "https://example.com/6",
+//         "2025/8/6",
+//         "guanjianxinxi"
+
+//     ]
+// ]
+
+newResultArray = []
+For Each item In resultArray2
+    newItem = [
+        "国家图书馆",
+        item[0],       
+        item[1],       
+        item[2],      
+        item[3]       
+    ]
+    
+    Push(newResultArray,newItem)
+Next
+resultArray2 = newResultArray
+TracePrint(resultArray2)
+
+Rem 写入Excel
+sYesterday1 = Time.Format(yesterday, "yyyymmdd")  
+sSevenDaysAgo1 = Time.Format(sevenDaysAgo, "yyyymmdd")  
+sRet = "("+sSevenDaysAgo1+"-"+sYesterday1+")"
+filePath = '''D:\Desktop\图书馆\服务通知查询\服务通知'''+sRet+'''.xlsx'''
+objExcelWorkBook = Excel.OpenExcel(filePath, true, "Excel", "", "")
+
+titleCheck = Excel.ReadCell(objExcelWorkBook, "Sheet1", "A1")
+If titleCheck = "" 
+    titleRow = [["图书馆名称", "标题","网页链接", "发布时间", "关键信息"]]
+    Excel.WriteRow(objExcelWorkBook, "Sheet1", "A1", titleRow, false)
+    startRow = 2 
+Else
+    iRowCount = Excel.GetRowsCount(objExcelWorkBook, "Sheet1")
+    startRow = iRowCount + 1  
+End If
+
+Delay(1000)
+If UBound(resultArray2) >= 0 And Len(resultArray2) > 0 
+    startCell = "A" & CStr(startRow)
+    Excel.WriteRange(objExcelWorkBook, "Sheet1", startCell, resultArray2, false)
+    TracePrint("数据已追加到Excel文件，从" & startCell & "开始")
+Else
+    TracePrint("没有找到匹配的数据，未写入内容")
+End If
+
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","A1",20,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","B1",80,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","C1",70,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","D1",10,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","E1",30,false)
+Excel.Save(objExcelWorkBook)
+
 Catch 异常
 TracePrint(异常)
 END Try

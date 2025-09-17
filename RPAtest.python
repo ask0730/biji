@@ -1,0 +1,297 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+国家图书馆新闻链接抓取程序
+基于原RPA代码转换为Python版本
+"""
+
+import requests
+from bs4 import BeautifulSoup
+import re
+import pandas as pd
+from datetime import datetime, timedelta
+import os
+import time
+from urllib.parse import urljoin, urlparse
+
+class NLCNewsCrawler:
+    def __init__(self):
+        self.base_url = "https://www.nlc.cn/"
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        })
+        
+        # 创建输出目录
+        self.output_dir = r"D:\Desktop\图书馆\服务通知查询"
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+    
+    def get_page_content(self, url):
+        """获取网页内容"""
+        try:
+            response = self.session.get(url, timeout=30)
+            response.raise_for_status()
+            response.encoding = 'utf-8'
+            return response.text
+        except Exception as e:
+            print(f"获取页面失败: {e}")
+            return None
+    
+    def parse_news_links(self, html_content):
+        """解析新闻链接"""
+        soup = BeautifulSoup(html_content, 'html.parser')
+        news_data = []
+        
+        print("开始解析网页内容...")
+        
+        # 查找所有可能的新闻链接
+        # 先尝试查找包含"最新公告"或"新闻"的区域
+        news_sections = soup.find_all(['div', 'ul'], class_=re.compile(r'.*news.*|.*announcement.*|.*notice.*|.*公告.*|.*新闻.*'))
+        
+        if not news_sections:
+            # 查找所有ul标签
+            news_sections = soup.find_all('ul')
+            print(f"找到 {len(news_sections)} 个ul标签")
+        
+        # 查找所有链接
+        all_links = soup.find_all('a', href=True)
+        print(f"找到 {len(all_links)} 个链接")
+        
+        # 过滤出可能的新闻链接
+        for link in all_links:
+            try:
+                title = link.get_text(strip=True)
+                href = link.get('href', '')
+                
+                # 跳过空标题或明显不是新闻的链接
+                if not title or len(title) < 3:
+                    continue
+                
+                # 跳过导航链接
+                if any(skip in title.lower() for skip in ['首页', '登录', '注册', '搜索', '更多', '更多>>', '>>']):
+                    continue
+                
+                # 处理相对链接
+                if href and not href.startswith('http'):
+                    href = urljoin(self.base_url, href)
+                
+                # 查找日期 - 在父元素中查找
+                date_str = ''
+                parent = link.parent
+                while parent and not date_str:
+                    # 查找日期元素
+                    date_elem = parent.find(['b', 'span', 'em'], string=re.compile(r'\d{4}[-/年]\d{1,2}[-/月]\d{1,2}[日]?'))
+                    if date_elem:
+                        date_str = date_elem.get_text(strip=True)
+                    else:
+                        # 在文本中查找日期
+                        date_pattern = r'\d{4}[-/年]\d{1,2}[-/月]\d{1,2}[日]?'
+                        date_match = re.search(date_pattern, parent.get_text())
+                        if date_match:
+                            date_str = date_match.group()
+                    parent = parent.parent
+                
+                # 如果还没找到日期，在整个链接文本中查找
+                if not date_str:
+                    date_pattern = r'\d{4}[-/年]\d{1,2}[-/月]\d{1,2}[日]?'
+                    date_match = re.search(date_pattern, title)
+                    if date_match:
+                        date_str = date_match.group()
+                
+                if title and href:
+                    news_data.append({
+                        'title': title,
+                        'url': href,
+                        'date': date_str
+                    })
+                    
+            except Exception as e:
+                print(f"解析链接失败: {e}")
+                continue
+        
+        print(f"解析到 {len(news_data)} 条新闻数据")
+        return news_data
+    
+    def filter_news(self, news_data):
+        """过滤新闻，保留符合条件的内容"""
+        # 根据原RPA代码的过滤规则
+        pattern = r'(?:调整\S*?(?:服务|时间)|扩大\S*?区域|优化\S*?|新增\S*?|(?:开馆|恢复开馆|临时闭馆)|(?:公告|通告)|通知|开放|服务调整|预约参观)'
+        
+        filtered_news = []
+        for item in news_data:
+            title = item['title']
+            if re.search(pattern, title):
+                # 提取关键信息
+                keywords = self.extract_keywords(item)
+                item['keywords'] = keywords
+                filtered_news.append(item)
+        
+        return filtered_news
+    
+    def extract_keywords(self, item):
+        """提取关键信息"""
+        keywords = []
+        keyword_pattern = r'(?:文献外借服务|卡证服务|费用免除服务|未成年人|老年人)'
+        
+        for key, value in item.items():
+            if isinstance(value, str):
+                matches = re.findall(keyword_pattern, value)
+                for match in matches:
+                    if match not in keywords:
+                        keywords.append(match)
+        
+        return '，'.join(keywords) if keywords else ''
+    
+    def filter_by_date_range(self, news_data, days=7):
+        """按日期范围过滤新闻"""
+        current_date = datetime.now()
+        yesterday = current_date - timedelta(days=1)
+        seven_days_ago = current_date - timedelta(days=days)
+        
+        filtered_news = []
+        
+        for item in news_data:
+            date_str = item.get('date', '').strip()
+            if not date_str:
+                continue
+            
+            # 标准化日期格式
+            formatted_date = self.normalize_date(date_str)
+            if not formatted_date:
+                continue
+            
+            # 检查日期是否在范围内
+            if seven_days_ago <= formatted_date <= yesterday:
+                filtered_news.append(item)
+        
+        return filtered_news
+    
+    def normalize_date(self, date_str):
+        """标准化日期格式"""
+        if not date_str:
+            return None
+        
+        # 移除中文
+        date_str = re.sub(r'[年月日]', '-', date_str)
+        
+        # 处理不同的日期格式
+        date_patterns = [
+            r'(\d{4})-(\d{1,2})-(\d{1,2})',  # yyyy-mm-dd
+            r'(\d{4})/(\d{1,2})/(\d{1,2})',  # yyyy/mm/dd
+            r'(\d{4})\.(\d{1,2})\.(\d{1,2})', # yyyy.mm.dd
+        ]
+        
+        for pattern in date_patterns:
+            match = re.match(pattern, date_str)
+            if match:
+                year, month, day = match.groups()
+                try:
+                    return datetime(int(year), int(month), int(day))
+                except ValueError:
+                    continue
+        
+        return None
+    
+    def save_to_excel(self, news_data):
+        """保存数据到Excel文件"""
+        if not news_data:
+            print("没有找到匹配的数据，未写入内容")
+            return
+        
+        # 准备数据
+        current_date = datetime.now()
+        yesterday = current_date - timedelta(days=1)
+        seven_days_ago = current_date - timedelta(days=7)
+        
+        date_range = f"({seven_days_ago.strftime('%Y%m%d')}-{yesterday.strftime('%Y%m%d')})"
+        filename = f"服务通知{date_range}.xlsx"
+        filepath = os.path.join(self.output_dir, filename)
+        
+        # 创建DataFrame
+        df_data = []
+        for item in news_data:
+            df_data.append([
+                "国家图书馆",
+                item['title'],
+                item['url'],
+                item['date'],
+                item.get('keywords', '')
+            ])
+        
+        df = pd.DataFrame(df_data, columns=['图书馆名称', '标题', '网页链接', '发布时间', '关键信息'])
+        
+        # 检查文件是否存在
+        if os.path.exists(filepath):
+            # 追加数据
+            existing_df = pd.read_excel(filepath)
+            combined_df = pd.concat([existing_df, df], ignore_index=True)
+            combined_df.to_excel(filepath, index=False)
+            print(f"数据已追加到Excel文件: {filepath}")
+        else:
+            # 创建新文件
+            df.to_excel(filepath, index=False)
+            print(f"数据已保存到Excel文件: {filepath}")
+        
+        # 调整列宽
+        with pd.ExcelWriter(filepath, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+            
+            # 设置列宽
+            worksheet.column_dimensions['A'].width = 20
+            worksheet.column_dimensions['B'].width = 80
+            worksheet.column_dimensions['C'].width = 70
+            worksheet.column_dimensions['D'].width = 15
+            worksheet.column_dimensions['E'].width = 30
+    
+    def crawl_news(self):
+        """主爬取函数"""
+        print("开始抓取国家图书馆新闻...")
+        
+        # 获取主页内容
+        html_content = self.get_page_content(self.base_url)
+        if not html_content:
+            print("无法获取网页内容")
+            return
+        
+        # 解析新闻链接
+        news_data = self.parse_news_links(html_content)
+        print(f"找到 {len(news_data)} 条新闻")
+        
+        if not news_data:
+            print("未找到新闻数据")
+            return
+        
+        # 过滤新闻
+        filtered_news = self.filter_news(news_data)
+        print(f"过滤后剩余 {len(filtered_news)} 条新闻")
+        
+        # 按日期范围过滤
+        date_filtered_news = self.filter_by_date_range(filtered_news)
+        print(f"日期过滤后剩余 {len(date_filtered_news)} 条新闻")
+        
+        # 保存到Excel
+        self.save_to_excel(date_filtered_news)
+        
+        # 打印结果
+        for i, item in enumerate(date_filtered_news, 1):
+            print(f"{i}. {item['title']}")
+            print(f"   链接: {item['url']}")
+            print(f"   日期: {item['date']}")
+            if item.get('keywords'):
+                print(f"   关键词: {item['keywords']}")
+            print()
+
+def main():
+    """主函数"""
+    crawler = NLCNewsCrawler()
+    crawler.crawl_news()
+
+if __name__ == "__main__":
+    main()
