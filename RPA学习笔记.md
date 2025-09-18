@@ -16,3 +16,6 @@
 
 内层窗口缺失贴到目标里：
 `{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}`
+
+开发语言
+BotScript（简称UB语言）
