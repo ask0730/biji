@@ -4,7 +4,7 @@ import time
 import random
 from urllib.parse import urlparse
 
-def download_pdf_stealth(url, filename=None, delay_range=(1, 3)):
+def download_pdf_stealth(url, filename=None, delay_range=(10, 20)):
     """
     隐蔽下载PDF文件
     
@@ -69,48 +69,9 @@ def download_pdf_stealth(url, filename=None, delay_range=(1, 3)):
     except Exception as e:
         print(f"发生错误: {e}")
 
-def download_pdf_simple(url, filename=None):
-    """
-    简单下载PDF文件（原版本）
-    """
-    try:
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        
-        if filename is None:
-            parsed_url = urlparse(url)
-            filename = os.path.basename(parsed_url.path)
-            if not filename.endswith('.pdf'):
-                filename = 'downloaded_file.pdf'
-        
-        if not filename.endswith('.pdf'):
-            filename += '.pdf'
-        
-        with open(filename, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
-        
-        print(f"PDF文件已成功下载: {filename}")
-        print(f"文件大小: {os.path.getsize(filename)} 字节")
-        
-    except requests.exceptions.RequestException as e:
-        print(f"下载失败: {e}")
-    except Exception as e:
-        print(f"发生错误: {e}")
-
 if __name__ == "__main__":
     # PDF下载链接
     pdf_url = "https://www.gzlib.com.cn/tcsoft/resources/files/20221215/33769c82-0734-4eb3-a0c1-f646f64320bf.pdf"
     
-    print("选择下载模式:")
-    print("1. 隐蔽模式 (推荐)")
-    print("2. 简单模式")
-    
-    choice = input("请输入选择 (1 或 2): ").strip()
-    
-    if choice == "1":
-        print("使用隐蔽模式下载...")
-        download_pdf_stealth(pdf_url, "stealth_downloaded_document.pdf")
-    else:
-        print("使用简单模式下载...")
-        download_pdf_simple(pdf_url, "simple_downloaded_document.pdf")
+    print("使用隐蔽模式下载PDF文件...")
+    download_pdf_stealth(pdf_url, "downloaded_document.pdf")
