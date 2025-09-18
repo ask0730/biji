@@ -4,7 +4,7 @@ import time
 import random
 from urllib.parse import urlparse
 
-def download_pdf_stealth(url, filename=None, delay_range=(10, 20)):
+def download_pdf_stealth(url, filename=None, delay_range=(1, 3)):
     """
     隐蔽下载PDF文件
     
@@ -69,9 +69,12 @@ def download_pdf_stealth(url, filename=None, delay_range=(10, 20)):
     except Exception as e:
         print(f"发生错误: {e}")
 
+
 if __name__ == "__main__":
     # PDF下载链接
     pdf_url = "https://www.gzlib.com.cn/tcsoft/resources/files/20221215/33769c82-0734-4eb3-a0c1-f646f64320bf.pdf"
     
-    print("使用隐蔽模式下载PDF文件...")
+    print("PDF下载工具")
+    print("=" * 30)
+    print("使用隐蔽模式下载...")
     download_pdf_stealth(pdf_url, "downloaded_document.pdf")
