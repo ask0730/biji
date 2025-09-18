@@ -2,15 +2,17 @@ import requests
 import os
 import time
 import random
+import sys
 from urllib.parse import urlparse
 
-def download_pdf_stealth(url, filename=None, delay_range=(1, 3)):
+def download_pdf_stealth(url, filename=None, save_dir=None, delay_range=(1, 3)):
     """
     隐蔽下载PDF文件
     
     Args:
         url (str): PDF文件的URL
         filename (str): 保存的文件名，如果为None则从URL中提取
+        save_dir (str): 保存目录，如果为None则保存到当前目录
         delay_range (tuple): 随机延迟范围（秒）
     """
     try:
@@ -53,13 +55,20 @@ def download_pdf_stealth(url, filename=None, delay_range=(1, 3)):
         if not filename.endswith('.pdf'):
             filename += '.pdf'
         
+        # 创建保存目录
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
+            file_path = os.path.join(save_dir, filename)
+        else:
+            file_path = filename
+        
         # 下载并保存文件
-        with open(filename, 'wb') as file:
+        with open(file_path, 'wb') as file:
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
         
-        print(f"PDF文件已成功下载: {filename}")
-        print(f"文件大小: {os.path.getsize(filename)} 字节")
+        print(f"PDF文件已成功下载: {file_path}")
+        print(f"文件大小: {os.path.getsize(file_path)} 字节")
         
         # 关闭会话
         session.close()
@@ -70,11 +79,32 @@ def download_pdf_stealth(url, filename=None, delay_range=(1, 3)):
         print(f"发生错误: {e}")
 
 
-if __name__ == "__main__":
-    # PDF下载链接
-    pdf_url = "https://www.gzlib.com.cn/tcsoft/resources/files/20221215/33769c82-0734-4eb3-a0c1-f646f64320bf.pdf"
+def main():
+    """主函数：处理命令行参数或使用默认值"""
+    # 默认参数
+    sPDFUrl = "https://www.nlc.cn/upload/attachments/2025-08-15/ad77d431.pdf"
+    sPDFName = "2025年国际图书馆年报"
+    
+    # 检查命令行参数
+    if len(sys.argv) >= 3:
+        sPDFUrl = sys.argv[1]
+        sPDFName = sys.argv[2]
+    elif len(sys.argv) == 2:
+        sPDFUrl = sys.argv[1]
+    
+    # 设置保存目录
+    save_directory = r"D:\Desktop\biji\图书馆\年报下载"
     
     print("PDF下载工具")
-    print("=" * 30)
+    print("=" * 50)
+    print(f"下载URL: {sPDFUrl}")
+    print(f"文件名: {sPDFName}")
+    print(f"保存目录: {save_directory}")
+    print("=" * 50)
+    
+    # 开始下载
     print("使用隐蔽模式下载...")
-    download_pdf_stealth(pdf_url, "downloaded_document.pdf")
+    download_pdf_stealth(sPDFUrl, sPDFName, save_directory)
+
+if __name__ == "__main__":
+    main()
