@@ -93,7 +93,7 @@ def main():
         sPDFUrl = sys.argv[1]
     
     # 设置保存目录
-    save_directory = r"D:\Desktop\biji\图书馆\年报下载"
+    save_directory = "C:\\Users\\Administrator\\Desktop\\图书馆\\年报下载"
     
     print("PDF下载工具")
     print("=" * 50)
