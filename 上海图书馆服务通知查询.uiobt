@@ -177,158 +177,23 @@ For i = 0 To UBound(arrayTitle) - 1
 Next
 TracePrint(resultArray)
 
-Rem 过滤数组
-resultArray1 = []
-pattern = "(?:调整\\S*?(?:服务|时间)|扩大\\S*?区域|优化\\S*?|新增\\S*?|(?:开馆|恢复开馆|临时闭馆)|(?:公告|通告)|通知|开放|服务调整|预约参观)"
-For Each item In resultArray
-    strTitle = item[0]
-        matchResult = Regex.Find(strTitle, pattern)
-    
-    If Len(matchResult) > 0 
-        push(resultArray1, item)
-    End If
-Next
+Rem 使用Python插件处理数据
+resultArray1 = library_data_processor.filter_library_data(resultArray)
 TracePrint(resultArray1)
 
-Rem 关键信息
-For Each item In resultArray1
-    keywords = []
-    For Each element In item
-        pattern = "(?:文献外借服务|卡证服务|费用免除服务|未成年人|老年人)"
-        arrRet = Regex.FindAll(element, pattern)
-        For Each match In arrRet
-            If InStr(1, Join(keywords, ","), match, true) = 0 
-                Push(keywords, match)
-            End If
-        Next
-    Next
-    
-    If Len(keywords) > 0 
-        Push(item, Join(keywords, "，"))  
-    Else
-        Push(item, "")  
-    End If
-Next
-
-Rem 输出前七天的数据（7天前到昨天）
-// 获取日期范围并格式化（保留格式化步骤，避免数值格式）
-currentDate = Time.Date()  
-yesterday = Time.DateAdd("d", -1, currentDate)  
-sevenDaysAgo = Time.DateAdd("d", -7, currentDate)  
-
-// 格式化日期为字符串（避免数值格式），用于后续转换对比
-sYesterday = Time.Format(yesterday, "yyyy-mm-dd")  
-sSevenDaysAgo = Time.Format(sevenDaysAgo, "yyyy-mm-dd")  
-
-// 测试数据
-// resultArray1 = [
-//     [
-//         "关于暂停国家数字图书馆APP在线办证功能的通知",
-//         "https://www.nlc.cn/web/dsb_zx/zxgg/20250731_2647288.shtml",
-//         "2025-07-31"
-//     ],
-//     [
-//         "测试记录1",
-//         "https://example.com/1",
-//         "2025/08/07"
-//     ],
-//     [
-//         "测试记录2",
-//         "https://example.com/2",
-//         "2025/8/7"
-//     ],
-//     [
-//         "测试记录3",
-//         "https://example.com/3",
-//         "2024-09-05"
-//     ],
-//     [
-//         "匹配记录1",
-//         "https://example.com/4",
-//         "2025-08-06"
-//     ],
-//     [
-//         "匹配记录2",
-//         "https://example.com/5",
-//         "2025.08.07"
-//     ],
-//     [
-//         "匹配记录3",
-//         "https://example.com/6",
-//         "2025/8/6"
-//     ]
-// ]
-
-resultArray2 = []
-
-For Each item In resultArray1
-    If IsArray(item) And UBound(item) >= 2 
-        dateStr = Trim(item[2])
-        isMatch = False
-        formattedRecordDate = ""  
-        
-        // 格式1: yyyy-mm-dd
-        If Regex.Test(dateStr, "^\\d{4}-\\d{1,2}-\\d{1,2}$") 
-            parts = Split(dateStr, "-")
-            If UBound(parts) = 2 
-                year = parts[0]
-                month = Right("0" + parts[1], 2)  //补零（如8→08）
-                day = Right("0" + parts[2], 2)    //补零（如7→07）
-                formattedRecordDate = year & "-" & month & "-" & day
-            End If
-        //格式2: yyyy/mm/dd
-        ElseIf Regex.Test(dateStr, "^\\d{4}/\\d{1,2}/\\d{1,2}$") 
-            parts = Split(dateStr, "/")
-            If UBound(parts) = 2 
-                year = parts[0]
-                month = Right("0" + parts[1], 2)
-                day = Right("0" + parts[2], 2)
-                formattedRecordDate = year & "-" & month & "-" & day // 转换为yyyy-mm-dd
-            End If
-        // 格式3: yyyy.mm.dd
-        ElseIf Regex.Test(dateStr, "^\\d{4}\\.\\d{1,2}\\.\\d{1,2}$") 
-            parts = Split(dateStr, ".")
-            If UBound(parts) = 2 
-                year = parts[0]
-                month = Right("0" + parts[1], 2)
-                day = Right("0" + parts[2], 2)
-                formattedRecordDate = year & "-" & month & "-" & day  //转换为yyyy-mm-dd
-            End If
-        End If
-        
-        //判断标准化后的记录日期是否在7天前到昨天之间
-        If formattedRecordDate <> "" 
-            // 字符串格式对比（yyyy-mm-dd可直接比较大小）
-            If formattedRecordDate >= sSevenDaysAgo And formattedRecordDate <= sYesterday 
-                isMatch = True
-            End If
-        End If
-
-        If isMatch 
-            resultArray2 = Push(resultArray2, item)
-        End If
-    End If
-Next
-
+Rem 使用Python插件按日期过滤数据（7天前到昨天）
+resultArray2 = library_data_processor.filter_by_date_range(resultArray1, 7)
 TracePrint(resultArray2) 
 
-Rem 新增图书馆列
-newResultArray = []
-For Each item In resultArray2
-    newItem = [
-        "上海图书馆",
-        item[0],       
-        item[1],       
-        item[2],      
-        item[3]       
-    ]
-    
-    Push(newResultArray,newItem)
-Next
-resultArray2 = newResultArray
+Rem 使用Python插件添加图书馆名称
+resultArray2 = library_data_processor.add_library_name(resultArray2, "上海图书馆")
 TracePrint(resultArray2)
 
 Rem 写入Excel
+// 重新计算日期用于文件名
+currentDate = Time.Date()  
+yesterday = Time.DateAdd("d", -1, currentDate)  
+sevenDaysAgo = Time.DateAdd("d", -7, currentDate)  
 sYesterday1 = Time.Format(yesterday, "yyyymmdd")  
 sSevenDaysAgo1 = Time.Format(sevenDaysAgo, "yyyymmdd")  
 sRet = "("+sSevenDaysAgo1+"-"+sYesterday1+")"
