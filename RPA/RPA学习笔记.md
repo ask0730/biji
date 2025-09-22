@@ -6,16 +6,21 @@
 
 ## 解决方法：
 ### 以下是成功和失败案例：
-成功获取链接
+- 成功获取链接
 {"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"DIV","parentid":"news","css-selector":"body>div>div>div>div>main>div>div>div>div>div>div>div>div>div>div>div"}]}
 {"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"span"},{"tag":"a","idx":0}],"exact":true,"vprops":["text","url"]},"props":["url"]}]}
 
-获取链接失败
+- 获取链接失败
 {"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"}],"html":[{"tag":"DIV","parentid":"news","css-selector":"body>div>div>div>div>main>div>div>div>div>div>div>div>div>div>div>div"}]}
 {"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"span"},{"tag":"a","idx":0}],"exact":true,"vprops":["text","url"]},"props":["url"]}]}
 
 内层窗口缺失贴到目标里：
 `{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}`
 
-开发语言
+# 2.开发语言
 BotScript（简称UB语言）
+
+# 3.在机器人指挥官部署流程
+- 1、新建流程
+- 2、在creator发布流程
+- 3、新建触发器
