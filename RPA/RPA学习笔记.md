@@ -17,10 +17,34 @@
 内层窗口缺失贴到目标里：
 `{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}`
 
+
+
 # 2.开发语言
 BotScript（简称UB语言）
+
+
+
 
 # 3.在机器人指挥官部署流程
 - 1、新建流程
 - 2、在creator发布流程
 - 3、新建触发器
+
+
+
+
+# 4.合并二维数组
+```vbscript
+resultArray = []
+For i = 0 To UBound(arrayTitle) - 1
+    newItem = [
+        arrayTitle[i][0],  
+        arrayHref[i][0],   
+        arrayDate[i][0]   
+    ]
+    push(resultArray, newItem)
+Next
+TracePrint(resultArray)
+```
+
+
