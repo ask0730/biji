@@ -80,8 +80,9 @@ left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
 on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
+where 1 = 1 
+-- and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 )  -- 人员档案标识为有效，人员类型为正式员工 
+-- and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
 and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
