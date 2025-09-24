@@ -803,9 +803,6 @@ class IndependentAuthorWanfangScraper:
             for paper in papers:
                 data.append({
                     '作者(arrayAuthor)': paper.get('authors', ''),
-                    '作者数量': paper.get('authors_count', 0),
-                    '第一作者': paper.get('first_author', ''),
-                    '所有作者': ';'.join(paper.get('all_authors', [])),
                     '论文名(arrayTitle)': paper.get('title', ''),
                     '期刊名(arrayJournal)': paper.get('journal', ''),
                     '发表时间(arrayTime)': paper.get('publish_time', ''),
