@@ -257,18 +257,331 @@ class IndependentAuthorWanfangScraper:
         }
         
         try:
-            # 提取标题
+            # 提取标题和链接
             try:
                 title_element = title_area.find_element(By.CSS_SELECTOR, ".title")
                 paper['title'] = title_element.text.strip()
                 
-                # 获取标题链接
+                # 尝试多种方法获取链接
+                link_found = False
+                
+                # 方法1: 从title元素中查找a标签
                 try:
                     title_link = title_element.find_element(By.TAG_NAME, "a")
                     if title_link:
                         paper['link'] = title_link.get_attribute('href')
+                        link_found = True
+                        print(f"从title的a标签找到链接: {paper['link']}")
                 except NoSuchElementException:
                     pass
+                
+                # 方法2: 从title-area中查找a标签
+                if not link_found:
+                    try:
+                        title_area_link = title_area.find_element(By.TAG_NAME, "a")
+                        if title_area_link:
+                            paper['link'] = title_area_link.get_attribute('href')
+                            link_found = True
+                            print(f"从title-area的a标签找到链接: {paper['link']}")
+                    except NoSuchElementException:
+                        pass
+                
+                # 方法3: 查找包含链接的其他元素
+                if not link_found:
+                    link_selectors = [
+                        ".link",
+                        ".url", 
+                        ".detail-link",
+                        ".paper-link",
+                        "[href*='detail']",
+                        "[href*='paper']",
+                        "[href*='wanfang']"
+                    ]
+                    
+                    for selector in link_selectors:
+                        try:
+                            link_element = title_area.find_element(By.CSS_SELECTOR, selector)
+                            if link_element:
+                                href = link_element.get_attribute('href')
+                                if href:
+                                    paper['link'] = href
+                                    link_found = True
+                                    print(f"使用选择器 '{selector}' 找到链接: {paper['link']}")
+                                    break
+                        except NoSuchElementException:
+                            continue
+                
+                # 方法4: 从父元素中查找链接
+                if not link_found:
+                    try:
+                        parent = title_area.find_element(By.XPATH, "..")
+                        parent_links = parent.find_elements(By.TAG_NAME, "a")
+                        for link in parent_links:
+                            href = link.get_attribute('href')
+                            if href and ('detail' in href or 'paper' in href or 'wanfang' in href):
+                                paper['link'] = href
+                                link_found = True
+                                print(f"从父元素找到链接: {paper['link']}")
+                                break
+                    except Exception as e:
+                        pass
+                
+                # 方法5: 查找所有可能的链接元素
+                if not link_found:
+                    try:
+                        all_links = title_area.find_elements(By.TAG_NAME, "a")
+                        for link in all_links:
+                            href = link.get_attribute('href')
+                            if href and ('detail' in href or 'paper' in href or 'wanfang' in href):
+                                paper['link'] = href
+                                link_found = True
+                                print(f"从title-area内所有链接中找到: {paper['link']}")
+                                break
+                    except Exception as e:
+                        pass
+                
+                # 方法6: 处理点击跳转的标题元素
+                if not link_found:
+                    try:
+                        # 检查标题元素是否可点击（有tabindex属性）
+                        tabindex = title_element.get_attribute('tabindex')
+                        if tabindex is not None:
+                            print(f"发现可点击的标题元素 (tabindex={tabindex})")
+                            
+                            # 方法6a: 尝试在新标签页中打开链接
+                            try:
+                                # 使用JavaScript在新标签页中打开链接
+                                self.driver.execute_script("arguments[0].click();", title_element)
+                                time.sleep(1)
+                                
+                                # 切换到新标签页
+                                if len(self.driver.window_handles) > 1:
+                                    self.driver.switch_to.window(self.driver.window_handles[-1])
+                                    new_url = self.driver.current_url
+                                    
+                                    if 'detail' in new_url or 'wanfang' in new_url:
+                                        paper['link'] = new_url
+                                        link_found = True
+                                        print(f"通过新标签页获取链接: {paper['link']}")
+                                    
+                                    # 关闭新标签页并返回原标签页
+                                    self.driver.close()
+                                    self.driver.switch_to.window(self.driver.window_handles[0])
+                                else:
+                                    print("点击后未打开新标签页")
+                                    
+                            except Exception as e:
+                                print(f"新标签页方法失败: {e}")
+                                
+                                # 方法6b: 尝试直接点击并返回
+                                try:
+                                    current_url = self.driver.current_url
+                                    title_element.click()
+                                    time.sleep(2)
+                                    
+                                    new_url = self.driver.current_url
+                                    if new_url != current_url:
+                                        paper['link'] = new_url
+                                        link_found = True
+                                        print(f"通过点击获取链接: {paper['link']}")
+                                        
+                                        # 返回原页面
+                                        self.driver.back()
+                                        time.sleep(1)
+                                    else:
+                                        print("点击标题后未发生页面跳转")
+                                        
+                                except Exception as e2:
+                                    print(f"直接点击方法也失败: {e2}")
+                        
+                        # 查找onclick事件
+                        if not link_found:
+                            onclick = title_element.get_attribute('onclick')
+                            if onclick:
+                                # 从onclick中提取URL
+                                url_match = re.search(r"['\"]([^'\"]*detail[^'\"]*)['\"]", onclick)
+                                if url_match:
+                                    paper['link'] = url_match.group(1)
+                                    link_found = True
+                                    print(f"从onclick事件找到链接: {paper['link']}")
+                        
+                        # 查找data属性
+                        if not link_found:
+                            data_attrs = ['data-url', 'data-link', 'data-href', 'data-detail', 'data-id']
+                            for attr in data_attrs:
+                                data_value = title_element.get_attribute(attr)
+                                if data_value:
+                                    # 如果是ID，构造完整URL
+                                    if attr == 'data-id':
+                                        paper['link'] = f"https://d.wanfangdata.com.cn/periodical/detail/{data_value}"
+                                    else:
+                                        paper['link'] = data_value
+                                    link_found = True
+                                    print(f"从{attr}属性找到链接: {paper['link']}")
+                                    break
+                    except Exception as e:
+                        pass
+                
+                # 方法7: 查找父容器中的所有链接
+                if not link_found:
+                    try:
+                        # 查找包含title-area的容器
+                        container = title_area.find_element(By.XPATH, "ancestor::*[contains(@class, 'item') or contains(@class, 'result') or contains(@class, 'paper')]")
+                        container_links = container.find_elements(By.TAG_NAME, "a")
+                        for link in container_links:
+                            href = link.get_attribute('href')
+                            if href and ('detail' in href or 'paper' in href or 'wanfang' in href):
+                                paper['link'] = href
+                                link_found = True
+                                print(f"从容器中找到链接: {paper['link']}")
+                                break
+                    except Exception as e:
+                        pass
+                
+                # 方法8: 查找兄弟元素中的链接
+                if not link_found:
+                    try:
+                        # 查找下一个兄弟元素
+                        next_sibling = title_area.find_element(By.XPATH, "following-sibling::*")
+                        sibling_links = next_sibling.find_elements(By.TAG_NAME, "a")
+                        for link in sibling_links:
+                            href = link.get_attribute('href')
+                            if href and ('detail' in href or 'paper' in href or 'wanfang' in href):
+                                paper['link'] = href
+                                link_found = True
+                                print(f"从兄弟元素找到链接: {paper['link']}")
+                                break
+                    except Exception as e:
+                        pass
+                
+                # 方法9: 通过分析页面结构构造链接
+                if not link_found:
+                    try:
+                        # 查找页面中可能包含论文ID的元素
+                        page_source = self.driver.page_source
+                        
+                        # 查找万方数据特有的编码ID模式
+                        id_patterns = [
+                            r'ChVQZXJpb2RpY2FsQ0hJMjAyNTA2MjIS[^"\'>\s]+',  # 万方特有的编码格式
+                            r'data-id="([^"]+)"',
+                            r'paperId["\']?\s*:\s*["\']?([^"\']+)["\']?',
+                            r'detail/([^"\'>\s]+)',
+                            r'id["\']?\s*:\s*["\']?([^"\']+)["\']?'
+                        ]
+                        
+                        for pattern in id_patterns:
+                            matches = re.findall(pattern, page_source)
+                            if matches:
+                                # 取第一个匹配的ID
+                                paper_id = matches[0]
+                                if len(paper_id) > 10:  # 万方ID通常比较长
+                                    paper['link'] = f"https://d.wanfangdata.com.cn/periodical/{paper_id}"
+                                    link_found = True
+                                    print(f"通过页面分析构造链接: {paper['link']}")
+                                    break
+                    except Exception as e:
+                        pass
+                
+                # 方法10: 查找Vue.js相关的数据属性
+                if not link_found:
+                    try:
+                        # 查找Vue.js的data属性
+                        vue_data_attrs = [
+                            'data-v-be67beae',  # 从HTML中看到的Vue scope ID
+                            'data-v-01ef3b52',
+                            'data-paper-id',
+                            'data-detail-id'
+                        ]
+                        
+                        for attr in vue_data_attrs:
+                            data_value = title_element.get_attribute(attr)
+                            if data_value and len(data_value) > 5:
+                                paper['link'] = f"https://d.wanfangdata.com.cn/periodical/{data_value}"
+                                link_found = True
+                                print(f"从Vue属性{attr}构造链接: {paper['link']}")
+                                break
+                    except Exception as e:
+                        pass
+                
+                # 方法11: 通过JavaScript获取链接信息
+                if not link_found:
+                    try:
+                        # 执行JavaScript来获取可能的链接信息
+                        js_code = """
+                        var titleElement = arguments[0];
+                        var linkInfo = {};
+                        
+                        // 查找所有可能的属性
+                        var attrs = ['data-id', 'data-url', 'data-link', 'data-href', 'data-detail'];
+                        for (var i = 0; i < attrs.length; i++) {
+                            var value = titleElement.getAttribute(attrs[i]);
+                            if (value) {
+                                linkInfo[attrs[i]] = value;
+                            }
+                        }
+                        
+                        // 查找父元素中的链接信息
+                        var parent = titleElement.parentElement;
+                        while (parent && parent.tagName !== 'BODY') {
+                            var links = parent.querySelectorAll('a[href*="wanfang"], a[href*="detail"]');
+                            if (links.length > 0) {
+                                linkInfo.parentHref = links[0].href;
+                                break;
+                            }
+                            parent = parent.parentElement;
+                        }
+                        
+                        return linkInfo;
+                        """
+                        
+                        link_info = self.driver.execute_script(js_code, title_element)
+                        
+                        # 处理获取到的链接信息
+                        for key, value in link_info.items():
+                            if value and ('wanfang' in value or 'detail' in value or len(value) > 10):
+                                if key == 'parentHref':
+                                    paper['link'] = value
+                                else:
+                                    paper['link'] = f"https://d.wanfangdata.com.cn/periodical/{value}"
+                                link_found = True
+                                print(f"通过JavaScript获取链接({key}): {paper['link']}")
+                                break
+                                
+                    except Exception as e:
+                        pass
+                
+                # 方法12: 查找页面中的万方编码ID
+                if not link_found:
+                    try:
+                        # 查找页面中所有可能的万方编码ID
+                        page_source = self.driver.page_source
+                        
+                        # 万方编码ID的特征模式
+                        wanfang_patterns = [
+                            r'ChVQZXJpb2RpY2FsQ0hJMjAyNTA2MjIS[A-Za-z0-9+/=]+',  # 完整的万方编码
+                            r'[A-Za-z0-9+/=]{50,}',  # 长编码字符串
+                        ]
+                        
+                        for pattern in wanfang_patterns:
+                            matches = re.findall(pattern, page_source)
+                            if matches:
+                                # 过滤出可能的万方ID
+                                for match in matches:
+                                    if len(match) > 50 and 'ChVQZXJpb2RpY2FsQ0hJMjAyNTA2MjIS' in match:
+                                        paper['link'] = f"https://d.wanfangdata.com.cn/periodical/{match}"
+                                        link_found = True
+                                        print(f"通过页面源码找到万方编码ID: {paper['link']}")
+                                        break
+                                if link_found:
+                                    break
+                    except Exception as e:
+                        pass
+                
+                if not link_found:
+                    print("未找到论文链接")
+                else:
+                    print(f"✅ 成功获取完整链接: {paper['link']}")
+                    print(f"   链接长度: {len(paper['link'])} 字符")
                     
             except NoSuchElementException:
                 print("未找到 .title")
