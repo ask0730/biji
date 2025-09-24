@@ -40,6 +40,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -48,6 +50,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
@@ -95,6 +98,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -103,6 +108,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
@@ -149,6 +155,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -157,6 +165,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
@@ -204,6 +213,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -212,6 +223,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
@@ -259,6 +271,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -267,6 +281,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
@@ -312,6 +327,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -320,6 +337,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
@@ -350,6 +368,8 @@ left outer join org_dept org_dept
 on org_dept.pk_dept = T1.pk_dept 
 left outer join hi_entryapply hi_entryapply 
 on hi_entryapply.pk_psnjob = T1.pk_psnjob 
+left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
+on t2.def2 = bd_defdoc_zzlx.pk_defdoc
 left outer join bd_psncl  --人员类别
 on T1.pk_psncl=bd_psncl.pk_psncl
 where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
@@ -358,6 +378,7 @@ and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职�
 and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
+and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
 )a
 
