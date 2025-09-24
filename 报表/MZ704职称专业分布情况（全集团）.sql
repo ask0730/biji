@@ -1,31 +1,67 @@
--- t_2
+-- MZ704职称专业分布情况（全集团）- 合并查询
 select 
---总数
-count(a.wxg) wxg
-,count(a.kfy) kfy
-,count(a.yxg) yxg
-,count(a.zyxg) zyxg
-,count(a.ccg) ccg
-,count(a.czg)czg
-,count(a.hg) hg
-,count(a.dg) dg
+-- 总数（排除未评定专业技术职务）
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '燃气具安装维修工' then 1 end) wxg,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '管道燃气客服员' then 1 end) kfy,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '燃气管网运行工' then 1 end) yxg,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '压缩天然气场站运行工' then 1 end) zyxg,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '液化天然气储运工' then 1 end) ccg,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '压缩机操作工' then 1 end) czg,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '焊工' then 1 end) hg,
+count(case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '高压电工' then 1 end) dg,
 
+-- 高级技师（一级）
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '燃气具安装维修工' then 1 end) wxg2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '管道燃气客服员' then 1 end) kfy2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '燃气管网运行工' then 1 end) yxg2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '压缩天然气场站运行工' then 1 end) zyxg2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '液化天然气储运工' then 1 end) ccg2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '压缩机操作工' then 1 end) czg2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '焊工' then 1 end) hg2,
+count(case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '高压电工' then 1 end) dg2,
 
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '燃气具安装维修工'  then 1 end wxg
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '管道燃气客服员'  then 1 end kfy
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '燃气管网运行工'  then 1 end yxg
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '压缩天然气场站运行工'  then 1 end zyxg
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '液化天然气储运工'  then 1 end ccg
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '压缩机操作工'  then 1 end czg
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '焊工'  then 1 end hg
-,case when T3.glbdef1.name<>'没有取得资格证书' and T3.glbdef3 = '高压电工'  then 1 end dg
+-- 技师（二级）
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '燃气具安装维修工' then 1 end) wxg3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '管道燃气客服员' then 1 end) kfy3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '燃气管网运行工' then 1 end) yxg3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '压缩天然气场站运行工' then 1 end) zyxg3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '液化天然气储运工' then 1 end) ccg3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '压缩机操作工' then 1 end) czg3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '焊工' then 1 end) hg3,
+count(case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '高压电工' then 1 end) dg3,
 
+-- 高级工（三级）
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '燃气具安装维修工' then 1 end) wxg4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '管道燃气客服员' then 1 end) kfy4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '燃气管网运行工' then 1 end) yxg4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '压缩天然气场站运行工' then 1 end) zyxg4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '液化天然气储运工' then 1 end) ccg4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '压缩机操作工' then 1 end) czg4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '焊工' then 1 end) hg4,
+count(case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '高压电工' then 1 end) dg4,
 
+-- 中级工（四级）
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '燃气具安装维修工' then 1 end) wxg5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '管道燃气客服员' then 1 end) kfy5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '燃气管网运行工' then 1 end) yxg5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '压缩天然气场站运行工' then 1 end) zyxg5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '液化天然气储运工' then 1 end) ccg5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '压缩机操作工' then 1 end) czg5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '焊工' then 1 end) hg5,
+count(case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '高压电工' then 1 end) dg5,
+
+-- 初级工（五级）
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '燃气具安装维修工' then 1 end) wxg6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '管道燃气客服员' then 1 end) kfy6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '燃气管网运行工' then 1 end) yxg6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '压缩天然气场站运行工' then 1 end) zyxg6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '液化天然气储运工' then 1 end) ccg6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '压缩机操作工' then 1 end) czg6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '焊工' then 1 end) hg6,
+count(case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '高压电工' then 1 end) dg6,
+
+-- 没有取得资格证书
+count(case when T3.glbdef1.name = '没有取得资格证书' then 1 end) wzg7
 
 from bd_psndoc bd_psndoc 
 inner join hi_psnorg hi_psnorg 
@@ -52,340 +88,3 @@ and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
 and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
 order by T1.showorder
-)a
-
-
-
--- t_3
-select 
---总数
-count(a.wxg) wxg2
-,count(a.kfy) kfy2
-,count(a.yxg) yxg2
-,count(a.zyxg) zyxg2
-,count(a.ccg) ccg2
-,count(a.czg) czg2
-,count(a.hg) hg2
-,count(a.dg) dg2
-
-
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '燃气具安装维修工'  then 1 end wxg
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '管道燃气客服员'  then 1 end kfy
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '燃气管网运行工'  then 1 end yxg
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '压缩天然气场站运行工'  then 1 end zyxg
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '液化天然气储运工'  then 1 end ccg
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '压缩机操作工'  then 1 end czg
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '焊工'  then 1 end hg
-,case when T3.glbdef1.name = '高级技师（一级）' and T3.glbdef3 = '高压电工'  then 1 end dg
-
-
-
-from bd_psndoc bd_psndoc 
-inner join hi_psnorg hi_psnorg 
-on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join hi_psnjob T1 
-ON T1.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_adminorg T2 
-ON T2.pk_adminorg = T1.pk_org 
-left outer join hi_psndoc_glbdef2 T3 
-ON T3.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_dept org_dept 
-on org_dept.pk_dept = T1.pk_dept 
-left outer join hi_entryapply hi_entryapply 
-on hi_entryapply.pk_psnjob = T1.pk_psnjob 
-left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
-on t2.def2 = bd_defdoc_zzlx.pk_defdoc
-left outer join bd_psncl  --人员类别
-on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
-and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
-and bd_psncl.name in (parameter('rylb'))
-and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
-order by T1.showorder
-)a
-
-
-
--- t_4
-select 
---总数
-count(a.wxg) wxg3
-,count(a.kfy) kfy3
-,count(a.yxg) yxg3
-,count(a.zyxg) zyxg3
-,count(a.ccg) ccg3
-,count(a.czg) czg3
-,count(a.hg) hg3
-,count(a.dg) dg3
-
-
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '燃气具安装维修工'  then 1 end wxg
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '管道燃气客服员'  then 1 end kfy
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '燃气管网运行工'  then 1 end yxg
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '压缩天然气场站运行工'  then 1 end zyxg
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '液化天然气储运工'  then 1 end ccg
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '压缩机操作工'  then 1 end czg
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '焊工'  then 1 end hg
-,case when T3.glbdef1.name = '技师（二级）' and T3.glbdef3 = '高压电工'  then 1 end dg
-
-
-from bd_psndoc bd_psndoc 
-inner join hi_psnorg hi_psnorg 
-on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join hi_psnjob T1 
-ON T1.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_adminorg T2 
-ON T2.pk_adminorg = T1.pk_org 
-left outer join hi_psndoc_glbdef2 T3 
-ON T3.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_dept org_dept 
-on org_dept.pk_dept = T1.pk_dept 
-left outer join hi_entryapply hi_entryapply 
-on hi_entryapply.pk_psnjob = T1.pk_psnjob 
-left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
-on t2.def2 = bd_defdoc_zzlx.pk_defdoc
-left outer join bd_psncl  --人员类别
-on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
-and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
-and bd_psncl.name in (parameter('rylb'))
-and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
-order by T1.showorder
-)a
-
-
-
-
--- t_5
-select 
---总数
-count(a.wxg) wxg4
-,count(a.kfy) kfy4
-,count(a.yxg) yxg4
-,count(a.zyxg) zyxg4
-,count(a.ccg) ccg4
-,count(a.czg) czg4
-,count(a.hg) hg4
-,count(a.dg) dg4
-
-
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '燃气具安装维修工'  then 1 end wxg
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '管道燃气客服员'  then 1 end kfy
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '燃气管网运行工'  then 1 end yxg
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '压缩天然气场站运行工'  then 1 end zyxg
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '液化天然气储运工'  then 1 end ccg
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '压缩机操作工'  then 1 end czg
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '焊工'  then 1 end hg
-,case when T3.glbdef1.name = '高级工（三级）' and T3.glbdef3 = '高压电工'  then 1 end dg
-
-
-from bd_psndoc bd_psndoc 
-inner join hi_psnorg hi_psnorg 
-on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join hi_psnjob T1 
-ON T1.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_adminorg T2 
-ON T2.pk_adminorg = T1.pk_org 
-left outer join hi_psndoc_glbdef2 T3 
-ON T3.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_dept org_dept 
-on org_dept.pk_dept = T1.pk_dept 
-left outer join hi_entryapply hi_entryapply 
-on hi_entryapply.pk_psnjob = T1.pk_psnjob 
-left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
-on t2.def2 = bd_defdoc_zzlx.pk_defdoc
-left outer join bd_psncl  --人员类别
-on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
-and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
-and bd_psncl.name in (parameter('rylb'))
-and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
-order by T1.showorder
-)a
-
-
-
-
--- t_6
-select 
---总数
-count(a.wxg) wxg5
-,count(a.kfy) kfy5
-,count(a.yxg) yxg5
-,count(a.zyxg) zyxg5
-,count(a.ccg) ccg5
-,count(a.czg) czg5
-,count(a.hg) hg5
-,count(a.dg) dg5
-
-
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '燃气具安装维修工'  then 1 end wxg
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '管道燃气客服员'  then 1 end kfy
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '燃气管网运行工'  then 1 end yxg
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '压缩天然气场站运行工'  then 1 end zyxg
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '液化天然气储运工'  then 1 end ccg
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '压缩机操作工'  then 1 end czg
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '焊工'  then 1 end hg
-,case when T3.glbdef1.name = '中级工（四级）' and T3.glbdef3 = '高压电工'  then 1 end dg
-
-
-from bd_psndoc bd_psndoc 
-inner join hi_psnorg hi_psnorg 
-on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join hi_psnjob T1 
-ON T1.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_adminorg T2 
-ON T2.pk_adminorg = T1.pk_org 
-left outer join hi_psndoc_glbdef2 T3 
-ON T3.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_dept org_dept 
-on org_dept.pk_dept = T1.pk_dept 
-left outer join hi_entryapply hi_entryapply 
-on hi_entryapply.pk_psnjob = T1.pk_psnjob 
-left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
-on t2.def2 = bd_defdoc_zzlx.pk_defdoc
-left outer join bd_psncl  --人员类别
-on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
-and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
-and bd_psncl.name in (parameter('rylb'))
-and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
-order by T1.showorder
-)a
-
-
--- t_7
-select 
---总数
-count(a.wxg) wxg6
-,count(a.kfy) kfy6
-,count(a.yxg) yxg6
-,count(a.zyxg) zyxg6
-,count(a.ccg) ccg6
-,count(a.czg) czg6
-,count(a.hg) hg6
-,count(a.dg) dg6
-
-
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '燃气具安装维修工'  then 1 end wxg
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '管道燃气客服员'  then 1 end kfy
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '燃气管网运行工'  then 1 end yxg
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '压缩天然气场站运行工'  then 1 end zyxg
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '液化天然气储运工'  then 1 end ccg
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '压缩机操作工'  then 1 end czg
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '焊工'  then 1 end hg
-,case when T3.glbdef1.name = '初级工（五级）' and T3.glbdef3 = '高压电工'  then 1 end dg
-
-
-from bd_psndoc bd_psndoc 
-inner join hi_psnorg hi_psnorg 
-on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join hi_psnjob T1 
-ON T1.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_adminorg T2 
-ON T2.pk_adminorg = T1.pk_org 
-left outer join hi_psndoc_glbdef2 T3 
-ON T3.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_dept org_dept 
-on org_dept.pk_dept = T1.pk_dept 
-left outer join hi_entryapply hi_entryapply 
-on hi_entryapply.pk_psnjob = T1.pk_psnjob 
-left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
-on t2.def2 = bd_defdoc_zzlx.pk_defdoc
-left outer join bd_psncl  --人员类别
-on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
-and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
-and bd_psncl.name in (parameter('rylb'))
-and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
-order by T1.showorder
-)a
-
-
-
-
--- t_8
-select 
---总数
-count(a.wzg) wzg7
-from (
-select distinct
-T1.pk_psnjob 
-,bd_psndoc.name
---总数（排除未评定专业技术职务）
-,case when T3.glbdef1.name = '没有取得资格证书'  then 1 end wzg
-
-from bd_psndoc bd_psndoc 
-inner join hi_psnorg hi_psnorg 
-on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join hi_psnjob T1 
-ON T1.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_adminorg T2 
-ON T2.pk_adminorg = T1.pk_org 
-left outer join hi_psndoc_glbdef2 T3 
-ON T3.pk_psndoc = bd_psndoc.pk_psndoc 
-left outer join org_dept org_dept 
-on org_dept.pk_dept = T1.pk_dept 
-left outer join hi_entryapply hi_entryapply 
-on hi_entryapply.pk_psnjob = T1.pk_psnjob 
-left outer join bd_defdoc bd_defdoc_zzlx  --组织类型
-on t2.def2 = bd_defdoc_zzlx.pk_defdoc
-left outer join bd_psncl  --人员类别
-on T1.pk_psncl=bd_psncl.pk_psncl
-where 1 = 1 and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
-and T1.endflag='N' and T1.lastflag='Y' and T1.ismainjob='Y'  and T1.trnsevent <> '4'
-and T3.glbdef7.name='已聘任该项技能等级'--是否聘任专业技术职务为'已聘任该项专业技术职务'
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param2'),'yyyy-mm-dd')
-and bd_psncl.name in (parameter('rylb'))
-and t2.name in (parameter('zzmc'))
-and bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部','子公司','子公司下属分公司','子公司下属子公司')
-order by T1.showorder
-)a
-
-
--- 连接条件:
-表2全连接表3 1=1
-表2全连接表4 1=1
-表2全连接表5 1=1
-表2全连接表6 1=1
-表2全连接表7 1=1
