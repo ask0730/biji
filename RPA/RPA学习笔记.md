@@ -15,8 +15,9 @@
 {"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"span"},{"tag":"a","idx":0}],"exact":true,"vprops":["text","url"]},"props":["url"]}]}
 
 内层窗口缺失贴到目标里：
-`{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}`
-
+```
+{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}
+```
 
 
 # 2.开发语言
