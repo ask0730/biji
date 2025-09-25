@@ -47,4 +47,40 @@ Next
 TracePrint(resultArray)
 ```
 
+# 5.拆分二维数组
+```vb
+Rem 获取标题和日期
+// arrayData = [
+//     [
+//         "置顶\n上海图书馆（上海科学技术情报研究所）2025年国庆节、中秋节期间开放公告\n2025-09-22"
+//     ],
+//     [
+//         "置顶\n邀请读者为上海图书馆\"十五五\"发展规划建言献策\n2025-08-05"
+//     ],
+//     [
+//         "上海图书馆电话总机临时关闭公告\n2025-09-17"
+//     ]
+// ]
 
+arrayTitle = []
+arrayDate = []
+
+For i = 0 To UBound(arrayData) - 1
+    strOriginal = arrayData[i][0]
+    arrParts = Split(strOriginal, "\n")
+    
+    If UBound(arrParts) >= 2 And arrParts[0] = "置顶" Then
+        strTitle = arrParts[1]
+        strDate = arrParts[2]
+    ElseIf UBound(arrParts) >= 1 Then
+        strTitle = arrParts[0]
+        strDate = arrParts[1]
+    Else
+        strTitle = strOriginal
+        strDate = ""
+    End If
+    
+    Push(arrayTitle, [strTitle])
+    Push(arrayDate, [strDate])
+Next
+```
