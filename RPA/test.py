@@ -12,12 +12,15 @@ def init_logger():
     os.makedirs(log_dir, exist_ok=True)
     log_path = os.path.join(log_dir, "api_debug.log")
 
-    logging.basicConfig(
-        filename=log_path,
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        encoding="utf-8"
-    )
+    # Create file handler with UTF-8 encoding for Python 3.7.1 compatibility
+    file_handler = logging.FileHandler(log_path, encoding='utf-8')
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    file_handler.setFormatter(formatter)
+    
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
     return logging.getLogger()
 
 
