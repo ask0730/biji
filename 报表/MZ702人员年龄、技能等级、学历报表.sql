@@ -1,6 +1,6 @@
 -- t_1
 select 
-gwxl,gslx 
+a.zzmc,gwxl,gslx 
 ,count(distinct pk_psndoc) zs
 ,count(distinct case when hz = 1 then pk_psndoc end) hz,count(distinct case when bshz = 1 then pk_psndoc end) bshz
 ,count(distinct case when nan = 1 then pk_psndoc end) nan ,count(distinct case when nv = 1 then pk_psndoc end) nv
@@ -9,6 +9,7 @@ gwxl,gslx
 ,count(distinct case when gzjyx = 1 then pk_psndoc end) gzjyx,count(distinct case when dxzk = 1 then pk_psndoc end) dxzk,count(distinct case when dxbk = 1 then pk_psndoc end) dxbk,count(distinct case when ss = 1 then pk_psndoc end) ss,count(distinct case when bs = 1 then pk_psndoc end) bs
 from 
 (select bd_psndoc.pk_psndoc,
+T2.name zzmc,
 case when  bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') then '母公司'
 when  bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司')
 and bd_defdoc_dwszd.name ='京内' then '京内子公司'
@@ -90,18 +91,24 @@ and
 (T1.pk_postseries in ( '10011T100000000098AQ' , '10011T100000000098AT' , '10011T100000000098AU' , '10011T100000000098AV' , '10011T100000000098AW' , '10011T100000000098AX' , '10011T100000000098AY' , '10011T100000000098AZ' )  or
 T1.pk_postseries in ( '10011T100000000098AR' , '10011T100000000098B0' , '10011T100000000098BB' , '10011T100000000098BP' , '10011T100000000098BQ' , '10011T100000000098BT' , '10011T100000000098BU' , '10011T100000000098BV' , '10011T100000000098BW' , '10011T100000000098BX' , '10011T100000000098BY' , '10011T100000000098BZ' , '10011T100000000098C0' , '10011T100000000098C1' , '10011T100000000098C2' , '10011T100000000098C3' , '10011T1000000000A73M' , '10011T100000000098B1' , '10011T100000000098C4' , '10011T100000000098C5' , '10011T100000000098C6' , '10011T100000000098C7' , '10011T100000000098CH' , '10011T100000000098CI' , '10011T100000000098CJ' , '10011T100000000098CK' , '10011T100000000098CL' , '10011T100000000098CM' , '10011T100000000098CN' , '10011T100000000098CO' , '10011T100000000098CP' , '10011T100000000098CQ' , '10011T100000000098CR' , '10011T100000000098CS' , '10011T100000000098CT' , '10011T100000000098CU' , '10011T100000000098DP' , '10011T100000000098DQ' , '10011T100000000098DR' , '10011T100000000098DS' , '10011T100000000098DT' , '10011T100000000098DU' , '10011T100000000098B7' , '10011T100000000098DV' , '10011T100000000098DW' , '10011T100000000098DX' , '10011T100000000098DY' , '10011T100000000098DZ' , '10011T100000000098E0' , '10011T100000000098E1' , '10011T100000000098E2' , '10011T100000000098E3' , '10011T100000000098BA' ))
 -- 修改：调整时间条件，允许查询在指定时间范围内有工作经历的员工（包括已离职）
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param1'),'yyyy-mm-dd')
+and T1.begindate<='2099-12-31' and nvl(T1.enddate, '2099-12-31') >= '1950-01-01'
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
 and bd_defdoc_zzlx.name in (parameter('zzlx'))
+-- 只显示有公司类型的组织名称
+and (
+  bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') 
+  or (bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司') and bd_defdoc_dwszd.name in ('京内','京外','境外'))
+)
 order by T1.showorder)a 
 where rn = 1
-group by gwxl,gslx order by gwxl,gslx
+group by a.zzmc,gwxl,gslx order by a.zzmc,gwxl,gslx
 
 -- t_2
 
-select count(distinct case when wdj = 1 then pk_psndoc end) wdj,count(distinct case when cj = 1 then pk_psndoc end) cj,count(distinct case when zj = 1 then pk_psndoc end) zj,count(distinct case when fgj = 1 then pk_psndoc end) fgj,count(distinct case when zgj = 1 then pk_psndoc end) zgj,gwxl,gslx from 
+select count(distinct case when wdj = 1 then pk_psndoc end) wdj,count(distinct case when cj = 1 then pk_psndoc end) cj,count(distinct case when zj = 1 then pk_psndoc end) zj,count(distinct case when fgj = 1 then pk_psndoc end) fgj,count(distinct case when zgj = 1 then pk_psndoc end) zgj,a.zzmc,gwxl,gslx from 
 (select bd_psndoc.pk_psndoc,
+T2.name zzmc,
 case when  bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') then '母公司'
 when  bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司')
 and bd_defdoc_dwszd.name ='京内' then '京内子公司'
@@ -165,14 +172,19 @@ and
 (T1.pk_postseries in ( '10011T100000000098AQ' , '10011T100000000098AT' , '10011T100000000098AU' , '10011T100000000098AV' , '10011T100000000098AW' , '10011T100000000098AX' , '10011T100000000098AY' , '10011T100000000098AZ' )  or
 T1.pk_postseries in ( '10011T100000000098AR' , '10011T100000000098B0' , '10011T100000000098BB' , '10011T100000000098BP' , '10011T100000000098BQ' , '10011T100000000098BT' , '10011T100000000098BU' , '10011T100000000098BV' , '10011T100000000098BW' , '10011T100000000098BX' , '10011T100000000098BY' , '10011T100000000098BZ' , '10011T100000000098C0' , '10011T100000000098C1' , '10011T100000000098C2' , '10011T100000000098C3' , '10011T1000000000A73M' , '10011T100000000098B1' , '10011T100000000098C4' , '10011T100000000098C5' , '10011T100000000098C6' , '10011T100000000098C7' , '10011T100000000098CH' , '10011T100000000098CI' , '10011T100000000098CJ' , '10011T100000000098CK' , '10011T100000000098CL' , '10011T100000000098CM' , '10011T100000000098CN' , '10011T100000000098CO' , '10011T100000000098CP' , '10011T100000000098CQ' , '10011T100000000098CR' , '10011T100000000098CS' , '10011T100000000098CT' , '10011T100000000098CU' , '10011T100000000098DP' , '10011T100000000098DQ' , '10011T100000000098DR' , '10011T100000000098DS' , '10011T100000000098DT' , '10011T100000000098DU' , '10011T100000000098B7' , '10011T100000000098DV' , '10011T100000000098DW' , '10011T100000000098DX' , '10011T100000000098DY' , '10011T100000000098DZ' , '10011T100000000098E0' , '10011T100000000098E1' , '10011T100000000098E2' , '10011T100000000098E3' , '10011T100000000098BA' ))
 -- 修改：调整时间条件，允许查询在指定时间范围内有工作经历的员工（包括已离职）
-and T1.begindate<=datefmt(parameter('param2'),'yyyy-mm-dd') and nvl(T1.enddate, '2099-12-31') >= datefmt(parameter('param1'),'yyyy-mm-dd')
+and T1.begindate<='2099-12-31' and nvl(T1.enddate, '2099-12-31') >= '1950-01-01'
 and bd_psncl.name in (parameter('rylb'))
 and t2.name in (parameter('zzmc'))
 and bd_defdoc_zzlx.name in (parameter('zzlx'))
+-- 只显示有公司类型的组织名称
+and (
+  bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') 
+  or (bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司') and bd_defdoc_dwszd.name in ('京内','京外','境外'))
+)
 order by T1.showorder
 )a 
 where rn = 1
-group by gwxl,gslx order by gwxl,gslx
+group by a.zzmc,gwxl,gslx order by a.zzmc,gwxl,gslx
 
 
 -- 连接结构（使用LEFT JOIN避免数据丢失）
