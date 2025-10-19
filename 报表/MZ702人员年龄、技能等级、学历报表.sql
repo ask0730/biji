@@ -88,9 +88,13 @@ from (
     and T1.pk_psnjob = (
       select max(pk_psnjob) 
       from hi_psnjob T1_dup 
+      left outer join org_adminorg T2_dup on T2_dup.pk_adminorg = T1_dup.pk_org 
+      left outer join bd_defdoc bd_defdoc_dwszd_dup on T2_dup.def4 = bd_defdoc_dwszd_dup.pk_defdoc
       where T1_dup.pk_psndoc = T1.pk_psndoc 
         and T1_dup.lastflag='Y' 
         and T1_dup.ismainjob='Y'
+        -- 关键修改：只在该组织范围内选择最新记录
+        and bd_defdoc_dwszd_dup.name = bd_defdoc_dwszd.name
     ) 
     and (
       T1.pk_postseries in ( '10011T100000000098AQ' , '10011T100000000098AT' , '10011T100000000098AU' , '10011T100000000098AV' , '10011T100000000098AW' , '10011T100000000098AX' , '10011T100000000098AY' , '10011T100000000098AZ' )  or
@@ -125,4 +129,15 @@ join (
     and T1.lastflag='Y' and T1.ismainjob='Y'
     and T1.begindate<='2099-12-31' and isnull(T1.enddate, '2099-12-31') >= '1950-01-01'
     and bd_defdoc_zzlx.name in (parameter('zzlx'))
+    -- 使用相同的组织范围逻辑
+    and T1.pk_psnjob = (
+      select max(pk_psnjob) 
+      from hi_psnjob T1_dup_org
+      left outer join org_adminorg T2_dup_org on T2_dup_org.pk_adminorg = T1_dup_org.pk_org 
+      left outer join bd_defdoc bd_defdoc_dwszd_dup_org on T2_dup_org.def4 = bd_defdoc_dwszd_dup_org.pk_defdoc
+      where T1_dup_org.pk_psndoc = T1.pk_psndoc 
+        and T1_dup_org.lastflag='Y' 
+        and T1_dup_org.ismainjob='Y'
+        and bd_defdoc_dwszd_dup_org.name = bd_defdoc_dwszd.name
+    )
 ) orgs on orgs.gslx = agg.gslx
