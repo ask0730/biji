@@ -57,17 +57,17 @@ from (
     count(distinct case when defdoc.code in ('2','21','28','29') then bd_psndoc.pk_psndoc end) as dxbk,
     count(distinct case when defdoc.code in ('1','14','15','16','17','18','19') then bd_psndoc.pk_psndoc end) as ss,
     count(distinct case when defdoc.code in ('0','11','12','13') then bd_psndoc.pk_psndoc end) as bs,
-    count(distinct case when (T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '未评定专业技术职务') 
+    count(distinct case when (T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and defdoc_1.name = '未评定专业技术职务') 
                            or (T3.pk_psndoc is null) 
                            or (T3.glbdef8 is null)
                            or (T3.glbdef4 is null)
                       then bd_psndoc.pk_psndoc end) as wdj,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and (T3.glbdef4.name = '助理级专业技术职务' or T3.glbdef4.name = '员级专业技术职务') then bd_psndoc.pk_psndoc end) as cj,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '中级专业技术职务' then bd_psndoc.pk_psndoc end) as zj,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '副高级专业技术职务' then bd_psndoc.pk_psndoc end) as fgj,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '正高级专业技术职务' then bd_psndoc.pk_psndoc end) as zgj,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '首席技师' then bd_psndoc.pk_psndoc end) as sxjs,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '特级技师' then bd_psndoc.pk_psndoc end) as tjjs
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and (defdoc_1.name = '助理级专业技术职务' or defdoc_1.name = '员级专业技术职务') then bd_psndoc.pk_psndoc end) as cj,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and defdoc_1.name = '中级专业技术职务' then bd_psndoc.pk_psndoc end) as zj,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and defdoc_1.name = '副高级专业技术职务' then bd_psndoc.pk_psndoc end) as fgj,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and defdoc_1.name = '正高级专业技术职务' then bd_psndoc.pk_psndoc end) as zgj,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and defdoc_1.name = '首席技师' then bd_psndoc.pk_psndoc end) as sxjs,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and defdoc_1.name = '特级技师' then bd_psndoc.pk_psndoc end) as tjjs
   from 
   bd_psndoc bd_psndoc 
     inner join hi_psnorg hi_psnorg on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
