@@ -26,7 +26,9 @@ select
   agg.cj,
   agg.zj,
   agg.fgj,
-  agg.zgj
+  agg.zgj,
+  agg.sxjs,
+  agg.tjjs
 from (
   select 
     case when  bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') then '母公司'
@@ -55,11 +57,17 @@ from (
     count(distinct case when defdoc.code in ('2','21','28','29') then bd_psndoc.pk_psndoc end) as dxbk,
     count(distinct case when defdoc.code in ('1','14','15','16','17','18','19') then bd_psndoc.pk_psndoc end) as ss,
     count(distinct case when defdoc.code in ('0','11','12','13') then bd_psndoc.pk_psndoc end) as bs,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '未评定专业技术职务' then bd_psndoc.pk_psndoc end) as wdj,
+    count(distinct case when (T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '未评定专业技术职务') 
+                           or (T3.pk_psndoc is null) 
+                           or (T3.glbdef8 is null)
+                           or (T3.glbdef4 is null)
+                      then bd_psndoc.pk_psndoc end) as wdj,
     count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and (T3.glbdef4.name = '助理级专业技术职务' or T3.glbdef4.name = '员级专业技术职务') then bd_psndoc.pk_psndoc end) as cj,
     count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '中级专业技术职务' then bd_psndoc.pk_psndoc end) as zj,
     count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '副高级专业技术职务' then bd_psndoc.pk_psndoc end) as fgj,
-    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '正高级专业技术职务' then bd_psndoc.pk_psndoc end) as zgj
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '正高级专业技术职务' then bd_psndoc.pk_psndoc end) as zgj,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '首席技师' then bd_psndoc.pk_psndoc end) as sxjs,
+    count(distinct case when T3.glbdef8 = '10011T10000000001XG7' and (T1.trnsevent <> '4' or T1.trnsevent is null) and T3.glbdef4.name = '特级技师' then bd_psndoc.pk_psndoc end) as tjjs
   from 
   bd_psndoc bd_psndoc 
     inner join hi_psnorg hi_psnorg on hi_psnorg.pk_psndoc = bd_psndoc.pk_psndoc 
@@ -91,10 +99,6 @@ from (
   and T1.begindate<='2099-12-31' and isnull(T1.enddate, '2099-12-31') >= '1950-01-01'
   and bd_psncl.name in (parameter('rylb'))
   and bd_defdoc_zzlx.name in (parameter('zzlx'))
-  and (
-    bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') 
-    or (bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司') and bd_defdoc_dwszd.name in ('京内','京外','境外'))
-  )
   group by 
     case when  bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') then '母公司'
          when  bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司') and bd_defdoc_dwszd.name ='京内' then '京内子公司'
@@ -121,8 +125,4 @@ join (
     and T1.lastflag='Y' and T1.ismainjob='Y'
     and T1.begindate<='2099-12-31' and isnull(T1.enddate, '2099-12-31') >= '1950-01-01'
     and bd_defdoc_zzlx.name in (parameter('zzlx'))
-    and (
-      bd_defdoc_zzlx.name in ('总部','分公司','专业机构','事业部') 
-      or (bd_defdoc_zzlx.name in ('子公司','子公司下属分公司','子公司下属子公司') and bd_defdoc_dwszd.name in ('京内','京外','境外'))
-    )
 ) orgs on orgs.gslx = agg.gslx
