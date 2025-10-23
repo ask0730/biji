@@ -81,17 +81,6 @@ from (
   where 1 = 1 
     and ( hi_psnorg.indocflag = 'Y' and hi_psnorg.psntype = 0 ) 
     and T1.lastflag='Y' and T1.ismainjob='Y'
-    and T1.pk_psnjob = (
-      select max(pk_psnjob) 
-      from hi_psnjob T1_dup 
-      left outer join org_adminorg T2_dup on T2_dup.pk_adminorg = T1_dup.pk_org 
-      left outer join bd_defdoc bd_defdoc_dwszd_dup on T2_dup.def4 = bd_defdoc_dwszd_dup.pk_defdoc
-      where T1_dup.pk_psndoc = T1.pk_psndoc 
-        and T1_dup.lastflag='Y' 
-        and T1_dup.ismainjob='Y'
-        -- 关键修改：只在该组织范围内选择最新记录
-        and bd_defdoc_dwszd_dup.name = bd_defdoc_dwszd.name
-    ) 
     and (
       T1.pk_postseries in ( '10011T100000000098AQ' , '10011T100000000098AT' , '10011T100000000098AU' , '10011T100000000098AV' , '10011T100000000098AW' , '10011T100000000098AX' , '10011T100000000098AY' , '10011T100000000098AZ' )  or
       T1.pk_postseries in ( '10011T100000000098AR' , '10011T100000000098B0' , '10011T100000000098BB' , '10011T100000000098BP' , '10011T100000000098BQ' , '10011T100000000098BT' , '10011T100000000098BU' , '10011T100000000098BV' , '10011T100000000098BW' , '10011T100000000098BX' , '10011T100000000098BY' , '10011T100000000098BZ' , '10011T100000000098C0' , '10011T100000000098C1' , '10011T100000000098C2' , '10011T100000000098C3' , '10011T1000000000A73M' , '10011T100000000098B1' , '10011T100000000098C4' , '10011T100000000098C5' , '10011T100000000098C6' , '10011T100000000098C7' , '10011T100000000098CH' , '10011T100000000098CI' , '10011T100000000098CJ' , '10011T100000000098CK' , '10011T100000000098CL' , '10011T100000000098CM' , '10011T100000000098CN' , '10011T100000000098CO' , '10011T100000000098CP' , '10011T100000000098CQ' , '10011T100000000098CR' , '10011T100000000098CS' , '10011T100000000098CT' , '10011T100000000098CU' , '10011T100000000098DP' , '10011T100000000098DQ' , '10011T100000000098DR' , '10011T100000000098DS' , '10011T100000000098DT' , '10011T100000000098DU' , '10011T100000000098B7' , '10011T100000000098DV' , '10011T100000000098DW' , '10011T100000000098DX' , '10011T100000000098DY' , '10011T100000000098DZ' , '10011T100000000098E0' , '10011T100000000098E1' , '10011T100000000098E2' , '10011T100000000098E3' , '10011T100000000098BA' )
@@ -127,15 +116,4 @@ join (
     and T1.begindate<=parameter('param2') and nvl(T1.enddate, '2099-12-31') >= parameter('param1')
     and bd_defdoc_zzlx.name in (parameter('zzlx'))
     and T2.name in (parameter('zzmc'))
-    -- 使用相同的组织范围逻辑
-    and T1.pk_psnjob = (
-      select max(pk_psnjob) 
-      from hi_psnjob T1_dup_org
-      left outer join org_adminorg T2_dup_org on T2_dup_org.pk_adminorg = T1_dup_org.pk_org 
-      left outer join bd_defdoc bd_defdoc_dwszd_dup_org on T2_dup_org.def4 = bd_defdoc_dwszd_dup_org.pk_defdoc
-      where T1_dup_org.pk_psndoc = T1.pk_psndoc 
-        and T1_dup_org.lastflag='Y' 
-        and T1_dup_org.ismainjob='Y'
-        and bd_defdoc_dwszd_dup_org.name = bd_defdoc_dwszd.name
-    )
 ) orgs on orgs.gslx = agg.gslx
