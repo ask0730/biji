@@ -96,12 +96,17 @@ from (
     select top 1 T1_dedup.pk_psnjob
     from hi_psnjob T1_dedup
     left outer join org_adminorg T2_dedup on T2_dedup.pk_adminorg = T1_dedup.pk_org
+    left outer join bd_psncl bd_psncl_dedup on T1_dedup.pk_psncl = bd_psncl_dedup.pk_psncl
     left outer join bd_defdoc bd_defdoc_zzlx_dedup on T2_dedup.def2 = bd_defdoc_zzlx_dedup.pk_defdoc
     left outer join bd_defdoc bd_defdoc_dwszd_dedup on T2_dedup.def4 = bd_defdoc_dwszd_dedup.pk_defdoc
     where T1_dedup.pk_psndoc = T1.pk_psndoc
       and T1_dedup.ismainjob='Y'
       -- 时间段内的记录
       and T1_dedup.begindate<=parameter('param2') and nvl(T1_dedup.enddate, '2099-12-31') >= parameter('param1')
+      -- 必须满足主查询的筛选条件（关键修改）
+      and bd_psncl_dedup.name in (parameter('rylb'))
+      and bd_defdoc_zzlx_dedup.name in (parameter('zzlx'))
+      and T2_dedup.name in (parameter('zzmc'))
       -- 同一组织类型（母公司/京内子公司/京外子公司/境外子公司）
       and (
         case when bd_defdoc_zzlx_dedup.name in ('总部','分公司','专业机构','事业部') then '母公司'
