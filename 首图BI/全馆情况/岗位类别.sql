@@ -3,7 +3,7 @@ select
     bd_psndoc.code,
     bd_psndoc.name,
     bd_psndoc.age 年龄,
-    om_postseries.postseriesname 岗位类别,
+    coalesce(om_postseries.postseriesname, '无') 岗位类别,
     1 as 人数
 from bd_psndoc bd_psndoc 
 inner join hi_psnorg hi_psnorg 
