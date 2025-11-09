@@ -1,5 +1,14 @@
 select hi_psnjob.pk_psnjob ,bd_psndoc.code,bd_psndoc.name, 
-bd_psndoc.age 年龄, bd_defdoc2 .name 学历,
+bd_psndoc.age 年龄, 
+case 
+    when bd_defdoc2.name like '%在职专科%' or bd_defdoc2.name = '专科' then '专科'
+    when bd_defdoc2.name like '%在职本科%' or bd_defdoc2.name = '大学本科' or bd_defdoc2.name = '双学士' then '大学本科'
+    when bd_defdoc2.name like '%在职研究生%' or bd_defdoc2.name like '%全日制研究生%' or bd_defdoc2.name = '硕士研究生' then '硕士研究生'
+    when bd_defdoc2.name like '%全日制博士研究生%' or bd_defdoc2.name like '%博士研究生%' then '博士研究生'
+    when bd_defdoc2.name like '%高中%' or bd_defdoc2.name like '%以下%' then '高中及以下'
+    else bd_defdoc2.name 
+end 学历,
+bd_defdoc2.name 原始学历,
 case when hi_psndoc_edu.lasteducation = 'Y' then '最高学历' 
         when hi_psndoc_edu.lasteducation = 'N' then '非最高学历' end 学历类别,
 hi_psndoc_edu.school 学校,
