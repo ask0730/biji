@@ -1,0 +1,258 @@
+Try
+
+Dim hWeb,arrayData,arrElement,arrRet,objExcelWorkBook,strOriginal,arrParts,item,strDate,keywords,pattern,titleRow,dateStr,dateMatch,timeStr,pureDate,arrAddress,arrayDate,arrayHref,arrayTitle,arrPeople,arrType,currentDate,currentValue,dLastRow,dStartCell,dStartRow,filePath,iRowCount,isExit,newItem,result,resultArray,sevenDaysAgo,sRet,sSevenDaysAgo1,startCell,startRow,sYesterday1,titleCheck,yesterday,arrTitle,strTitle
+hWeb = WebBrowser.Create("edge","https://www.library.sh.cn/info/news",30000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+
+Delay(1000)
+
+
+arrayData = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"DIV","parentid":"news","css-selector":"body>div>div>div>div>main>div>div>div>div>div>div>div>div>div>div>div"}]},{"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"span"},{"tag":"a","idx":0}],"exact":true,"vprops":["text","url"]},"props":["text"]}]},{"objNextLinkElement":'',"iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":False})
+
+
+Rem 获取标题和日期
+arrayTitle = []
+arrayDate = []
+
+For i = 0 To UBound(arrayData) - 1
+    strOriginal = arrayData[i][0]
+    arrParts = Split(strOriginal, "\n")
+    
+    If UBound(arrParts) >= 2 And arrParts[0] = "置顶" Then
+        strTitle = arrParts[1]
+        strDate = arrParts[2]
+    ElseIf UBound(arrParts) >= 1 Then
+        strTitle = arrParts[0]
+        strDate = arrParts[1]
+    Else
+        strTitle = strOriginal
+        strDate = ""
+    End If
+    Push(arrayTitle, [strTitle])
+    Push(arrayDate, [strDate])
+Next
+
+
+Rem 获取链接
+arrayHref = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"msedge"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"DIV","parentid":"news","css-selector":"body>div>div>div>div>main>div>div>div>div>div>div>div>div>div>div>div"}]},{"ExtractTable":0,"Columns":[{"selecors":{"path":[{"tag":"span"},{"tag":"a","idx":0}],"exact":true,"vprops":["text","url"]},"props":["url"]}]},{"objNextLinkElement":'',"iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":False})
+
+Rem 合并数组
+resultArray = []
+For i = 0 To UBound(arrayTitle) - 1
+    newItem = [
+        arrayTitle[i][0],  
+        arrayHref[i][0],   
+        arrayDate[i][0]   
+    ]
+    push(resultArray, newItem)
+Next
+TracePrint(resultArray)
+
+Rem 使用Python插件处理数据
+resultArray = library_data_processor.filter_library_data(resultArray)
+
+Rem 使用Python插件按日期过滤数据（7天前到昨天）
+resultArray = library_data_processor.filter_by_date_range(resultArray, 7)
+
+Rem 使用Python插件添加图书馆名称
+resultArray = library_data_processor.add_library_name(resultArray, "上海图书馆")
+TracePrint(resultArray)
+
+Rem 写入Excel
+// 重新计算日期用于文件名
+currentDate = Time.Date()  
+yesterday = Time.DateAdd("d", -1, currentDate)  
+sevenDaysAgo = Time.DateAdd("d", -7, currentDate)  
+sYesterday1 = Time.Format(yesterday, "yyyymmdd")  
+sSevenDaysAgo1 = Time.Format(sevenDaysAgo, "yyyymmdd")  
+sRet = "("+sSevenDaysAgo1+"-"+sYesterday1+")"
+filePath = '''C:\Users\Administrator\Desktop\图书馆\服务通知查询'''+sRet+'''.xlsx'''
+objExcelWorkBook = Excel.OpenExcel(filePath, true, "Excel", "", "")
+
+titleCheck = Excel.ReadCell(objExcelWorkBook, "Sheet1", "A1")
+If titleCheck = "" 
+    titleRow = [["图书馆名称", "标题","网页链接", "发布时间", "关键信息"]]
+    Excel.WriteRow(objExcelWorkBook, "Sheet1", "A1", titleRow, false)
+    startRow = 2 
+Else
+    iRowCount = Excel.GetRowsCount(objExcelWorkBook, "Sheet1")
+    startRow = iRowCount + 1  
+End If
+
+Delay(1000)
+If UBound(resultArray) >= 0 And Len(resultArray) > 0 
+    startCell = "A" & CStr(startRow)
+    Excel.WriteRange(objExcelWorkBook, "Sheet1", startCell, resultArray, false)
+    TracePrint("数据已追加到Excel文件，从" & startCell & "开始")
+Else
+    TracePrint("没有找到匹配的数据，未写入内容")
+End If
+
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","A1",20,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","B1",80,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","C1",70,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","D1",10,false)
+Excel.SetColumnWidth(objExcelWorkBook,"Sheet1","E1",30,false)
+Excel.Save(objExcelWorkBook)
+Excel.CloseExcel(objExcelWorkBook,true)
+
+TracePrint(resultArray)
+arrTitle = []
+For Each subArray In resultArray
+    Push(arrTitle, subArray[3])
+Next
+TracePrint(arrTitle)
+For Each title In arrTitle
+    Delay(1000)
+    TracePrint(title)
+    
+    Text.Click(@ui"块级元素<div>_置顶上海图书馆电话总机临时关闭公告2025-09-17置顶上海图书馆徐家汇藏书楼",title,"regex",1,"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    sRet = Text.Get(@ui"文本区域<article>_开学季，当学生们踏入校园开启新学期的征程时，上海图书馆无障碍阅览室里涌动",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true})
+    TracePrint($PrevResult)
+
+    Rem 输出到deepseek
+    result = test.handle_uibot_string(sRet)
+    TracePrint(result)
+
+    Rem 遍历字典处理deepseek返回的内容
+    // 测试数据
+    // result={"服务人群" : ["读者"],"服务类型" : ["图书馆服务","规划研究"],"服务范围" : ["上海"]}
+
+    // 初始化目标数组
+    arrType = []
+    arrAddress = []
+    arrPeople = []
+
+// 遍历字典，按key匹配赋值
+For Each key, value In result
+    Select Case key
+       Case "服务类型"
+            arrType = value    // 赋值给服务类型数组
+       Case "服务范围"
+            arrAddress = value // 赋值给服务范围数组
+       Case "服务人群"
+            arrPeople = value  // 赋值给服务人群数组
+    End Select
+Next
+TracePrint(resultArray)
+arrTitle = []
+For Each subArray In resultArray
+    Push(arrTitle, subArray[3])
+Next
+arrTitle = []
+For Each subArray In resultArray
+    Push(arrTitle, subArray[3])
+Next
+Excel.Save(objExcelWorkBook)
+Excel.CloseExcel(objExcelWorkBook,true)
+
+TracePrint(resultArray)
+arrTitle = []
+For Each subArray In resultArray
+    Push(arrTitle, subArray[3])
+Next
+Rem 写入到excel
+objExcelWorkBook = Excel.OpenExcel('''C:\Users\Administrator\Desktop\关键词库.xlsx''',true,"Excel","","")
+
+// 写入标题
+titleCheck = Excel.ReadCell(objExcelWorkBook, "Sheet1", "A1")
+If titleCheck = "" 
+    titleRow = [["服务类型", "服务范围","服务人群"]]
+    Excel.WriteRow(objExcelWorkBook, "Sheet1", "A1", titleRow, false)
+    startRow = 2 
+End If
+
+// 写入服务类型
+isExit = false
+dLastRow = 1
+
+Do While isExit = false
+    currentValue = Excel.ReadCell(objExcelWorkBook, "Sheet1", "A" & CStr(dLastRow), true)
+    If currentValue = "" 
+        isExit = true  
+    Else
+        dLastRow = dLastRow + 1  
+    End If
+Loop
+
+dStartRow = dLastRow
+
+Delay(1000)
+
+If UBound(arrType) >= 0 
+    dStartCell = "A" & CStr(dStartRow)
+    Excel.WriteColumn(objExcelWorkBook, "Sheet1", dStartCell, arrType, false)
+Else
+    TracePrint("arrType数组中没有数据，未写入内容")
+End If
+
+// 写入服务范围
+isExit = false
+dLastRow = 1
+
+Do While isExit = false
+    currentValue = Excel.ReadCell(objExcelWorkBook, "Sheet1", "B" & CStr(dLastRow), true)
+    If currentValue = "" 
+        isExit = true  
+    Else
+        dLastRow = dLastRow + 1  
+    End If
+Loop
+
+dStartRow = dLastRow
+
+Delay(1000)
+
+If UBound(arrAddress) >= 0 
+    dStartCell = "B" & CStr(dStartRow)
+    Excel.WriteColumn(objExcelWorkBook, "Sheet1", dStartCell, arrAddress, false)
+Else
+    TracePrint("arrAddress数组中没有数据，未写入内容")
+End If
+
+// 写入服务人群
+isExit = false
+dLastRow = 1
+
+Do While isExit = false
+    currentValue = Excel.ReadCell(objExcelWorkBook, "Sheet1", "C" & CStr(dLastRow), true)
+    If currentValue = "" 
+        isExit = true  
+    Else
+        dLastRow = dLastRow + 1  
+    End If
+Loop
+
+dStartRow = dLastRow
+
+Delay(1000)
+
+If UBound(arrPeople) >= 0 
+    dStartCell = "C" & CStr(dStartRow)
+    Excel.WriteColumn(objExcelWorkBook, "Sheet1", dStartCell, arrPeople, false)
+Else
+    TracePrint("arrPeople数组中没有数据，未写入内容")
+End If
+
+// 保存到Excel
+Excel.Save(objExcelWorkBook)
+Excel.CloseExcel(objExcelWorkBook,true)
+
+Mouse.Action(@ui"链接<a>_新闻公告","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+
+
+Next
+
+App.Kill("msedge.exe")
+App.Kill("excel.exe")
+
+Catch 异常
+TracePrint(异常)
+App.Kill("msedge.exe")
+App.Kill("excel.exe")
+END Try
+
+
+
+
+
+
