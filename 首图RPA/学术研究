@@ -1,0 +1,163 @@
+Rem ============================================
+Rem 脚本名称：学术研究数据抓取与合并
+Rem 功能说明：依次调用三个Python插件，抓取知网和万方数据，并合并去重
+Rem 使用场景：定期抓取学术论文数据，整合多个数据源
+Rem 依赖模块：
+Rem   - cnki_selenium（知网数据抓取）
+Rem     需要添加函数：scrape_cnki_papers(workDir, url, max_pages) -> 返回论文数量
+Rem   - wanfang_independent_authors（万方数据抓取）
+Rem     需要添加函数：scrape_wanfang_papers(workDir, url) -> 返回论文数量
+Rem   - merge_data（数据合并去重）
+Rem     需要添加函数：merge_and_deduplicate(workDir) -> 返回记录数
+Rem 输出文件：
+Rem   - 最终输出：C:\Users\Administrator\Desktop\图书馆\学术研究\学术研究.xlsx
+Rem   - 临时文件：会在处理完成后自动删除
+Rem ============================================
+
+Rem 变量声明
+Rem workDir: 工作目录（所有文件操作都在此目录下进行）
+Rem outputPath: 最终输出文件路径
+Rem cnkiUrl: 知网搜索URL
+Rem wanfangUrl: 万方搜索URL
+Rem cnkiResult: 知网数据抓取结果（论文数量）
+Rem wanfangResult: 万方数据抓取结果（论文数量）
+Rem mergeResult: 数据合并结果（记录数）
+Rem allFiles: 文件数组，用于存储找到的文件列表
+Rem latestFile: 最新生成的合并文件路径
+Rem latestTime: 最新文件的修改时间
+Rem fileTime: 当前文件的修改时间
+Rem fileName: 文件名
+Rem file: 循环变量，用于遍历文件
+Dim workDir, outputPath, cnkiUrl, wanfangUrl, cnkiResult, wanfangResult, mergeResult, allFiles, latestFile, latestTime, fileTime, fileName, file
+
+Rem ============================================
+Rem 第一步：设置工作目录
+Rem ============================================
+Rem 定义工作目录，所有文件操作都在此目录下进行
+workDir = "C:\\Users\\Administrator\\Desktop\\图书馆\\学术研究"
+
+Rem 确保工作目录存在
+If Not File.FolderExists(workDir) Then
+    File.CreateFolder(workDir)
+End If
+
+Rem 定义最终输出文件路径
+outputPath = workDir & "\\学术研究.xlsx"
+
+Rem ============================================
+Rem 第二步：调用知网数据抓取插件
+Rem ============================================
+Rem 调用cnki_selenium模块的scrape_cnki_papers函数抓取知网论文数据
+Rem 功能：使用Selenium自动化浏览器，抓取知网数据库中与"首都图书馆"相关的论文
+Rem 参数说明：
+Rem   - workDir: 工作目录路径，文件将保存到此目录
+Rem   - url: 知网搜索URL（可选，使用默认值）
+Rem   - max_pages: 最大抓取页数（可选，默认1页）
+Rem 输出文件：首都图书馆相关论文_YYYYMMDD_HHMMSS.xlsx（保存到工作目录）
+Rem 返回值：抓取到的论文数量（整数）
+Rem 知网搜索URL（首都图书馆相关论文）
+cnkiUrl = "https://kns.cnki.net/kns8s/defaultresult/index?crossids=YSTT4HG0%2CLSTPFY1C%2CJUP3MUPD%2CMPMFIG1A%2CWQ0UVIAA%2CBLZOG7CK%2CPWFIRAGL%2CEMRPGLPA%2CNLBO1Z6R%2CNN3FJMUV&korder=AF&kw=%E9%A6%96%E9%83%BD%E5%9B%BE%E4%B9%A6%E9%A6%86"
+Rem 调用抓取函数，传入工作目录、URL和最大页数
+cnkiResult = cnki_selenium.scrape_cnki_papers(workDir, cnkiUrl, 1)
+
+Rem ============================================
+Rem 第三步：调用万方数据抓取插件
+Rem ============================================
+Rem 调用wanfang_independent_authors模块的scrape_wanfang_papers函数抓取万方论文数据
+Rem 功能：使用Selenium自动化浏览器，抓取万方数据库中与"首都图书馆"相关的论文
+Rem 特点：专门处理每个作者都是独立span元素的情况
+Rem 参数说明：
+Rem   - workDir: 工作目录路径，文件将保存到此目录
+Rem   - url: 万方搜索URL（可选，使用默认值）
+Rem 输出文件：万方数据论文_独立作者_YYYYMMDD_HHMMSS.xlsx（保存到工作目录）
+Rem 返回值：抓取到的论文数量（整数）
+Rem 万方搜索URL（首都图书馆相关论文）
+wanfangUrl = "https://s.wanfangdata.com.cn/paper?q=%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D%3A%E9%A6%96%E9%83%BD%E5%9B%BE%E4%B9%A6%E9%A6%86&p=1"
+Rem 调用抓取函数，传入工作目录和URL
+wanfangResult = wanfang_independent_authors.scrape_wanfang_papers(workDir, wanfangUrl)
+
+Rem ============================================
+Rem 第四步：调用数据合并去重插件
+Rem ============================================
+Rem 调用merge_data模块的merge_and_deduplicate函数合并和去重知网、万方数据
+Rem 功能：
+Rem   - 读取知网和万方的Excel数据文件（从工作目录中查找最新的知网和万方文件）
+Rem   - 根据论文标题进行去重（标准化标题后比较）
+Rem   - 合并数据并添加数据来源标识（"知网"、"万方"或"知网和万方"）
+Rem   - 保存合并后的数据到新的Excel文件
+Rem 参数说明：
+Rem   - workDir: 工作目录路径，在此目录下读取和生成文件
+Rem 输出文件：合并去重数据_YYYYMMDD_HHMMSS.xlsx（保存到工作目录）
+Rem 返回值：合并后的记录数（整数）
+Rem 注意：
+Rem   - 该插件会自动在工作目录下查找最新的知网和万方Excel文件
+Rem   - 如果文件不存在，会跳过该数据源
+Rem   - 去重基于论文标题的标准化比较（去除标点、转小写）
+Rem 调用合并函数，传入工作目录
+mergeResult = merge_data.merge_and_deduplicate(workDir)
+
+Rem ============================================
+Rem 第五步：将合并后的数据重命名为最终文件名并删除临时文件
+Rem ============================================
+Rem 查找最新生成的合并文件
+Rem 合并文件命名格式：合并去重数据_YYYYMMDD_HHMMSS.xlsx
+Rem 在工作目录下查找所有匹配的文件
+Dim allFiles, latestFile, latestTime, fileTime, fileName
+allFiles = File.GetFiles(workDir, "合并去重数据_*.xlsx")
+latestFile = ""
+latestTime = 0
+
+Rem 找到最新的合并文件
+For Each file In allFiles
+    fileName = File.GetFileName(file)
+    If InStr(fileName, "合并去重数据_") > 0 Then
+        Rem 获取文件修改时间
+        fileTime = File.GetModifyTime(file)
+        If fileTime > latestTime Then
+            latestTime = fileTime
+            latestFile = file
+        End If
+    End If
+Next
+
+Rem 如果找到合并文件，重命名为最终文件名
+If latestFile <> "" Then
+    Rem 如果目标文件已存在，先删除
+    If File.FileExists(outputPath) Then
+        File.DeleteFile(outputPath)
+    End If
+    Rem 重命名文件为最终文件名
+    File.MoveFile(latestFile, outputPath)
+Else
+    TracePrint("警告：未找到合并文件，请检查merge_data插件是否正常执行")
+End If
+
+Rem ============================================
+Rem 第六步：删除所有临时文件
+Rem ============================================
+Rem 删除知网数据文件（首都图书馆相关论文_*.xlsx）
+allFiles = File.GetFiles(workDir, "首都图书馆相关论文_*.xlsx")
+For Each file In allFiles
+    File.DeleteFile(file)
+Next
+
+Rem 删除万方数据文件（万方数据论文_独立作者_*.xlsx）
+allFiles = File.GetFiles(workDir, "万方数据论文_独立作者_*.xlsx")
+For Each file In allFiles
+    File.DeleteFile(file)
+Next
+
+Rem 删除合并数据文件（合并去重数据_*.xlsx）
+allFiles = File.GetFiles(workDir, "合并去重数据_*.xlsx")
+For Each file In allFiles
+    File.DeleteFile(file)
+Next
+
+Rem 删除其他可能的临时文件（知网.xlsx、万方.xlsx）
+If File.FileExists(workDir & "\\知网.xlsx") Then
+    File.DeleteFile(workDir & "\\知网.xlsx")
+End If
+
+If File.FileExists(workDir & "\\万方.xlsx") Then
+    File.DeleteFile(workDir & "\\万方.xlsx")
+End If
