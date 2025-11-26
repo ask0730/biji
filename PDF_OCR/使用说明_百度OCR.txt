@@ -1,0 +1,65 @@
+百度 OCR PDF 转 Word 使用说明
+=====================================
+
+功能说明：
+---------
+使用百度 OCR API 扫描 PDF 文件，将识别结果输出到 Word 文档。
+
+安装依赖：
+---------
+1. 安装 Python 库：
+   pip install -r requirements_baidu_ocr.txt
+
+2. 安装 Poppler（PDF 转图片需要）：
+   Windows: 下载并安装 Poppler for Windows
+   - 下载地址: https://github.com/oschwartz10612/poppler-windows/releases
+   - 解压后将 bin 目录添加到系统 PATH 环境变量
+   
+   Linux: sudo apt-get install poppler-utils
+   Mac: brew install poppler
+
+配置 API 密钥：
+-------------
+有三种方式配置百度 OCR API 密钥：
+
+方式1: 环境变量（推荐）
+  设置以下环境变量：
+  - BAIDU_OCR_APP_ID
+  - BAIDU_OCR_API_KEY
+  - BAIDU_OCR_SECRET_KEY
+
+方式2: 配置文件
+  在脚本目录下创建 baidu_ocr_config.json 文件：
+  {
+    "APP_ID": "your_app_id",
+    "API_KEY": "your_api_key",
+    "SECRET_KEY": "your_secret_key"
+  }
+
+方式3: 运行时输入
+  运行脚本时，如果没有配置密钥，会提示您输入。
+
+获取 API 密钥：
+-------------
+访问百度智能云控制台：
+https://console.bce.baidu.com/ai/#/ai/ocr/overview/index
+
+创建通用文字识别应用，获取 APP_ID、API_KEY 和 SECRET_KEY。
+
+使用方法：
+---------
+1. 确保 PDF 文件 "职称参评-毛雅君20251114V1.0(1).pdf" 在脚本目录下
+2. 运行脚本：
+   python baidu_ocr_pdf_to_word.py
+3. 等待处理完成，结果会保存为 Word 文档
+
+输出文件：
+---------
+输出文件命名格式：{PDF文件名}_OCR结果_{时间戳}.docx
+例如：职称参评-毛雅君20251114V1.0(1)_OCR结果_20251124_153000.docx
+
+日志文件：
+---------
+处理日志保存在 logs/baidu_ocr.log
+
+

@@ -1,0 +1,210 @@
+2025-11-25 23:13:54,653 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:13:54,654 - ERROR - 处理失败: EOF when reading a line
+Traceback (most recent call last):
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 285, in main
+    client = init_baidu_ocr()
+             ^^^^^^^^^^^^^^^^
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 146, in init_baidu_ocr
+    APP_ID = input("请输入 APP_ID: ").strip()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line
+2025-11-25 23:14:38,524 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:27:34,177 - INFO - 百度 OCR 客户端初始化成功
+2025-11-25 23:27:34,177 - INFO - 开始将 PDF 转换为图片: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:27:34,189 - ERROR - PDF 转换失败: Unable to get page count. Is poppler installed and in PATH?
+2025-11-25 23:27:34,189 - ERROR - 处理失败: Unable to get page count. Is poppler installed and in PATH?
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pdf2image\pdf2image.py", line 581, in pdfinfo_from_path
+    proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] 系统找不到指定的文件。
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 289, in main
+    images = pdf_to_images(pdf_file)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 164, in pdf_to_images
+    images = convert_from_path(pdf_path, dpi=dpi)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pdf2image\pdf2image.py", line 127, in convert_from_path
+    page_count = pdfinfo_from_path(
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pdf2image\pdf2image.py", line 607, in pdfinfo_from_path
+    raise PDFInfoNotInstalledError(
+pdf2image.exceptions.PDFInfoNotInstalledError: Unable to get page count. Is poppler installed and in PATH?
+2025-11-25 23:33:55,236 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:33:55,236 - ERROR - 处理失败: EOF when reading a line
+Traceback (most recent call last):
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 299, in main
+    client = init_baidu_ocr()
+             ^^^^^^^^^^^^^^^^
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 145, in init_baidu_ocr
+    APP_ID = input("请输入 APP_ID: ").strip()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line
+2025-11-25 23:34:07,577 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:34:07,578 - INFO - 百度 OCR 客户端初始化成功
+2025-11-25 23:34:07,578 - INFO - 开始将 PDF 转换为图片: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:34:08,827 - INFO - 成功转换 12 页
+2025-11-25 23:34:08,828 - INFO - 正在识别第 1 页
+2025-11-25 23:34:11,456 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:11,456 - INFO - 正在识别第 2 页
+2025-11-25 23:34:13,093 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:13,093 - INFO - 正在识别第 3 页
+2025-11-25 23:34:15,547 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:15,547 - INFO - 正在识别第 4 页
+2025-11-25 23:34:17,523 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:17,523 - INFO - 正在识别第 5 页
+2025-11-25 23:34:19,095 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:19,095 - INFO - 正在识别第 6 页
+2025-11-25 23:34:20,592 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:20,593 - INFO - 正在识别第 7 页
+2025-11-25 23:34:22,370 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:22,370 - INFO - 正在识别第 8 页
+2025-11-25 23:34:23,867 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:23,867 - INFO - 正在识别第 9 页
+2025-11-25 23:34:25,493 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:25,493 - INFO - 正在识别第 10 页
+2025-11-25 23:34:27,347 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:27,348 - INFO - 正在识别第 11 页
+2025-11-25 23:34:29,091 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:29,091 - INFO - 正在识别第 12 页
+2025-11-25 23:34:29,651 - ERROR - OCR 识别失败: IAM Certification failed
+2025-11-25 23:34:29,700 - INFO - Word 文档已保存: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_233429.docx
+2025-11-25 23:34:29,700 - ERROR - 处理失败: 'gbk' codec can't encode character '\u2713' in position 2: illegal multibyte sequence
+Traceback (most recent call last):
+  File "D:\Desktop\demo\PDF_OCR\baidu_ocr_pdf_to_word.py", line 336, in main
+    print(f"\n✓ 完成！结果已保存到: {os.path.basename(output_file)}")
+UnicodeEncodeError: 'gbk' codec can't encode character '\u2713' in position 2: illegal multibyte sequence
+2025-11-25 23:35:43,588 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:35:43,589 - INFO - 百度 OCR 客户端初始化成功
+2025-11-25 23:35:43,590 - INFO - 开始将 PDF 转换为图片: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:35:46,786 - INFO - 成功转换 12 页
+2025-11-25 23:35:46,789 - INFO - 正在识别第 1 页
+2025-11-25 23:35:50,059 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:35:50,059 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:35:50,059 - INFO - 正在识别第 2 页
+2025-11-25 23:35:52,078 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:35:52,078 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:35:52,078 - INFO - 正在识别第 3 页
+2025-11-25 23:35:54,942 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:35:54,942 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:35:54,942 - INFO - 正在识别第 4 页
+2025-11-25 23:35:57,187 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:35:57,188 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:35:57,188 - INFO - 正在识别第 5 页
+2025-11-25 23:35:58,939 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:35:58,939 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:35:58,939 - INFO - 正在识别第 6 页
+2025-11-25 23:36:00,610 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:36:00,610 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:36:00,610 - INFO - 正在识别第 7 页
+2025-11-25 23:36:02,395 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:36:02,396 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:36:02,396 - INFO - 正在识别第 8 页
+2025-11-25 23:36:05,118 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:36:05,118 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:36:05,118 - INFO - 正在识别第 9 页
+2025-11-25 23:36:31,196 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:36:31,196 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:36:31,196 - INFO - 正在识别第 10 页
+2025-11-25 23:37:31,297 - ERROR - OCR 识别失败: SDK108 - connection or read data timeout
+2025-11-25 23:37:31,297 - INFO - 正在识别第 11 页
+2025-11-25 23:38:27,225 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:38:27,225 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:38:27,225 - INFO - 正在识别第 12 页
+2025-11-25 23:38:28,421 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:38:28,421 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:38:28,451 - INFO - Word 文档已保存: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_233828.docx
+2025-11-25 23:38:28,451 - INFO - 处理完成，输出文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_233828.docx
+2025-11-25 23:40:02,110 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:40:02,111 - INFO - 百度 OCR 客户端初始化成功
+2025-11-25 23:40:02,111 - INFO - 开始将 PDF 转换为图片: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:40:03,228 - INFO - 成功转换 12 页
+2025-11-25 23:40:03,230 - INFO - 正在识别第 1 页
+2025-11-25 23:40:10,370 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:10,370 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:10,370 - INFO - 正在识别第 2 页
+2025-11-25 23:40:14,355 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:14,355 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:14,355 - INFO - 正在识别第 3 页
+2025-11-25 23:40:17,600 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:17,601 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:17,601 - INFO - 正在识别第 4 页
+2025-11-25 23:40:19,231 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:19,231 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:19,231 - INFO - 正在识别第 5 页
+2025-11-25 23:40:20,911 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:20,911 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:20,911 - INFO - 正在识别第 6 页
+2025-11-25 23:40:22,671 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:22,671 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:22,671 - INFO - 正在识别第 7 页
+2025-11-25 23:40:24,671 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:24,672 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:24,672 - INFO - 正在识别第 8 页
+2025-11-25 23:40:26,109 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:26,110 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:26,110 - INFO - 正在识别第 9 页
+2025-11-25 23:40:27,591 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:27,591 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:27,591 - INFO - 正在识别第 10 页
+2025-11-25 23:40:29,290 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:29,290 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:29,290 - INFO - 正在识别第 11 页
+2025-11-25 23:40:31,473 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:31,473 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:31,473 - INFO - 正在识别第 12 页
+2025-11-25 23:40:32,155 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:40:32,155 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:40:32,185 - INFO - Word 文档已保存: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_234032.docx
+2025-11-25 23:40:32,186 - INFO - 处理完成，输出文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_234032.docx
+2025-11-25 23:41:47,274 - INFO - 开始处理文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:41:47,275 - INFO - 百度 OCR 客户端初始化成功
+2025-11-25 23:41:47,275 - INFO - 开始将 PDF 转换为图片: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1).pdf
+2025-11-25 23:41:48,253 - INFO - 成功转换 12 页
+2025-11-25 23:41:48,255 - INFO - 正在识别第 1 页
+2025-11-25 23:41:50,404 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:41:50,404 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:41:50,405 - INFO - 正在识别第 2 页
+2025-11-25 23:41:52,669 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:41:52,669 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:41:52,669 - INFO - 正在识别第 3 页
+2025-11-25 23:41:55,795 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:41:55,795 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:41:55,795 - INFO - 正在识别第 4 页
+2025-11-25 23:41:58,083 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:41:58,083 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:41:58,083 - INFO - 正在识别第 5 页
+2025-11-25 23:42:00,124 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:00,124 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:00,124 - INFO - 正在识别第 6 页
+2025-11-25 23:42:02,126 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:02,126 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:02,126 - INFO - 正在识别第 7 页
+2025-11-25 23:42:04,750 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:04,750 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:04,751 - INFO - 正在识别第 8 页
+2025-11-25 23:42:07,163 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:07,163 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:07,163 - INFO - 正在识别第 9 页
+2025-11-25 23:42:10,134 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:10,135 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:10,135 - INFO - 正在识别第 10 页
+2025-11-25 23:42:12,894 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:12,894 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:12,894 - INFO - 正在识别第 11 页
+2025-11-25 23:42:16,037 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:16,037 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:16,037 - INFO - 正在识别第 12 页
+2025-11-25 23:42:17,028 - ERROR - OCR 识别失败: 14 - IAM Certification failed
+2025-11-25 23:42:17,028 - ERROR - API 认证失败，请检查 APP_ID、API_KEY 和 SECRET_KEY 是否正确
+2025-11-25 23:42:17,061 - INFO - Word 文档已保存: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_234217.docx
+2025-11-25 23:42:17,061 - INFO - 处理完成，输出文件: D:\Desktop\demo\PDF_OCR\职称参评-毛雅君20251114V1.0(1)_OCR结果_20251125_234217.docx
