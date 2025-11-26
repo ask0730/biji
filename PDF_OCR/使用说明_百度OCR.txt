@@ -63,3 +63,4 @@ https://console.bce.baidu.com/ai/#/ai/ocr/overview/index
 处理日志保存在 logs/baidu_ocr.log
 
 
+
