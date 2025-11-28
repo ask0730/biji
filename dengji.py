@@ -3,6 +3,7 @@ import PyPDF2
 import re
 import os
 import shutil
+import sys
 from datetime import datetime
 try:
     import pdfplumber
@@ -927,11 +928,19 @@ def parse_tables_json(json_path="提取的表格数据.json"):
 
 # 运行示例（从配置文件读取路径）
 if __name__ == "__main__":
-    # 读取配置文件
-    config_path = "config.json"
+    # 获取exe或脚本所在目录
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的exe
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        # 如果是Python脚本
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # 配置文件路径（exe或脚本同级目录）
+    config_path = os.path.join(base_dir, "config.json")
     if not os.path.exists(config_path):
         print(f"✗ 错误: 配置文件不存在: {config_path}")
-        print("请创建config.json文件，格式如下：")
+        print("请在同级目录创建config.json文件，格式如下：")
         print('{')
         print('  "input_folder": "输入文件夹路径（必填）",')
         print('  "output_folder": "输出文件夹路径（必填）",')
@@ -978,8 +987,13 @@ if __name__ == "__main__":
         print(f"找到 {len(pdf_files)} 个PDF文件，开始处理...")
         print("=" * 60)
         
-        # 获取代码文件所在目录（JSON文件保存路径）
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # 获取exe或脚本所在目录（JSON文件保存路径）
+        if getattr(sys, 'frozen', False):
+            # 如果是打包后的exe
+            script_dir = os.path.dirname(sys.executable)
+        else:
+            # 如果是Python脚本
+            script_dir = os.path.dirname(os.path.abspath(__file__))
         
         # 处理每个PDF文件
         for pdf_file in pdf_files:

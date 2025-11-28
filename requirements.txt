@@ -1,0 +1,6 @@
+pdfplumber
+xlrd
+xlwt
+xlutils
+PyPDF2
+
