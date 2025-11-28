@@ -925,55 +925,138 @@ def parse_tables_json(json_path="提取的表格数据.json"):
     
     return result
 
-# 运行示例（需替换为实际PDF文件路径）
+# 运行示例（从配置文件读取路径）
 if __name__ == "__main__":
-    pdf_file_path = "D:\Desktop\首图源文件\韩佳.pdf"  # 请替换为你的PDF文件路径
+    # 读取配置文件
+    config_path = "config.json"
+    if not os.path.exists(config_path):
+        print(f"✗ 错误: 配置文件不存在: {config_path}")
+        print("请创建config.json文件，格式如下：")
+        print('{')
+        print('  "input_folder": "输入文件夹路径（必填）",')
+        print('  "output_folder": "输出文件夹路径（必填）",')
+        print('  "template_path": "Excel模板文件路径（可选，不填则跳过Excel写入）"')
+        print('}')
+        exit(1)
     
-    # 第一步：处理PDF文件，生成"提取的表格数据.json"
-    print("=" * 60)
-    print("第一步：处理PDF文件，提取表格数据...")
-    print("=" * 60)
-    main(pdf_file_path)
-    
-    # 第二步：解析"提取的表格数据.json"，生成"解析后的数据.json"
-    print("\n" + "=" * 60)
-    print("第二步：解析表格数据JSON，生成解析后的数据...")
-    print("=" * 60)
-    
-    # 等待一下，确保文件已写入
-    import time
-    time.sleep(0.5)
-    
-    parsed_data = parse_tables_json("提取的表格数据.json")
-    if parsed_data:
-        output_path = "解析后的数据.json"
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(parsed_data, f, ensure_ascii=False, indent=2)
-        print(f"\n✓ 已将解析后的数据保存为: {output_path}")
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
         
-        # 第三步：将解析后的数据写入Excel模板
-        print("\n" + "=" * 60)
-        print("第三步：将解析后的数据写入Excel模板...")
+        input_folder = config.get("input_folder", "").strip()
+        output_folder = config.get("output_folder", "").strip()
+        template_path = config.get("template_path", "").strip()
+        
+        if not input_folder or not output_folder:
+            print("✗ 错误: 配置文件中缺少必要的路径配置")
+            print("必须配置: input_folder 和 output_folder")
+            exit(1)
+        
+        # 确保输出文件夹存在
+        os.makedirs(output_folder, exist_ok=True)
+        
+        # 检查模板文件路径
+        if not template_path:
+            print("⚠ 提示: 未配置模板文件路径（template_path）")
+            print("将跳过Excel写入步骤，只生成JSON文件")
+            template_path = None
+        elif not os.path.exists(template_path):
+            print(f"✗ 警告: 模板文件不存在: {template_path}")
+            print("请检查配置文件中的 template_path 路径是否正确")
+            print("将跳过Excel写入步骤，只生成JSON文件")
+            template_path = None
+        else:
+            print(f"✓ 模板文件路径: {template_path}")
+        
+        # 获取输入文件夹中的所有PDF文件
+        pdf_files = [f for f in os.listdir(input_folder) if f.lower().endswith('.pdf')]
+        
+        if not pdf_files:
+            print(f"✗ 在输入文件夹中未找到PDF文件: {input_folder}")
+            exit(1)
+        
+        print(f"找到 {len(pdf_files)} 个PDF文件，开始处理...")
         print("=" * 60)
         
-        # 获取员工姓名
-        employee_name = parsed_data.get("人员基本信息", {}).get("姓名", "")
-        if not employee_name:
-            employee_name = parsed_data.get("职称申报基础信息", {}).get("姓名")
+        # 获取代码文件所在目录（JSON文件保存路径）
+        script_dir = os.path.dirname(os.path.abspath(__file__))
         
-        template_path = r"D:\Desktop\demo\PDF_OCR\导入模版.xls"
-        if os.path.exists(template_path):
-            # 以员工姓名重命名文件
-            output_excel_path = os.path.join(os.path.dirname(template_path), f"{employee_name}.xls")
+        # 处理每个PDF文件
+        for pdf_file in pdf_files:
+            pdf_file_path = os.path.join(input_folder, pdf_file)
+            pdf_name = os.path.splitext(pdf_file)[0]  # 获取PDF文件名（不含扩展名）
             
-            # 复制模板
-            shutil.copy2(template_path, output_excel_path)
-            print(f"已复制模板到: {output_excel_path}")
+            print(f"\n正在处理: {pdf_file}")
+            print("-" * 60)
             
-            # 写入JSON数据到第四行
-            write_json_to_excel(output_excel_path, parsed_data, row=3)
-            print(f"✓ 已将解析后的数据写入Excel第4行（文件名: {employee_name}.xls）")
-        else:
-            print(f"✗ 警告: 模板文件不存在: {template_path}")
-    else:
-        print("✗ 解析失败，请检查'提取的表格数据.json'文件是否存在")
+            # 第一步：处理PDF文件，生成"提取的表格数据.json"
+            print("第一步：处理PDF文件，提取表格数据...")
+            # JSON文件保存到代码同级路径
+            extracted_json_path = os.path.join(script_dir, f"{pdf_name}_提取的表格数据.json")
+            main(pdf_file_path)
+            
+            # 将提取的表格数据移动到代码同级路径
+            if os.path.exists("提取的表格数据.json"):
+                shutil.move("提取的表格数据.json", extracted_json_path)
+                print(f"已保存提取的表格数据到: {extracted_json_path}")
+            
+            # 第二步：解析"提取的表格数据.json"，生成"解析后的数据.json"
+            print("\n第二步：解析表格数据JSON，生成解析后的数据...")
+            
+            # 等待一下，确保文件已写入
+            import time
+            time.sleep(0.5)
+            
+            # JSON文件保存到代码同级路径
+            parsed_json_path = os.path.join(script_dir, f"{pdf_name}_解析后的数据.json")
+            
+            parsed_data = parse_tables_json(extracted_json_path)
+            if parsed_data:
+                with open(parsed_json_path, "w", encoding="utf-8") as f:
+                    json.dump(parsed_data, f, ensure_ascii=False, indent=2)
+                print(f"✓ 已将解析后的数据保存为: {parsed_json_path}")
+                
+                # 第三步：将解析后的数据写入Excel模板
+                if template_path:
+                    print("\n第三步：将解析后的数据写入Excel模板...")
+                    
+                    # 获取员工姓名
+                    employee_name = parsed_data.get("人员基本信息", {}).get("姓名", "")
+                    if not employee_name:
+                        employee_name = parsed_data.get("职称申报基础信息", {}).get("姓名", "")
+                    
+                    # 如果还是没有姓名，使用PDF文件名
+                    if not employee_name:
+                        employee_name = pdf_name
+                    
+                    # 以员工姓名重命名文件，保存到输出文件夹
+                    output_excel_path = os.path.join(output_folder, f"{employee_name}.xls")
+                    
+                    # 如果文件已存在，添加序号
+                    counter = 1
+                    while os.path.exists(output_excel_path):
+                        output_excel_path = os.path.join(output_folder, f"{employee_name}_{counter}.xls")
+                        counter += 1
+                    
+                    # 复制模板
+                    shutil.copy2(template_path, output_excel_path)
+                    print(f"已复制模板到: {output_excel_path}")
+                    
+                    # 写入JSON数据到第四行
+                    write_json_to_excel(output_excel_path, parsed_data, row=3)
+                    print(f"✓ 已将解析后的数据写入Excel第4行（文件名: {os.path.basename(output_excel_path)}）")
+            else:
+                print("✗ 解析失败，请检查提取的表格数据文件是否存在")
+        
+        print("\n" + "=" * 60)
+        print(f"✓ 处理完成！共处理 {len(pdf_files)} 个文件")
+        print(f"输出文件夹: {output_folder}")
+        
+    except json.JSONDecodeError as e:
+        print(f"✗ 错误: 配置文件格式错误: {str(e)}")
+        exit(1)
+    except Exception as e:
+        print(f"✗ 错误: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        exit(1)
