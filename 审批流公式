@@ -18,3 +18,17 @@ getcolvalue(orgorgc,def11,pk_org,pk_psnjob.pk_org)
 
 业务单元，单位负责人
 getcolvalue(orgorgc,def13,pk_org,pk_psnjob.pk_org)
+
+人力专员
+getcolvalue(orgorgc,def9,pk_org,pk_psnjob.pk_org)
+
+人力部门负责人
+getcolvalue(orgorgc,def10,pk_org,pk_psnjob.pk_org)
+
+人力主管领导
+getcolvalue(orgorgc,def11,pk_org,pk_psnjob.pk_org)
+
+总经理
+getcolvalue(orgorgc,def12,pk_org,pk_psnjob.pk_org)
+
+董事长
