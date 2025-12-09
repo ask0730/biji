@@ -27,3 +27,8 @@ select * from wa_data where pk_psndoc = (select pk_psndoc from bd_psndoc where c
 select * from wa_classitem where pk_wa_class ='10011T100000000FZXGB' and cyear='2025' and cperiod='12';--薪资发放项目
 
 
+
+更新任职受雇从业日期：
+select * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206');
+SELECT * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206') AND begindate = '2025-09-08';
+UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2025-12-01')  WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206')  AND begindate = CONVERT(DATE, '2025-09-08'); 
