@@ -11,14 +11,14 @@ if errorlevel 1 (
 
 echo.
 echo 开始打包...
-pyinstaller --onefile --console --name dengji dengji.py
+pyinstaller dengji.spec
 
 echo.
 echo 打包完成！
 echo exe文件位置: dist\dengji.exe
 echo.
 echo 请将以下文件放在exe同级目录：
-echo   - config.json
+echo   - config.txt
 echo   - 导入模版.xls (如果使用Excel功能)
 echo.
 pause

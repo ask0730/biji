@@ -926,6 +926,32 @@ def parse_tables_json(json_path="提取的表格数据.json"):
     
     return result
 
+def load_config_from_txt(config_path):
+    """从TXT配置文件读取配置，格式：key=value，支持#注释和空行"""
+    config = {}
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                # 跳过空行和注释行
+                if not line or line.startswith('#'):
+                    continue
+                # 解析 key=value 格式
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    # 去掉引号（如果有）
+                    if value.startswith('"') and value.endswith('"'):
+                        value = value[1:-1]
+                    elif value.startswith("'") and value.endswith("'"):
+                        value = value[1:-1]
+                    config[key] = value
+    except Exception as e:
+        print(f"读取配置文件时出错: {str(e)}")
+        return None
+    return config
+
 # 运行示例（从配置文件读取路径）
 if __name__ == "__main__":
     # 获取exe或脚本所在目录
@@ -937,24 +963,33 @@ if __name__ == "__main__":
         base_dir = os.path.dirname(os.path.abspath(__file__))
     
     # 配置文件路径（exe或脚本同级目录）
-    config_path = os.path.join(base_dir, "config.json")
+    config_path = os.path.join(base_dir, "config.txt")
     if not os.path.exists(config_path):
         print(f"✗ 错误: 配置文件不存在: {config_path}")
-        print("请在同级目录创建config.json文件，格式如下：")
-        print('{')
-        print('  "input_folder": "输入文件夹路径（必填）",')
-        print('  "output_folder": "输出文件夹路径（必填）",')
-        print('  "template_path": "Excel模板文件路径（可选，不填则跳过Excel写入）"')
-        print('}')
+        print("请在同级目录创建config.txt文件，格式如下：")
+        print('input_folder=输入文件夹路径（必填）')
+        print('output_folder=输出文件夹路径（必填）')
+        print('template_path=Excel模板文件路径（可选，不填则跳过Excel写入）')
+        print('processed_folder=已处理PDF文件夹路径（可选，不填则不移动PDF文件）')
+        print('json_output_folder=JSON输出文件夹路径（可选，不填则保存到exe同级目录）')
+        print('')
+        print('说明：')
+        print('  - 每行一个配置项，格式为 key=value')
+        print('  - 支持使用 # 开头添加注释')
+        print('  - 支持空行')
         exit(1)
     
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
+        config = load_config_from_txt(config_path)
+        if config is None:
+            print("✗ 错误: 读取配置文件失败")
+            exit(1)
         
         input_folder = config.get("input_folder", "").strip()
         output_folder = config.get("output_folder", "").strip()
         template_path = config.get("template_path", "").strip()
+        processed_folder = config.get("processed_folder", "").strip()
+        json_output_folder = config.get("json_output_folder", "").strip()
         
         if not input_folder or not output_folder:
             print("✗ 错误: 配置文件中缺少必要的路径配置")
@@ -963,6 +998,25 @@ if __name__ == "__main__":
         
         # 确保输出文件夹存在
         os.makedirs(output_folder, exist_ok=True)
+        
+        # 确保已处理文件夹存在（如果配置了）
+        if processed_folder:
+            os.makedirs(processed_folder, exist_ok=True)
+            print(f"✓ 已处理文件夹: {processed_folder}")
+        
+        # 确定JSON输出文件夹路径
+        if json_output_folder:
+            # 使用配置的JSON输出文件夹
+            json_output_dir = json_output_folder
+            os.makedirs(json_output_dir, exist_ok=True)
+            print(f"✓ JSON输出文件夹: {json_output_dir}")
+        else:
+            # 使用默认路径（exe或脚本同级目录）
+            if getattr(sys, 'frozen', False):
+                json_output_dir = os.path.dirname(sys.executable)
+            else:
+                json_output_dir = os.path.dirname(os.path.abspath(__file__))
+            print(f"✓ JSON输出文件夹: {json_output_dir} (默认路径)")
         
         # 检查模板文件路径
         if not template_path:
@@ -982,18 +1036,10 @@ if __name__ == "__main__":
         
         if not pdf_files:
             print(f"✗ 在输入文件夹中未找到PDF文件: {input_folder}")
-            exit(1)
+            exit(0)
         
         print(f"找到 {len(pdf_files)} 个PDF文件，开始处理...")
         print("=" * 60)
-        
-        # 获取exe或脚本所在目录（JSON文件保存路径）
-        if getattr(sys, 'frozen', False):
-            # 如果是打包后的exe
-            script_dir = os.path.dirname(sys.executable)
-        else:
-            # 如果是Python脚本
-            script_dir = os.path.dirname(os.path.abspath(__file__))
         
         # 处理每个PDF文件
         for pdf_file in pdf_files:
@@ -1005,11 +1051,11 @@ if __name__ == "__main__":
             
             # 第一步：处理PDF文件，生成"提取的表格数据.json"
             print("第一步：处理PDF文件，提取表格数据...")
-            # JSON文件保存到代码同级路径
-            extracted_json_path = os.path.join(script_dir, f"{pdf_name}_提取的表格数据.json")
+            # JSON文件保存到配置的路径或默认路径
+            extracted_json_path = os.path.join(json_output_dir, f"{pdf_name}_提取的表格数据.json")
             main(pdf_file_path)
             
-            # 将提取的表格数据移动到代码同级路径
+            # 将提取的表格数据移动到配置的路径
             if os.path.exists("提取的表格数据.json"):
                 shutil.move("提取的表格数据.json", extracted_json_path)
                 print(f"已保存提取的表格数据到: {extracted_json_path}")
@@ -1021,8 +1067,8 @@ if __name__ == "__main__":
             import time
             time.sleep(0.5)
             
-            # JSON文件保存到代码同级路径
-            parsed_json_path = os.path.join(script_dir, f"{pdf_name}_解析后的数据.json")
+            # JSON文件保存到配置的路径或默认路径
+            parsed_json_path = os.path.join(json_output_dir, f"{pdf_name}_解析后的数据.json")
             
             parsed_data = parse_tables_json(extracted_json_path)
             if parsed_data:
@@ -1059,16 +1105,29 @@ if __name__ == "__main__":
                     # 写入JSON数据到第四行
                     write_json_to_excel(output_excel_path, parsed_data, row=3)
                     print(f"✓ 已将解析后的数据写入Excel第4行（文件名: {os.path.basename(output_excel_path)}）")
+                
+                # 处理成功后，将PDF文件移动到已处理文件夹
+                if processed_folder:
+                    try:
+                        processed_pdf_path = os.path.join(processed_folder, pdf_file)
+                        # 如果目标文件已存在，添加时间戳
+                        if os.path.exists(processed_pdf_path):
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            name, ext = os.path.splitext(pdf_file)
+                            processed_pdf_path = os.path.join(processed_folder, f"{name}_{timestamp}{ext}")
+                        
+                        shutil.move(pdf_file_path, processed_pdf_path)
+                        print(f"✓ 已将PDF文件移动到已处理文件夹: {os.path.basename(processed_pdf_path)}")
+                    except Exception as e:
+                        print(f"⚠ 警告: 移动PDF文件到已处理文件夹失败: {str(e)}")
             else:
                 print("✗ 解析失败，请检查提取的表格数据文件是否存在")
+                print("⚠ PDF文件保留在原文件夹，可重新处理")
         
         print("\n" + "=" * 60)
         print(f"✓ 处理完成！共处理 {len(pdf_files)} 个文件")
         print(f"输出文件夹: {output_folder}")
         
-    except json.JSONDecodeError as e:
-        print(f"✗ 错误: 配置文件格式错误: {str(e)}")
-        exit(1)
     except Exception as e:
         print(f"✗ 错误: {str(e)}")
         import traceback
