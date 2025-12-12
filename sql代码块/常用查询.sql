@@ -20,7 +20,7 @@ commit;
 
 
 
-
+人员信息常用查询：
 select * from bd_psndoc where code = '00020569';--人员基本信息
 select * from hi_psnjob where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00020569');--工作记录
 select * from hi_psnorg where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00020569');--组织关系
