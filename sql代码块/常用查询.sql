@@ -58,3 +58,22 @@ DELETE FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE 
 4、若推送成功，则稍等两分钟执行【下拉获取竹云账户】任务
 
 
+根据部门编码查询部门人数：
+SELECT 
+    org_dept.code AS 部门编码,
+    org_dept.name AS 部门名称,
+    COUNT(DISTINCT bd_psndoc.pk_psndoc) AS 部门人数
+FROM bd_psndoc  -- 人员档案表
+INNER JOIN hi_psnjob T1  -- 人员岗位信息表
+    ON T1.pk_psndoc = bd_psndoc.pk_psndoc
+    AND T1.lastflag = 'Y'  -- 最新岗位记录
+    AND T1.ismainjob = 'Y'  -- 主岗位（避免兼职重复计数）
+    AND T1.endflag = 'N'  -- 岗位未结束（在职）
+INNER JOIN org_dept  -- 部门表
+    ON org_dept.pk_dept = T1.pk_dept
+WHERE 
+    bd_psndoc.enablestate = 2  -- 人员状态为"启用"（有效）
+    AND org_dept.code = 'QTH00004'  -- 替换为实际的部门编码
+GROUP BY 
+    org_dept.code, org_dept.name
+
