@@ -35,3 +35,26 @@ select * from wa_classitem where pk_wa_class ='10011T100000000FZXGB' and cyear='
 select * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206');
 SELECT * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206') AND begindate = '2025-09-08';
 UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2025-12-01')  WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206')  AND begindate = CONVERT(DATE, '2025-09-08'); 
+
+
+
+
+删除合同信息：
+select * from hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006101');
+DELETE FROM hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006101');
+
+
+直接修改的调配记录在这个表里查记录
+select * from bjrq_zy_psn_event where pk_psndoc in(select pk_psndoc from bd_psndoc where name='陈会升')
+
+
+
+重推竹云：
+SELECT * FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020358')
+DELETE FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020358')
+1、在【用户】节点修改人员的创建日期
+2、等待后台任务定时执行或在【后台任务监控】节点执行“用户新增传竹云”任务
+3、后台任务执行成功后，可以在【竹云入调离审批日志】节点查看是否推送成功
+4、若推送成功，则稍等两分钟执行“下拉获取竹云账户”任务
+
+
