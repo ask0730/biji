@@ -94,3 +94,13 @@ FROM bd_psndoc  -- 人员基本信息表
 LEFT JOIN bd_defdoc  -- 字典表（政治面貌）
     ON bd_psndoc.polity = bd_defdoc.pk_defdoc
 WHERE bd_psndoc.code = '00000935'  -- 替换为实际的人员编码
+
+
+
+
+
+
+
+北森：
+SELECT * FROM mzjh_sync_beisen_psn WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012328')
+select * from mzjh_sync_beisen_org where oid='1108071'
