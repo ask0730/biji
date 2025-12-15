@@ -77,3 +77,20 @@ WHERE
 GROUP BY 
     org_dept.code, org_dept.name
 
+
+
+
+
+查政治面貌：
+-- 根据人员编码查询政治面貌
+SELECT 
+    bd_psndoc.code AS 人员编码,
+    bd_psndoc.name AS 姓名,
+    CASE 
+        WHEN bd_defdoc.name IS NULL THEN '未填写'
+        ELSE bd_defdoc.name 
+    END AS 政治面貌
+FROM bd_psndoc  -- 人员基本信息表
+LEFT JOIN bd_defdoc  -- 字典表（政治面貌）
+    ON bd_psndoc.polity = bd_defdoc.pk_defdoc
+WHERE bd_psndoc.code = '00000935'  -- 替换为实际的人员编码
