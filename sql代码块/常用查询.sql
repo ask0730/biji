@@ -58,6 +58,8 @@ DELETE FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE 
 4、若推送成功，则稍等两分钟执行【下拉获取竹云账户】任务
 
 
+
+
 根据部门编码查询部门人数：
 SELECT 
     org_dept.code AS 部门编码,
@@ -101,6 +103,26 @@ WHERE bd_psndoc.code = '00000935'  -- 替换为实际的人员编码
 
 
 
-北森：
+北森人员推送：
 SELECT * FROM mzjh_sync_beisen_psn WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012328')
-select * from mzjh_sync_beisen_org where oid='1108071'
+
+UPDATE mzjh_sync_beisen_psn 
+SET 
+  userid = '627022117',  -- 若userid为数字类型，去掉单引号，改为627022117
+  record_id = '4fac82ad-5639-48fe-8b8f-c970a8775f2a',
+  flag = 'Y',  -- flag为字符串类型，保留单引号；若为字符类型，同样适用
+	TS='2025-12-16 15:31:01'
+WHERE pk_psndoc IN (
+  SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012328'
+);
+
+
+
+
+根据身份证号查参见工作日期：
+SELECT ID, JOINWORKDATE 
+FROM BD_PSNDOC 
+WHERE ID IN (
+    '110105198602251544',
+    '612732198107091522'
+)
