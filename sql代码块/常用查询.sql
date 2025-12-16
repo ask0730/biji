@@ -108,9 +108,9 @@ SELECT * FROM mzjh_sync_beisen_psn WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_
 
 UPDATE mzjh_sync_beisen_psn 
 SET 
-  userid = '627022117',  -- 若userid为数字类型，去掉单引号，改为627022117
+  userid = '627022117',  
   record_id = '4fac82ad-5639-48fe-8b8f-c970a8775f2a',
-  flag = 'Y',  -- flag为字符串类型，保留单引号；若为字符类型，同样适用
+  flag = 'Y',  
 	TS='2025-12-16 15:31:01'
 WHERE pk_psndoc IN (
   SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012328'
