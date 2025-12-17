@@ -21,12 +21,6 @@ def highlight_word_document(file_path):
         # 打开文档
         doc = Document(file_path)
         
-        # 创建备份
-        backup_path = file_path.with_suffix('.docx.backup')
-        if not backup_path.exists():
-            doc.save(backup_path)
-            print(f"  已创建备份: {backup_path.name}")
-        
         email_count = 0
         year_count = 0
         
@@ -139,9 +133,39 @@ def highlight_word_document(file_path):
         print(f"  ❌ 处理失败: {e}")
         return 0, 0
 
+def load_config(config_file="config.txt"):
+    """从配置文件读取设置"""
+    config = {
+        'output_dir': '项目申报文章'  # 默认输出目录
+    }
+    
+    try:
+        if Path(config_file).exists():
+            with open(config_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    # 跳过空行和注释
+                    if not line or line.startswith('#'):
+                        continue
+                    
+                    # 解析配置项
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip()
+                        
+                        if key == 'output_dir':
+                            config['output_dir'] = value
+    except Exception as e:
+        print(f"⚠️ 读取配置文件失败: {e}，使用默认设置")
+    
+    return config
+
 def main():
     """主函数"""
-    directory_path = Path(r"D:\Desktop\图书馆\项目申报")
+    # 从配置文件读取输出目录
+    config = load_config("config.txt")
+    directory_path = Path(config.get('output_dir', '项目申报文章'))
     
     print("=" * 60)
     print("Word文档直接高亮工具")
@@ -162,22 +186,11 @@ def main():
     print(f"📁 找到 {len(word_files)} 个Word文件")
     print()
     
-    # 确认操作
+    # 提示信息
     print("⚠️  警告: 将直接修改Word文档!")
     print("🎨 高亮效果:")
     print("  🟢 绿色高亮: 邮箱地址")
     print("  🟡 黄色高亮: 年份信息")
-    print()
-    
-    try:
-        confirm = input("确认继续? (y/n): ").lower().strip()
-        if confirm not in ['y', 'yes', '是']:
-            print("操作已取消")
-            return
-    except:
-        print("操作已取消")
-        return
-    
     print()
     print("开始处理...")
     print()
@@ -205,9 +218,7 @@ def main():
     print(f"📅 总年份数量: {total_years}")
     print()
     print("💡 提示:")
-    print("  - 原文件已备份为 .backup 文件")
     print("  - 可以直接在Word中查看高亮效果")
-    print("  - 如需恢复，删除高亮版本，重命名备份文件")
 
 if __name__ == "__main__":
     main()
