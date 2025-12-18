@@ -1,0 +1,11 @@
+# 配置文件
+# 格式：key=value
+# 支持使用 # 开头添加注释
+# 支持空行
+
+# 输出文件夹路径（可选）
+# 如果不配置或留空，将使用默认路径：脚本目录下的"下载的年报"文件夹
+# 示例：output_folder=D:\Desktop\图书馆年报
+# 示例：output_folder=C:\Users\用户名\Documents\年报下载
+output_folder=D:\Desktop\图书馆年报
+
