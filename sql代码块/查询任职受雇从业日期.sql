@@ -32,5 +32,5 @@ LEFT JOIN (
 ) hi_psnjob
     ON hi_psnjob.pk_psndoc = bd_psndoc.pk_psndoc
 WHERE 
-    bd_psndoc.code = '00004559'  -- 人员编码
+    bd_psndoc.code = '00008649'  -- 人员编码
 ;

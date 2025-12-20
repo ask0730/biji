@@ -38,7 +38,6 @@ UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2025-12-01')  WHERE pk_psndoc 
 
 
 
-
 删除合同信息：
 select * from hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006101');
 DELETE FROM hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006101');
@@ -126,3 +125,9 @@ WHERE ID IN (
     '110105198602251544',
     '612732198107091522'
 )
+
+
+
+
+查本企业总工龄：
+SELECT jobglbdef3  FROM hi_psnjob WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00019956')
