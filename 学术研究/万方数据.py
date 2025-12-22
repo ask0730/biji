@@ -342,74 +342,62 @@ class WanfangDataScraper:
                 for author_link in author_links:
                     # 排除 class="sup" 的 a 标签
                     link_class = author_link.get_attribute("class") or ""
-                    if "sup" in link_class.lower():
+                    if "sup" in link_class:
                         continue
                     
-                    # 统一使用JavaScript方法获取文本，确保彻底排除sup元素
                     try:
-                        author_name = self.driver.execute_script("""
-                            var link = arguments[0];
-                            var clone = link.cloneNode(true);
-                            // 移除所有包含sup的元素（包括class包含sup的）
-                            var supElements = clone.querySelectorAll('.sup, [class*="sup"], [class*="Sup"], [class*="SUP"]');
-                            supElements.forEach(function(el) { el.remove(); });
-                            // 也移除所有子元素中class包含sup的
-                            var allElements = clone.querySelectorAll('*');
-                            allElements.forEach(function(el) {
-                                var className = el.getAttribute('class') || '';
-                                if (className.toLowerCase().indexOf('sup') !== -1) {
-                                    el.remove();
-                                }
-                            });
-                            var text = clone.textContent.trim();
-                            // 清理文本中可能残留的sup相关内容
-                            text = text.replace(/\\s*\\[\\d+\\]\\s*/g, ''); // 移除类似[1]的引用标记
-                            return text;
-                        """, author_link)
+                        # 查找 a 标签内的 span（排除 class="sup" 的 span）
+                        author_spans = author_link.find_elements(By.TAG_NAME, "span")
+                        author_name = ""
+                        for span in author_spans:
+                            # 排除 class="sup" 的 span
+                            span_class = span.get_attribute("class") or ""
+                            if "sup" in span_class:
+                                continue
+                            span_text = span.text.strip()
+                            if span_text:
+                                author_name = span_text
+                                break
                         
-                        if author_name and author_name.strip():
-                            authors_list.append(author_name.strip())
-                    except Exception as e:
-                        # 如果JavaScript失败，尝试手动提取（排除sup）
-                        try:
-                            # 查找 a 标签内的 span（排除 class="sup" 的 span）
-                            author_spans = author_link.find_elements(By.TAG_NAME, "span")
-                            author_name_parts = []
-                            for span in author_spans:
-                                # 排除 class="sup" 的 span
-                                span_class = span.get_attribute("class") or ""
-                                if "sup" in span_class.lower():
-                                    continue
-                                span_text = span.text.strip()
-                                if span_text:
-                                    author_name_parts.append(span_text)
-                            
-                            if author_name_parts:
-                                author_name = ' '.join(author_name_parts).strip()
+                        # 如果找到了有效的作者名，添加到列表
+                        if author_name:
+                            authors_list.append(author_name)
+                        else:
+                            # 如果没有找到有效的span，使用JavaScript获取文本（排除sup元素）
+                            # 先移除sup元素，再获取文本
+                            try:
+                                # 使用JavaScript获取文本，排除sup元素
+                                author_name = self.driver.execute_script("""
+                                    var link = arguments[0];
+                                    var clone = link.cloneNode(true);
+                                    var supElements = clone.querySelectorAll('.sup, [class*="sup"]');
+                                    supElements.forEach(function(el) { el.remove(); });
+                                    return clone.textContent.trim();
+                                """, author_link)
                                 if author_name:
                                     authors_list.append(author_name)
-                            else:
-                                # 如果所有span都被排除了，尝试获取a标签的直接文本
-                                # 但需要手动清理可能包含的sup内容
-                                direct_text = author_link.text.strip()
-                                # 简单清理：移除常见的引用标记格式
-                                cleaned_text = re.sub(r'\s*\[\d+\]\s*', '', direct_text)
-                                if cleaned_text and cleaned_text.strip():
-                                    authors_list.append(cleaned_text.strip())
-                        except:
-                            # 最后的备选方案：直接获取文本并清理
-                            try:
-                                direct_text = author_link.text.strip()
-                                # 清理可能的引用标记
-                                cleaned_text = re.sub(r'\s*\[\d+\]\s*', '', direct_text)
-                                if cleaned_text and cleaned_text.strip():
-                                    authors_list.append(cleaned_text.strip())
                             except:
-                                pass
-                
-                # 最终清理：移除可能残留的空字符串和重复项
-                authors_list = [a for a in authors_list if a and a.strip()]
-                authors_list = list(dict.fromkeys(authors_list))  # 去重但保持顺序
+                                # 如果JavaScript失败，直接取a标签的文本
+                                author_name = author_link.text.strip()
+                                if author_name:
+                                    authors_list.append(author_name)
+                    except NoSuchElementException:
+                        # 如果没有span，使用JavaScript获取文本（排除sup元素）
+                        try:
+                            author_name = self.driver.execute_script("""
+                                var link = arguments[0];
+                                var clone = link.cloneNode(true);
+                                var supElements = clone.querySelectorAll('.sup, [class*="sup"]');
+                                supElements.forEach(function(el) { el.remove(); });
+                                return clone.textContent.trim();
+                            """, author_link)
+                            if author_name:
+                                authors_list.append(author_name)
+                        except:
+                            # 如果JavaScript失败，直接取a标签的文本
+                            author_name = author_link.text.strip()
+                            if author_name:
+                                authors_list.append(author_name)
                 
                 paper['authors'] = ';'.join(authors_list)
             except NoSuchElementException:
