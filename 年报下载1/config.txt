@@ -1,0 +1,8 @@
+# 配置文件
+# 格式：key=value
+# 支持使用 # 开头添加注释
+# 支持空行
+
+# 输出文件夹路径（必填）
+# 示例：output_folder=D:\Desktop\图书馆年报
+output_folder=D:\Desktop\图书馆年报
