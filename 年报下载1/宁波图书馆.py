@@ -173,13 +173,15 @@ def find_last_year_report(url, base_url):
             if not check_text:
                 continue
             
-            # 检查是否同时包含"图书馆"和"决算"，或者包含"图书馆"和"年报"
+            # 检查是否同时包含"图书馆"和"决算"，或者包含"图书馆"和"年报"/"报告"
             has_library = '图书馆' in check_text
             has_juesuan = '决算' in check_text
             has_report = '年报' in check_text or '年度报告' in check_text
+            # 使用正则表达式精确匹配"报告"词，避免误匹配"表"
+            has_baogao = bool(re.search(r'报告', check_text))  # 匹配"报告"，不包括单独的"表"
             
-            # 必须包含"图书馆"，并且包含"决算"或"年报"
-            if not (has_library and (has_juesuan or has_report)):
+            # 必须包含"图书馆"，并且包含"决算"或"年报"或"报告"
+            if not (has_library and (has_juesuan or has_report or has_baogao)):
                 continue
             
             # 构建完整URL
@@ -189,7 +191,13 @@ def find_last_year_report(url, base_url):
             is_pdf = full_url.lower().endswith('.pdf') or href.lower().endswith('.pdf')
             is_docx = full_url.lower().endswith('.docx') or href.lower().endswith('.docx')
             is_doc = full_url.lower().endswith('.doc') or href.lower().endswith('.doc')
-            is_html = full_url.lower().endswith(('.html', '.htm', '.shtml')) or href.lower().endswith(('.html', '.htm', '.shtml'))
+            # HTML页面判断：有扩展名，或者是信息页面路径（如/information/、/article/等）
+            is_html = (full_url.lower().endswith(('.html', '.htm', '.shtml')) or 
+                      href.lower().endswith(('.html', '.htm', '.shtml')) or
+                      '/information/' in full_url.lower() or
+                      '/article/' in full_url.lower() or
+                      '/news/' in full_url.lower() or
+                      '/detail/' in full_url.lower())
             
             # 提取年份
             year_in_text = extract_year_from_text(check_text)
@@ -264,7 +272,10 @@ def find_last_year_report(url, base_url):
                 return doc_links[0]['url'], doc_links[0]['year']
             
             # 优先处理HTML链接，进入页面查找PDF文档
-            html_links = [link for link in last_year_links if link.get('is_html', False)]
+            # 包括明确标记为HTML的链接，以及所有不是PDF/DOCX/DOC的链接（可能是信息页面）
+            html_links = [link for link in last_year_links 
+                         if link.get('is_html', False) or 
+                         not (link.get('is_pdf', False) or link.get('is_docx', False) or link.get('is_doc', False))]
             if html_links:
                 print(f"找到 {len(html_links)} 个去年的HTML链接，正在进入页面查找PDF文档...")
                 for link_info in html_links:
@@ -277,14 +288,112 @@ def find_last_year_report(url, base_url):
                         link_response.encoding = link_response.apparent_encoding or 'utf-8'
                         link_soup = BeautifulSoup(link_response.text, 'html.parser')
                         
+                        # 首先在页面源码中查找所有PDF URL（只查找完整的URL，不拼接）
+                        print("  正在分析页面源码查找PDF链接...")
+                        page_source = link_response.text
+                        # 只查找完整的http/https开头的PDF URL，不拼接相对路径
+                        pdf_url_pattern = r'https?://[^\s<>"\'\)]+\.pdf'
+                        
+                        found_pdf_urls = []
+                        found_pdf_urls_baogao = []  # 包含"报告"的PDF
+                        found_pdf_urls_biao = []   # 包含"表"的PDF（要排除）
+                        
+                        # 先查找所有a标签，获取PDF链接及其title属性
+                        pdf_links_with_title = []
+                        for doc_link in link_soup.find_all('a', href=True):
+                            doc_href = doc_link.get('href')
+                            doc_title = doc_link.get('title', '')
+                            doc_text = doc_link.get_text().strip()
+                            
+                            if not doc_href:
+                                continue
+                            
+                            doc_full_url = urljoin(html_url, doc_href)
+                            
+                            # 检查是否是PDF文件
+                            if doc_full_url.lower().endswith('.pdf') or doc_href.lower().endswith('.pdf'):
+                                # 检查是否是完整URL
+                                if doc_full_url.startswith('http'):
+                                    pdf_links_with_title.append({
+                                        'url': doc_full_url,
+                                        'title': doc_title,
+                                        'text': doc_text
+                                    })
+                        
+                        # 也查找源码中的PDF URL（可能不在a标签中）
+                        matches = re.findall(pdf_url_pattern, page_source, re.IGNORECASE)
+                        for pdf_url in matches:
+                            # 只使用源码中已经存在的完整URL，不进行任何拼接
+                            if pdf_url.lower().endswith('.pdf'):
+                                # 检查是否已经在a标签中找到
+                                found_in_link = False
+                                for link_info in pdf_links_with_title:
+                                    if link_info['url'] == pdf_url:
+                                        found_in_link = True
+                                        break
+                                
+                                if not found_in_link:
+                                    pdf_links_with_title.append({
+                                        'url': pdf_url,
+                                        'title': '',
+                                        'text': ''
+                                    })
+                        
+                        # 分类PDF链接：优先"报告"，排除"表"
+                        for link_info in pdf_links_with_title:
+                            pdf_url = link_info['url']
+                            title = link_info['title']
+                            text = link_info['text']
+                            
+                            # 检查URL、title和文本中是否包含"报告"或"表"
+                            check_all = pdf_url + ' ' + title + ' ' + text
+                            has_baogao = '报告' in check_all
+                            has_biao = ('表' in check_all and '报告' not in check_all)
+                            
+                            if pdf_url not in found_pdf_urls:
+                                found_pdf_urls.append(pdf_url)
+                                if has_baogao:
+                                    found_pdf_urls_baogao.append(pdf_url)
+                                elif has_biao:
+                                    found_pdf_urls_biao.append(pdf_url)
+                        
+                        # 如果找到PDF URL，优先使用包含"报告"的
+                        if found_pdf_urls_baogao:
+                            print(f"  在页面源码中找到 {len(found_pdf_urls_baogao)} 个包含'报告'的PDF链接")
+                            for pdf_url in found_pdf_urls_baogao:
+                                # 检查年份
+                                pdf_year = extract_year_from_text(pdf_url) or extract_year_from_url_params(pdf_url)
+                                if pdf_year == last_year_str or not pdf_year:
+                                    print(f"✓ 在页面源码中找到PDF（报告）: {pdf_url}")
+                                    return pdf_url, pdf_year or last_year_str
+                            # 如果没有匹配年份的，返回第一个包含"报告"的
+                            print(f"✓ 在页面源码中找到PDF（报告，未验证年份）: {found_pdf_urls_baogao[0]}")
+                            return found_pdf_urls_baogao[0], last_year_str
+                        
+                        # 如果没有找到包含"报告"的，再查找其他PDF（排除包含"表"的）
+                        other_pdf_urls = [url for url in found_pdf_urls if url not in found_pdf_urls_biao]
+                        if other_pdf_urls:
+                            print(f"  在页面源码中找到 {len(other_pdf_urls)} 个PDF链接（已排除'表'）")
+                            for pdf_url in other_pdf_urls:
+                                # 检查年份
+                                pdf_year = extract_year_from_text(pdf_url) or extract_year_from_url_params(pdf_url)
+                                if pdf_year == last_year_str or not pdf_year:
+                                    print(f"✓ 在页面源码中找到PDF: {pdf_url}")
+                                    return pdf_url, pdf_year or last_year_str
+                            # 如果没有匹配年份的，返回第一个
+                            print(f"✓ 在页面源码中找到PDF（未验证年份）: {other_pdf_urls[0]}")
+                            return other_pdf_urls[0], last_year_str
+                        
                         # 在这个页面中查找文档链接（PDF/DOCX/DOC）
                         doc_candidates = []  # 存储找到的文档候选
                         
+                        # 查找所有可能的文档链接（包括a标签和其他可能的链接）
+                        # 1. 查找a标签中的href
                         for doc_link in link_soup.find_all('a', href=True):
                             doc_href = doc_link.get('href')
                             doc_text = doc_link.get_text().strip()
                             doc_title = doc_link.get('title', '')
-                            doc_check_text = doc_text or doc_title
+                            doc_check_text = doc_text or doc_title or ''
                             
                             if not doc_href or doc_href.startswith('javascript:') or doc_href.startswith('#'):
                                 continue
@@ -299,55 +408,130 @@ def find_last_year_report(url, base_url):
                             if not is_doc_file:
                                 continue
                             
-                            # 检查是否包含年报相关关键词
-                            doc_keywords = ['年报', '年度报告', '决算', '报告', '附件', '下载']
-                            has_report_keyword = any(keyword in doc_check_text or keyword in doc_href.lower() for keyword in doc_keywords)
+                            # 检查是否包含年报相关关键词（包括在href中查找）
+                            doc_keywords = ['年报', '年度报告', '决算', '部门决算', '报告', '附件', '下载']
+                            check_all_text = doc_check_text + ' ' + doc_href.lower()
+                            has_report_keyword = any(keyword in check_all_text for keyword in doc_keywords)
                             
-                            # 检查年份
-                            doc_year = extract_year_from_text(doc_check_text) or extract_year_from_text(doc_href) or extract_year_from_url_params(doc_full_url)
+                            # 检查年份（从文本、href和URL参数中提取）
+                            doc_year = (extract_year_from_text(doc_check_text) or 
+                                      extract_year_from_text(doc_href) or 
+                                      extract_year_from_url_params(doc_full_url))
                             
-                            # 记录所有找到的文档
+                            # 检查是否包含"报告"或"表"
+                            has_baogao = '报告' in doc_check_text or '报告' in doc_href.lower()
+                            has_biao = ('表' in doc_check_text or '表' in doc_href.lower()) and '报告' not in doc_check_text and '报告' not in doc_href.lower()
+                            
+                            # 记录所有找到的文档（即使没有文本也记录）
                             doc_candidates.append({
                                 'url': doc_full_url,
-                                'text': doc_check_text,
+                                'text': doc_check_text or doc_href,
                                 'year': doc_year,
                                 'has_keyword': has_report_keyword,
-                                'is_pdf': doc_full_url.lower().endswith('.pdf')
+                                'is_pdf': doc_full_url.lower().endswith('.pdf'),
+                                'has_baogao': has_baogao,
+                                'has_biao': has_biao
                             })
                         
-                        # 优先选择PDF格式且包含关键词的文档
+                        # 2. 查找所有标签中的data属性（data-src, data-url, data-href等）
+                        for tag in link_soup.find_all(True):  # 查找所有标签
+                            for attr_name in ['data-src', 'data-url', 'data-href', 'data-link', 'data-file']:
+                                attr_value = tag.get(attr_name)
+                                if attr_value and (attr_value.lower().endswith(('.pdf', '.docx', '.doc'))):
+                                    doc_full_url = urljoin(html_url, attr_value)
+                                    doc_text = tag.get_text().strip() or attr_value
+                                    doc_year = extract_year_from_text(doc_text) or extract_year_from_text(attr_value) or extract_year_from_url_params(doc_full_url)
+                                    doc_keywords = ['年报', '年度报告', '决算', '部门决算', '报告', '附件', '下载']
+                                    check_all_text = doc_text + ' ' + attr_value.lower()
+                                    has_report_keyword = any(keyword in check_all_text for keyword in doc_keywords)
+                                    
+                                    # 检查是否包含"报告"或"表"
+                                    has_baogao = '报告' in doc_text or '报告' in attr_value.lower()
+                                    has_biao = ('表' in doc_text or '表' in attr_value.lower()) and '报告' not in doc_text and '报告' not in attr_value.lower()
+                                    
+                                    doc_candidates.append({
+                                        'url': doc_full_url,
+                                        'text': doc_text,
+                                        'year': doc_year,
+                                        'has_keyword': has_report_keyword,
+                                        'is_pdf': doc_full_url.lower().endswith('.pdf'),
+                                        'has_baogao': has_baogao,
+                                        'has_biao': has_biao
+                                    })
+                        
+                        # 3. 查找所有标签的src属性
+                        for tag in link_soup.find_all(True):
+                            src = tag.get('src')
+                            if src and (src.lower().endswith(('.pdf', '.docx', '.doc'))):
+                                doc_full_url = urljoin(html_url, src)
+                                doc_text = tag.get_text().strip() or src
+                                doc_year = extract_year_from_text(doc_text) or extract_year_from_text(src) or extract_year_from_url_params(doc_full_url)
+                                doc_keywords = ['年报', '年度报告', '决算', '部门决算', '报告', '附件', '下载']
+                                check_all_text = doc_text + ' ' + src.lower()
+                                has_report_keyword = any(keyword in check_all_text for keyword in doc_keywords)
+                                
+                                # 检查是否包含"报告"或"表"
+                                has_baogao = '报告' in doc_text or '报告' in src.lower()
+                                has_biao = ('表' in doc_text or '表' in src.lower()) and '报告' not in doc_text and '报告' not in src.lower()
+                                
+                                doc_candidates.append({
+                                    'url': doc_full_url,
+                                    'text': doc_text,
+                                    'year': doc_year,
+                                    'has_keyword': has_report_keyword,
+                                    'is_pdf': doc_full_url.lower().endswith('.pdf'),
+                                    'has_baogao': has_baogao,
+                                    'has_biao': has_biao
+                                })
+                        
+                        # 优先选择PDF格式且包含关键词的文档（优先"报告"，排除"表"）
+                        # 1. 优先：包含"报告"的PDF
                         for candidate in doc_candidates:
-                            if candidate['is_pdf'] and candidate['has_keyword'] and (candidate['year'] == last_year_str or not candidate['year']):
+                            if candidate['is_pdf'] and candidate['has_keyword'] and candidate.get('has_baogao', False) and not candidate.get('has_biao', False) and (candidate['year'] == last_year_str or not candidate['year']):
+                                print(f"✓ 在页面找到年报PDF（报告）: {candidate['text']}")
+                                print(f"  URL: {candidate['url']}")
+                                return candidate['url'], candidate['year'] or last_year_str
+                        
+                        # 2. 其次：包含关键词的PDF（排除"表"）
+                        for candidate in doc_candidates:
+                            if candidate['is_pdf'] and candidate['has_keyword'] and not candidate.get('has_biao', False) and (candidate['year'] == last_year_str or not candidate['year']):
                                 print(f"✓ 在页面找到年报PDF: {candidate['text']}")
                                 print(f"  URL: {candidate['url']}")
                                 return candidate['url'], candidate['year'] or last_year_str
                         
-                        # 其次选择任何PDF文档
+                        # 3. 再次：任何PDF文档（排除"表"）
                         for candidate in doc_candidates:
-                            if candidate['is_pdf'] and (candidate['year'] == last_year_str or not candidate['year']):
+                            if candidate['is_pdf'] and not candidate.get('has_biao', False) and (candidate['year'] == last_year_str or not candidate['year']):
                                 print(f"✓ 在页面找到PDF文档: {candidate['text']}")
                                 print(f"  URL: {candidate['url']}")
                                 return candidate['url'], candidate['year'] or last_year_str
                         
-                        # 最后选择其他格式的文档
+                        # 4. 最后：其他格式的文档（排除"表"）
                         for candidate in doc_candidates:
-                            if candidate['has_keyword'] and (candidate['year'] == last_year_str or not candidate['year']):
+                            if candidate['has_keyword'] and not candidate.get('has_biao', False) and (candidate['year'] == last_year_str or not candidate['year']):
                                 print(f"✓ 在页面找到年报文档: {candidate['text']}")
                                 print(f"  URL: {candidate['url']}")
                                 return candidate['url'], candidate['year'] or last_year_str
                         
-                        # 如果都没找到，尝试查找所有文档链接（不限制年份）
-                        if doc_candidates:
+                        # 如果都没找到，尝试查找所有文档链接（不限制年份，但排除"表"）
+                        other_candidates = [c for c in doc_candidates if not c.get('has_biao', False)]
+                        if other_candidates:
+                            # 优先包含"报告"的PDF
+                            for candidate in other_candidates:
+                                if candidate['is_pdf'] and candidate.get('has_baogao', False):
+                                    print(f"✓ 在页面找到PDF文档（报告，未验证年份）: {candidate['text']}")
+                                    print(f"  URL: {candidate['url']}")
+                                    return candidate['url'], candidate['year'] or last_year_str
                             # 优先PDF
-                            for candidate in doc_candidates:
+                            for candidate in other_candidates:
                                 if candidate['is_pdf']:
                                     print(f"✓ 在页面找到PDF文档（未验证年份）: {candidate['text']}")
                                     print(f"  URL: {candidate['url']}")
                                     return candidate['url'], candidate['year'] or last_year_str
                             # 其他格式
-                            print(f"✓ 在页面找到文档（未验证年份）: {doc_candidates[0]['text']}")
-                            print(f"  URL: {doc_candidates[0]['url']}")
-                            return doc_candidates[0]['url'], doc_candidates[0]['year'] or last_year_str
+                            print(f"✓ 在页面找到文档（未验证年份）: {other_candidates[0]['text']}")
+                            print(f"  URL: {other_candidates[0]['url']}")
+                            return other_candidates[0]['url'], other_candidates[0]['year'] or last_year_str
                         
                         # 如果没找到文档链接，尝试查找iframe或embed标签中的PDF
                         for iframe in link_soup.find_all(['iframe', 'embed']):
