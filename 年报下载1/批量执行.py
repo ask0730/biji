@@ -13,10 +13,71 @@ import subprocess
 import pandas as pd
 import time
 from pathlib import Path
+from datetime import datetime
+import logging
+
+# 全局日志对象
+logger = None
+log_file_handler = None
 
 def get_script_dir():
     """获取脚本所在目录"""
-    return os.path.dirname(os.path.abspath(__file__))
+    # 如果是打包后的exe，使用sys.executable
+    if getattr(sys, 'frozen', False):
+        # 打包后的exe
+        return os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        # 普通Python脚本
+        return os.path.dirname(os.path.abspath(__file__))
+
+def setup_logging(script_dir, no_console=False):
+    """设置日志系统"""
+    global logger, log_file_handler
+    
+    # 创建日志文件夹
+    log_dir = os.path.join(script_dir, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # 生成日志文件名（带时间戳）
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_file = os.path.join(log_dir, f'批量执行_{timestamp}.log')
+    
+    # 配置日志格式
+    log_format = '%(asctime)s - %(levelname)s - %(message)s'
+    date_format = '%Y-%m-%d %H:%M:%S'
+    
+    # 创建logger
+    logger = logging.getLogger('批量执行')
+    logger.setLevel(logging.DEBUG)
+    
+    # 清除已有的处理器
+    logger.handlers.clear()
+    
+    # 文件处理器
+    log_file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    log_file_handler.setLevel(logging.DEBUG)
+    file_formatter = logging.Formatter(log_format, date_format)
+    log_file_handler.setFormatter(file_formatter)
+    logger.addHandler(log_file_handler)
+    
+    # 控制台处理器（如果不禁止控制台）
+    if not no_console:
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.INFO)
+        console_formatter = logging.Formatter('%(message)s')
+        console_handler.setFormatter(console_formatter)
+        logger.addHandler(console_handler)
+    
+    logger.info(f"日志文件: {log_file}")
+    return log_file
+
+def log_print(*args, **kwargs):
+    """同时输出到控制台和日志"""
+    message = ' '.join(str(arg) for arg in args)
+    if logger:
+        logger.info(message)
+    else:
+        print(*args, **kwargs)
 
 def load_excel(excel_path):
     """读取Excel文件"""
@@ -24,7 +85,7 @@ def load_excel(excel_path):
         df = pd.read_excel(excel_path)
         return df
     except Exception as e:
-        print(f"✗ 读取Excel文件失败: {e}")
+        log_print(f"✗ 读取Excel文件失败: {e}")
         return None
 
 def save_excel(df, excel_path):
@@ -33,7 +94,7 @@ def save_excel(df, excel_path):
         df.to_excel(excel_path, index=False)
         return True
     except Exception as e:
-        print(f"✗ 保存Excel文件失败: {e}")
+        log_print(f"✗ 保存Excel文件失败: {e}")
         return False
 
 def get_library_name_from_script(script_name):
@@ -98,7 +159,7 @@ def check_if_downloaded(library_name, df):
                 break
     
     if download_column is None:
-        print(f"⚠️  警告: 未找到'是否下载'列，假设未下载")
+        log_print(f"⚠️  警告: 未找到'是否下载'列，假设未下载")
         return False, idx, None
     
     # 检查下载状态
@@ -109,7 +170,7 @@ def check_if_downloaded(library_name, df):
             status = ''
         is_downloaded = status in ['是', 'Y', 'y', 'Yes', 'YES', 'True', 'true', '1', '已下载', '完成', '✓']
     except Exception as e:
-        print(f"  ⚠️  读取下载状态失败: {e}，假设未下载")
+        log_print(f"  ⚠️  读取下载状态失败: {e}，假设未下载")
         is_downloaded = False
     
     return is_downloaded, idx, download_column
@@ -128,9 +189,9 @@ def execute_script(script_path):
         # 获取脚本所在目录
         script_dir = os.path.dirname(script_path)
         
-        print(f"\n{'='*60}")
-        print(f"正在执行: {script_name}")
-        print(f"{'='*60}")
+        log_print(f"\n{'='*60}")
+        log_print(f"正在执行: {script_name}")
+        log_print(f"{'='*60}")
         
         # 设置环境变量，强制使用UTF-8编码输出，避免GBK编码错误
         env = os.environ.copy()
@@ -165,7 +226,7 @@ def execute_script(script_path):
                 # 如果所有编码都失败，使用errors='replace'忽略错误字符
                 stdout_text = result.stdout.decode('utf-8', errors='replace')
             
-            print(stdout_text)
+            log_print(stdout_text)
         
         if result.stderr:
             # 尝试多种编码
@@ -180,7 +241,10 @@ def execute_script(script_path):
                 stderr_text = result.stderr.decode('utf-8', errors='replace')
             
             if stderr_text.strip():  # 只打印非空的错误信息
-                print(stderr_text, file=sys.stderr)
+                if logger:
+                    logger.error(stderr_text)
+                else:
+                    print(stderr_text, file=sys.stderr)
         
         # 检查是否成功
         output_text = stdout_text.lower() if stdout_text else ''
@@ -207,12 +271,16 @@ def execute_script(script_path):
             return False
             
     except subprocess.TimeoutExpired:
-        print(f"✗ 执行超时: {script_name}")
+        log_print(f"✗ 执行超时: {script_name}")
         return False
     except Exception as e:
-        print(f"✗ 执行脚本失败: {e}")
+        log_print(f"✗ 执行脚本失败: {e}")
         import traceback
-        traceback.print_exc()
+        error_trace = traceback.format_exc()
+        if logger:
+            logger.error(error_trace)
+        else:
+            traceback.print_exc()
         return False
 
 def get_all_library_scripts(script_dir):
@@ -223,35 +291,37 @@ def get_all_library_scripts(script_dir):
             scripts.append(file)
     return sorted(scripts)
 
-def main():
+def main(no_console=False):
     """主函数"""
-    print("=" * 60)
-    print("批量执行图书馆年报下载脚本")
-    print("=" * 60)
-    
-    # 获取脚本所在目录
+    # 设置日志
     script_dir = get_script_dir()
+    log_file = setup_logging(script_dir, no_console=no_console)
+    
+    log_print("=" * 60)
+    log_print("批量执行图书馆年报下载脚本")
+    log_print("=" * 60)
+    
     excel_path = os.path.join(script_dir, '是否下载.xlsx')
     
     # 检查Excel文件是否存在
     if not os.path.exists(excel_path):
-        print(f"✗ Excel文件不存在: {excel_path}")
-        print("  请确保'是否下载.xlsx'文件存在于脚本目录中")
+        log_print(f"✗ Excel文件不存在: {excel_path}")
+        log_print("  请确保'是否下载.xlsx'文件存在于脚本目录中")
         return
     
     # 读取Excel文件
-    print(f"\n正在读取Excel文件: {excel_path}")
+    log_print(f"\n正在读取Excel文件: {excel_path}")
     df = load_excel(excel_path)
     if df is None:
         return
     
-    print(f"✓ Excel文件读取成功")
-    print(f"  总行数: {len(df)}")
-    print(f"  列名: {', '.join(df.columns.tolist())}")
+    log_print(f"✓ Excel文件读取成功")
+    log_print(f"  总行数: {len(df)}")
+    log_print(f"  列名: {', '.join(df.columns.tolist())}")
     
     # 获取所有图书馆脚本
     scripts = get_all_library_scripts(script_dir)
-    print(f"\n找到 {len(scripts)} 个图书馆脚本")
+    log_print(f"\n找到 {len(scripts)} 个图书馆脚本")
     
     # 统计信息
     total_scripts = len(scripts)
@@ -264,39 +334,39 @@ def main():
     need_save = False
     
     # 遍历所有脚本
-    print(f"\n开始批量执行...")
-    print("-" * 60)
+    log_print(f"\n开始批量执行...")
+    log_print("-" * 60)
     
     for i, script_name in enumerate(scripts, 1):
         library_name = get_library_name_from_script(script_name)
         script_path = os.path.join(script_dir, script_name)
         
-        print(f"\n[{i}/{total_scripts}] 处理: {library_name}")
+        log_print(f"\n[{i}/{total_scripts}] 处理: {library_name}")
         
         # 检查是否已下载
         is_downloaded, idx, download_column = check_if_downloaded(library_name, df)
         
         if is_downloaded:
-            print(f"  ✓ 已下载，跳过")
+            log_print(f"  ✓ 已下载，跳过")
             skipped_count += 1
             continue
         
         if idx is None:
-            print(f"  ⚠️  在Excel中未找到对应记录，将执行脚本")
+            log_print(f"  ⚠️  在Excel中未找到对应记录，将执行脚本")
             not_found_count += 1
         
         # 执行脚本
         success = execute_script(script_path)
         
         if success:
-            print(f"  ✓ 执行成功")
+            log_print(f"  ✓ 执行成功")
             success_count += 1
             
             # 更新Excel中的下载状态
             if idx is not None and download_column is not None:
                 if update_download_status(df, idx, download_column, '是'):
                     need_save = True
-                    print(f"  ✓ 已更新Excel中的下载状态")
+                    log_print(f"  ✓ 已更新Excel中的下载状态")
             elif idx is None:
                 # 如果Excel中没有对应记录，尝试添加新记录
                 try:
@@ -318,41 +388,83 @@ def main():
                         new_row[download_column] = '是'
                         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
                         need_save = True
-                        print(f"  ✓ 已在Excel中添加新记录并标记为已下载")
+                        log_print(f"  ✓ 已在Excel中添加新记录并标记为已下载")
                     else:
-                        print(f"  ⚠️  Excel中未找到对应记录，且无法确定下载状态列，无法更新")
+                        log_print(f"  ⚠️  Excel中未找到对应记录，且无法确定下载状态列，无法更新")
                 except Exception as e:
-                    print(f"  ⚠️  添加Excel记录失败: {e}")
+                    log_print(f"  ⚠️  添加Excel记录失败: {e}")
         else:
-            print(f"  ✗ 执行失败")
+            log_print(f"  ✗ 执行失败")
             failed_count += 1
     
     # 保存Excel文件
     if need_save:
-        print(f"\n正在保存Excel文件...")
+        log_print(f"\n正在保存Excel文件...")
         if save_excel(df, excel_path):
-            print(f"✓ Excel文件已保存")
+            log_print(f"✓ Excel文件已保存")
         else:
-            print(f"✗ Excel文件保存失败")
+            log_print(f"✗ Excel文件保存失败")
     
     # 显示统计结果
-    print(f"\n" + "=" * 60)
-    print("批量执行完成!")
-    print("=" * 60)
-    print(f"总脚本数: {total_scripts}")
-    print(f"成功: {success_count} 个")
-    print(f"失败: {failed_count} 个")
-    print(f"跳过: {skipped_count} 个")
-    print(f"未找到记录: {not_found_count} 个")
-    print("=" * 60)
+    log_print(f"\n" + "=" * 60)
+    log_print("批量执行完成!")
+    log_print("=" * 60)
+    log_print(f"总脚本数: {total_scripts}")
+    log_print(f"成功: {success_count} 个")
+    log_print(f"失败: {failed_count} 个")
+    log_print(f"跳过: {skipped_count} 个")
+    log_print(f"未找到记录: {not_found_count} 个")
+    log_print("=" * 60)
+    log_print(f"\n日志文件已保存: {log_file}")
+    
+    # 确保日志写入文件
+    if log_file_handler:
+        log_file_handler.flush()
+        log_file_handler.close()
 
 if __name__ == "__main__":
+    # 检查是否是无控制台模式
+    # 如果是打包后的exe（使用--windowed打包），默认无控制台
+    no_console = False
+    if getattr(sys, 'frozen', False):
+        # 打包后的exe，默认无控制台模式
+        # 如果使用--windowed打包，stdout/stderr会被重定向
+        no_console = True
+    
+    # 也可以通过命令行参数强制设置
+    if len(sys.argv) > 1:
+        if '--no-console' in sys.argv:
+            no_console = True
+        elif '--console' in sys.argv:
+            no_console = False
+    
     try:
-        main()
+        main(no_console=no_console)
     except KeyboardInterrupt:
-        print("\n\n⚠️  用户中断操作")
+        if logger:
+            logger.warning("\n\n⚠️  用户中断操作")
+            if log_file_handler:
+                log_file_handler.flush()
+        else:
+            print("\n\n⚠️  用户中断操作")
     except Exception as e:
         import traceback
-        print(f"\n✗ 发生错误: {e}")
-        traceback.print_exc()
+        error_msg = f"\n✗ 发生错误: {e}"
+        error_trace = traceback.format_exc()
+        if logger:
+            logger.error(error_msg)
+            logger.error(error_trace)
+            if log_file_handler:
+                log_file_handler.flush()
+        else:
+            print(error_msg)
+            traceback.print_exc()
+    finally:
+        # 确保日志文件被关闭
+        if log_file_handler:
+            try:
+                log_file_handler.flush()
+                log_file_handler.close()
+            except:
+                pass
 
