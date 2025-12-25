@@ -6,3 +6,17 @@
 # 输出文件夹路径（必填）
 # 示例：output_folder=D:\Desktop\图书馆年报
 output_folder=D:\Desktop\图书馆年报
+
+# 文件夹移动配置
+# 源文件夹路径（要移动内容的文件夹）
+# 示例：source_folder=D:\Desktop\源文件夹
+source_folder=
+
+# 目标文件夹路径（移动到的目标文件夹）
+# 示例：target_folder=D:\Desktop\目标文件夹
+target_folder=
+
+# 是否覆盖已存在的文件（可选，默认false）
+# true/1/yes/是 表示覆盖，false/0/no/否 表示跳过
+# 示例：overwrite=false
+overwrite=false
