@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
 import time
 import pandas as pd
 import re
+import sys
+import io
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -8,6 +11,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
+# 设置标准输出编码为UTF-8，避免Windows下emoji字符编码错误
+if sys.platform == 'win32':
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    except:
+        pass
 
 class WanfangDataScraper:
     def __init__(self):

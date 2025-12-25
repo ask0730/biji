@@ -35,18 +35,48 @@ def find_title_column(df):
     
     return None
 
+def find_data_file(directory, prefix):
+    """查找匹配的数据文件"""
+    if not os.path.exists(directory):
+        return None
+    
+    # 可能的文件名模式
+    patterns = [
+        f"{prefix}.xlsx",
+        f"{prefix}数据.xlsx",
+        f"{prefix}数据_*.xlsx"
+    ]
+    
+    # 先尝试精确匹配
+    for pattern in patterns[:2]:
+        file_path = os.path.join(directory, pattern)
+        if os.path.exists(file_path):
+            return file_path
+    
+    # 尝试模糊匹配（带年份的文件）
+    import glob
+    for pattern in patterns[2:]:
+        matches = glob.glob(os.path.join(directory, pattern))
+        if matches:
+            # 返回最新的文件
+            return max(matches, key=os.path.getmtime)
+    
+    return None
+
 def main():
     print("万方和知网数据去重合并工具")
     print("=" * 50)
     
     # 设置文件路径
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    wanfang_file = os.path.join(current_dir, "万方.xlsx")
-    cnki_file = os.path.join(current_dir, "知网.xlsx")
+    
+    # 自动查找文件
+    wanfang_file = find_data_file(current_dir, "万方")
+    cnki_file = find_data_file(current_dir, "知网")
     
     print(f"当前目录: {current_dir}")
-    print(f"万方数据文件: {wanfang_file}")
-    print(f"知网数据文件: {cnki_file}")
+    print(f"万方数据文件: {wanfang_file if wanfang_file else '未找到'}")
+    print(f"知网数据文件: {cnki_file if cnki_file else '未找到'}")
     
     try:
         # 加载数据
@@ -56,21 +86,23 @@ def main():
         cnki_data = None
         
         # 加载万方数据
-        if os.path.exists(wanfang_file):
+        if wanfang_file and os.path.exists(wanfang_file):
             wanfang_data = pd.read_excel(wanfang_file)
             print(f"万方数据加载成功: {len(wanfang_data)} 条记录")
+            print(f"   文件: {os.path.basename(wanfang_file)}")
             print(f"   列名: {list(wanfang_data.columns)}")
         else:
-            print(f"万方数据文件不存在: {wanfang_file}")
+            print(f"万方数据文件不存在")
             wanfang_data = pd.DataFrame()
         
         # 加载知网数据
-        if os.path.exists(cnki_file):
+        if cnki_file and os.path.exists(cnki_file):
             cnki_data = pd.read_excel(cnki_file)
             print(f"知网数据加载成功: {len(cnki_data)} 条记录")
+            print(f"   文件: {os.path.basename(cnki_file)}")
             print(f"   列名: {list(cnki_data.columns)}")
         else:
-            print(f"知网数据文件不存在: {cnki_file}")
+            print(f"知网数据文件不存在")
             cnki_data = pd.DataFrame()
         
         # 检查数据是否为空
