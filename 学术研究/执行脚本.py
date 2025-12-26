@@ -114,8 +114,24 @@ def read_output(pipe, output_type='stdout', is_binary=False):
         except:
             print(error_msg)
 
+def find_script_executable(script_name):
+    """查找脚本的可执行文件（优先查找exe，其次py）"""
+    script_dir = get_script_dir()
+    
+    # 优先查找exe文件（不需要Python环境）
+    exe_path = os.path.join(script_dir, f"{script_name}.exe")
+    if os.path.exists(exe_path):
+        return exe_path, 'exe'
+    
+    # 其次查找py文件（需要Python环境）
+    py_path = os.path.join(script_dir, f"{script_name}.py")
+    if os.path.exists(py_path):
+        return py_path, 'py'
+    
+    return None, None
+
 def run_script(script_name, script_path):
-    """执行Python脚本，实时输出日志"""
+    """执行脚本（支持exe和py），实时输出日志"""
     print("\n" + "=" * 60)
     print(f"🚀 开始执行: {script_name}")
     print("=" * 60)
@@ -127,6 +143,14 @@ def run_script(script_name, script_path):
         # 获取脚本所在目录
         script_dir = os.path.dirname(os.path.abspath(script_path))
         
+        # 检查文件是否存在
+        if not os.path.exists(script_path):
+            print(f"❌ 脚本文件不存在: {script_path}")
+            return False
+        
+        # 判断是exe还是py文件
+        is_exe = script_path.lower().endswith('.exe')
+        
         # 切换到脚本目录
         original_dir = os.getcwd()
         os.chdir(script_dir)
@@ -137,12 +161,38 @@ def run_script(script_name, script_path):
         if sys.platform == 'win32':
             env['PYTHONUTF8'] = '1'
         
+        # 构建执行命令
+        if is_exe:
+            # 如果是exe文件，直接执行
+            cmd = [script_path]
+        else:
+            # 如果是py文件，需要Python解释器
+            python_exe = find_python_executable()
+            if python_exe is None:
+                # 如果找不到Python，尝试最后的手段
+                import shutil
+                # 尝试直接查找python.exe（Windows）或python3（Linux/Mac）
+                if sys.platform == 'win32':
+                    python_exe = shutil.which('python.exe') or shutil.which('python')
+                else:
+                    python_exe = shutil.which('python3') or shutil.which('python')
+                
+                # 如果还是找不到，使用sys.executable（普通Python脚本模式）
+                if python_exe is None:
+                    python_exe = sys.executable
+                    if getattr(sys, 'frozen', False):
+                        # 如果是打包后的exe，这不应该发生，但给出提示
+                        print("⚠️  警告: 无法找到Python解释器，请确保已安装Python并添加到PATH")
+                        return False
+            
+            cmd = [python_exe, '-u', '-X', 'utf8', script_path]
+        
         # 使用Popen创建进程，启用实时输出
         # 使用 -u 参数禁用Python输出缓冲，确保实时输出
         # 在Windows下使用二进制模式读取，然后手动解码，避免编码问题
         if sys.platform == 'win32':
             process = subprocess.Popen(
-                [sys.executable, '-u', '-X', 'utf8', script_path],
+                cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,  # 将stderr合并到stdout
                 bufsize=1,  # 行缓冲
@@ -150,7 +200,7 @@ def run_script(script_name, script_path):
             )
         else:
             process = subprocess.Popen(
-                [sys.executable, '-u', script_path],
+                cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,  # 将stderr合并到stdout
                 text=True,
@@ -162,7 +212,8 @@ def run_script(script_name, script_path):
             )
         
         # 创建线程实时读取输出
-        is_binary = sys.platform == 'win32'
+        # exe文件或Windows下使用二进制模式读取
+        is_binary = is_exe or sys.platform == 'win32'
         output_thread = threading.Thread(
             target=read_output,
             args=(process.stdout, 'stdout', is_binary),
@@ -219,14 +270,61 @@ def run_script(script_name, script_path):
             except:
                 pass
 
+def get_script_dir():
+    """获取脚本所在目录（支持打包为exe后运行）"""
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的exe，使用exe所在目录
+        return os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        # 如果是普通Python脚本，使用脚本所在目录
+        return os.path.dirname(os.path.abspath(__file__))
+
+def find_script_executable(script_name):
+    """查找脚本的可执行文件（优先查找exe，其次py）"""
+    script_dir = get_script_dir()
+    
+    # 优先查找exe文件（不需要Python环境）
+    exe_path = os.path.join(script_dir, f"{script_name}.exe")
+    if os.path.exists(exe_path):
+        return exe_path, 'exe'
+    
+    # 其次查找py文件（需要Python环境）
+    py_path = os.path.join(script_dir, f"{script_name}.py")
+    if os.path.exists(py_path):
+        return py_path, 'py'
+    
+    return None, None
+
+def find_python_executable():
+    """查找Python解释器路径"""
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的exe，尝试查找系统Python
+        import shutil
+        # 按优先级查找Python解释器
+        python_candidates = ['python', 'python3']
+        if sys.platform == 'win32':
+            # Windows下优先使用py启动器
+            python_candidates.insert(0, 'py')
+        
+        for candidate in python_candidates:
+            python_path = shutil.which(candidate)
+            if python_path:
+                return python_path
+        
+        # 如果找不到，返回None，后续会尝试使用sys.executable
+        return None
+    else:
+        # 如果是普通Python脚本，使用当前Python解释器
+        return sys.executable
+
 def main():
     """主函数"""
     print("=" * 60)
     print("📚 学术研究脚本批量执行工具")
     print("=" * 60)
     
-    # 获取脚本所在目录
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # 获取脚本所在目录（支持exe打包）
+    script_dir = get_script_dir()
     config_file = os.path.join(script_dir, 'config.txt')
     
     # 读取配置
@@ -251,9 +349,9 @@ def main():
     
     # 定义脚本执行顺序
     scripts = [
-        ('知网数据.py', '知网数据'),
-        ('万方数据.py', '万方数据'),
-        ('文件整理.py', '文件整理')
+        ('知网数据', '知网数据'),
+        ('万方数据', '万方数据'),
+        ('文件整理', '文件整理')
     ]
     
     # 记录执行结果
@@ -261,15 +359,20 @@ def main():
     start_time = datetime.now()
     
     # 按顺序执行脚本
-    for script_file, config_key in scripts:
-        script_path = os.path.join(script_dir, script_file)
+    for script_name, config_key in scripts:
         config_key_full = f'执行{config_key}'
         
-        # 检查脚本文件是否存在
-        if not os.path.exists(script_path):
-            print(f"\n⚠️  脚本文件不存在: {script_path}")
-            results.append((script_file, False, "文件不存在"))
+        # 自动查找脚本文件（优先exe，其次py）
+        script_path, script_type = find_script_executable(script_name)
+        
+        if script_path is None:
+            print(f"\n⚠️  脚本文件不存在: {script_name}.exe 或 {script_name}.py")
+            results.append((script_name, False, "文件不存在"))
             continue
+        
+        # 显示使用的文件类型
+        file_type_info = f" ({script_type.upper()})" if script_type else ""
+        print(f"\n📝 使用文件: {os.path.basename(script_path)}{file_type_info}")
         
         # 检查是否应该执行
         if not should_execute(config.get(config_key_full, '否')):
@@ -278,12 +381,12 @@ def main():
             continue
         
         # 执行脚本
-        success = run_script(script_file, script_path)
-        results.append((script_file, success, "执行成功" if success else "执行失败"))
+        success = run_script(script_name, script_path)
+        results.append((script_name, success, "执行成功" if success else "执行失败"))
         
         # 如果脚本执行失败，询问是否继续
         if not success:
-            print(f"\n⚠️  {script_file} 执行失败")
+            print(f"\n⚠️  {script_name} 执行失败")
             user_input = input("是否继续执行后续脚本？(Y/N，默认Y): ").strip().upper()
             if user_input not in ['', 'Y', 'YES']:
                 print("❌ 用户选择停止执行")
