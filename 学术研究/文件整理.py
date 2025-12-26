@@ -8,6 +8,7 @@ import pandas as pd
 import re
 from datetime import datetime
 import os
+import sys
 
 def normalize_title(title):
     """标准化论文标题，用于去重比较"""
@@ -63,12 +64,53 @@ def find_data_file(directory, prefix):
     
     return None
 
+def get_base_path():
+    """获取脚本或exe所在目录"""
+    if getattr(sys, 'frozen', False):
+        # 打包后的exe文件
+        return os.path.dirname(sys.executable)
+    else:
+        # 普通Python脚本
+        return os.path.dirname(os.path.abspath(__file__))
+
+def load_output_path(config_file="输出路径配置.txt"):
+    """从txt配置文件读取输出路径"""
+    current_dir = get_base_path()
+    config_path = os.path.join(current_dir, config_file)
+    
+    # 如果配置文件不存在，使用当前目录
+    if not os.path.exists(config_path):
+        print(f"配置文件不存在: {config_path}")
+        print(f"使用默认路径: {current_dir}")
+        return current_dir
+    
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            path = f.read().strip()
+            # 移除可能的引号和空格
+            path = path.strip('"\' \n\r\t')
+            
+            # 如果是相对路径，转换为绝对路径
+            if not os.path.isabs(path):
+                path = os.path.join(current_dir, path)
+            
+            # 如果路径不存在，创建目录
+            if not os.path.exists(path):
+                os.makedirs(path, exist_ok=True)
+                print(f"创建输出目录: {path}")
+            
+            return path
+    except Exception as e:
+        print(f"读取配置文件失败: {e}")
+        print(f"使用默认路径: {current_dir}")
+        return current_dir
+
 def main():
     print("万方和知网数据去重合并工具")
     print("=" * 50)
     
     # 设置文件路径
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = get_base_path()
     
     # 自动查找文件
     wanfang_file = find_data_file(current_dir, "万方")
@@ -200,8 +242,9 @@ def main():
             print("-" * 40)
         
         # 保存合并数据
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = os.path.join(current_dir, f"合并去重数据_{timestamp}.xlsx")
+        # 从配置文件读取输出路径
+        output_dir = load_output_path()
+        output_file = os.path.join(output_dir, "学术研究.xlsx")
         merged_data.to_excel(output_file, index=False, engine='openpyxl')
         
         print(f"\n数据处理完成！")
