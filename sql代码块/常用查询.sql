@@ -22,7 +22,7 @@ commit;
 
 人员信息常用查询：
 select * from bd_psndoc where code = '00020569';--人员基本信息
-select * from hi_psnjob where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00020569');--工作记录
+select * from hi_psnjob where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00001423');--工作记录
 select * from hi_psnorg where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00020569');--组织关系
 select * from bd_psnjob where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00020569');--人员任职信息
 select * from hi_psndoc_wadoc where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00020569');--薪资变动
@@ -32,9 +32,9 @@ select * from wa_classitem where pk_wa_class ='10011T100000000FZXGB' and cyear='
 
 
 更新任职受雇从业日期：
-select * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206');
-SELECT * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206') AND begindate = '2025-09-08';
-UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2025-12-01')  WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018206')  AND begindate = CONVERT(DATE, '2025-09-08'); 
+select * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772');
+SELECT * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772') AND begindate = '2024-06-20';
+UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2026-01-01')  WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001423')  AND begindate = CONVERT(DATE, '2024-03-01'); 
 
 
 
@@ -131,3 +131,20 @@ WHERE ID IN (
 
 查本企业总工龄：
 SELECT jobglbdef3  FROM hi_psnjob WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00019956')
+
+
+
+
+财务费用属性
+
+SELECT * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772') AND begindate = '2024-06-20';
+
+
+UPDATE HI_PSNJOB
+SET jobglbdef15 = '10011T10000000002P1M'
+WHERE pk_psndoc = (
+    SELECT pk_psndoc 
+    FROM bd_psndoc 
+    WHERE code = '00005772'
+) 
+AND begindate = '2024-06-20';
