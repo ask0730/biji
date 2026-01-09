@@ -148,3 +148,19 @@ WHERE pk_psndoc = (
     WHERE code = '00005772'
 ) 
 AND begindate = '2024-06-20';
+
+
+
+select * from wa_item WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772')
+
+
+
+
+更新考勤组织：
+select * from hi_psnjob WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005235')
+select glbdef7 from hi_psnjob WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005235') and enddate='2025-05-31'
+
+UPDATE hi_psnjob 
+SET glbdef7 = NULL 
+WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005235') 
+  AND enddate = '2025-05-31';
