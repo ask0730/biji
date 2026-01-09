@@ -172,27 +172,36 @@ delete from hrp_special_deduction_b where pk_org='00011T1000000000NGYX' and mont
 
 审批流调资信息维护：
 SELECT
-	distinct t1.BILLCODE 单据号,t1.PK_PSNAPP,t2.PK_WA_ITEM,t3.name 薪资项目,t2.PK_PSNAPP_B 定调资申请表体pk,
-t2.PK_WA_SECLV_APPLY 薪档
+    w.pk_org,
+    (SELECT name FROM org_orgs o WHERE o.pk_org = w.pk_org) AS oraName,
+    (SELECT name FROM bd_psndoc d WHERE d.pk_psndoc = w.pk_psndoc) AS psnName,
+    (SELECT name FROM wa_item m WHERE m.pk_wa_item = w.pk_wa_item) AS itemName,
+    w.begindate,
+    w.enddate,
+    w.nmoney,
+    w.workflowflag -- 是否来自审批流
 FROM
-	WA_PSNAPPAPROVE t1
-left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
-left join WA_CLASSITEM t3 on t2.PK_WA_ITEM=t3.PK_WA_ITEM
-where t1.BILLCODE='LYBL202601040005'
+    hi_psndoc_wadoc w
+WHERE
+    w.lastflag = 'Y' -- 最新标志
+    AND w.waflag = 'Y' -- 发放标志
+    AND w.workflowflag = 'Y' -- 是否来自审批流
+    AND EXISTS (
+        SELECT 1 
+        FROM bd_psndoc d 
+        WHERE w.pk_psndoc = d.pk_psndoc 
+        AND d.code IN ('00020664')
+    );
 
 
-UPDATE t2
-SET t2.PK_WA_SECLV_APPLY = '10011T10000000008SV1'
-FROM WA_PSNAPPAPROVE_B t2
-WHERE EXISTS (
-    SELECT 1 FROM WA_PSNAPPAPROVE t1
-    WHERE t1.PK_PSNAPP = t2.PK_PSNAPP 
-      AND t1.BILLCODE = 'LYBL202601040005'
-)
-AND EXISTS (
-    SELECT 1 FROM WA_CLASSITEM t3
-    WHERE t3.PK_WA_ITEM = t2.PK_WA_ITEM
-);
+UPDATE hi_psndoc_wadoc
+SET workflowflag = 'N'
+WHERE
+    lastflag = 'Y'
+    AND waflag = 'Y'
+    AND workflowflag = 'Y'
+    AND pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code IN ('00020664'));
+    
 
 
 
@@ -222,3 +231,10 @@ UPDATE sm_msg_user
 
 -- 提交事务，确认以上所有数据库修改生效
 COMMIT;
+
+
+
+
+
+
+
