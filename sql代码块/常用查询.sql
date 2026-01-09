@@ -163,7 +163,62 @@ WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005235')
 
 
 
+删除算税结果：
+select * from hrp_special_deduction_b where pk_org='00011T1000000000NGYX' and month='01' and year='2026'
+delete from hrp_special_deduction_b where pk_org='00011T1000000000NGYX' and month='01' and year='2026'
 
 
-改定调资信息维护：
-select * from wa_item WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772')
+
+
+审批流调资信息维护：
+SELECT
+	distinct t1.BILLCODE 单据号,t1.PK_PSNAPP,t2.PK_WA_ITEM,t3.name 薪资项目,t2.PK_PSNAPP_B 定调资申请表体pk,
+t2.PK_WA_SECLV_APPLY 薪档
+FROM
+	WA_PSNAPPAPROVE t1
+left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
+left join WA_CLASSITEM t3 on t2.PK_WA_ITEM=t3.PK_WA_ITEM
+where t1.BILLCODE='LYBL202601040005'
+
+
+UPDATE t2
+SET t2.PK_WA_SECLV_APPLY = '10011T10000000008SV1'
+FROM WA_PSNAPPAPROVE_B t2
+WHERE EXISTS (
+    SELECT 1 FROM WA_PSNAPPAPROVE t1
+    WHERE t1.PK_PSNAPP = t2.PK_PSNAPP 
+      AND t1.BILLCODE = 'LYBL202601040005'
+)
+AND EXISTS (
+    SELECT 1 FROM WA_CLASSITEM t3
+    WHERE t3.PK_WA_ITEM = t2.PK_WA_ITEM
+);
+
+
+
+
+
+更改单据显示状态：
+-- 1、将指定单据的状态修改为【已执行】
+UPDATE HI_STAPPLY
+   SET APPROVE_STATE = 102
+ WHERE BILL_CODE = '单据号';
+
+-- 2、审批中心错误消息 - 数据库手动订正处理
+-- 2.1 先查询出 该单据+指定用户 对应的错误审批消息数据（用于核对待更新的主键）
+SELECT *
+  FROM sm_msg_user
+ WHERE pk_message IN (SELECT pk_message
+                        FROM sm_msg_approve
+                       WHERE billno = '单据号')
+   AND pk_user IN (SELECT cuserid
+                     FROM sm_user
+                    WHERE user_name = '用户名称');
+
+-- 2.2 手动更新审批消息为【已读】状态，消除错误提醒
+UPDATE sm_msg_user
+   SET isread = 'Y'
+ WHERE pk_message = '要更新的pk_message';
+
+-- 提交事务，确认以上所有数据库修改生效
+COMMIT;
