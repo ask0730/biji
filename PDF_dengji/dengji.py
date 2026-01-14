@@ -314,7 +314,7 @@ def write_json_to_excel(excel_path, json_data, row=3):
         # 工作表名称到JSON键名的映射
         sheet_to_json_mapping = {
             "人员基本信息": "人员基本信息",
-            "自定义子集02": "自定义子集02",
+            "职称申报继续教育": "职称申报继续教育",
             "职称申报基础信息": "职称申报基础信息",
             "发表论文专著编著": "发表论文专著编著",
             "取得专利技术标准": "取得专利技术标准",
@@ -344,7 +344,7 @@ def write_json_to_excel(excel_path, json_data, row=3):
                 ref_row = min(2, ws_read.nrows - 1) if ws_read.nrows > 0 else 0
                 default_style = create_default_style()
                 
-                # 处理数组类型的JSON数据（如自定义子集02）
+                # 处理数组类型的JSON数据（如职称申报继续教育）
                 if isinstance(sheet_data, list):
                     # 对于数组，写入多行数据
                     for idx, item in enumerate(sheet_data):
@@ -444,7 +444,7 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                         basic_info["证件号码"] = str(row_data[k + 1]).strip()
             break
     
-    # 二、自定义子集02（在"继续教育-A4"后面）
+    # 二、职称申报继续教育（在"继续教育-A4"后面）
     continue_education_list = []
     
     # 找到"继续教育-A4"标记
@@ -917,7 +917,7 @@ def parse_tables_json(json_path="提取的表格数据.json"):
     # 组装结果
     result = {
         "人员基本信息": basic_info,
-        "自定义子集02": continue_education_list,
+        "职称申报继续教育": continue_education_list,
         "职称申报基础信息": title_app_info,
         "发表论文专著编著": papers_list,
         "取得专利技术标准": patents_list,
