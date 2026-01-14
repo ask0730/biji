@@ -319,6 +319,7 @@ def write_json_to_excel(excel_path, json_data, row=3):
             "发表论文专著编著": "发表论文专著编著",
             "取得专利技术标准": "取得专利技术标准",
             "其他业绩成果": "其他业绩成果",
+            "专业技术工作": "专业技术工作",
         }
         
         # 处理所有工作表
@@ -401,7 +402,7 @@ def main(pdf_path):
         print("未能提取到表格数据")
 
 def parse_tables_json(json_path="提取的表格数据.json"):
-    """读取提取的表格数据.json，解析为六个部分的数据"""
+    """读取提取的表格数据.json，解析为七个部分的数据"""
     from datetime import datetime
     
     try:
@@ -584,7 +585,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
         "所在部门": "",
         "社会信用代码": "",
         "行政职务": "",
-        "档案存放单位": ""
+        "档案存放单位": "",
+        "答辩代表作名称": ""
     }
     
     # 从"个人申请"后面提取
@@ -648,6 +650,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                                 title_app_info["行政职务"] = value
                             elif "档案存放单位" in cell_str:
                                 title_app_info["档案存放单位"] = value
+                            elif "答辩代表作" in cell_str:
+                                title_app_info["答辩代表作名称"] = value
                 break
     
     # 如果人员基本信息中没有姓名和证件号码，从职称申报基础信息中获取
@@ -914,6 +918,76 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                         achievements_list.append(achievement_item)
                 break
     
+    # 七、专业技术工作（"专业技术工作-C1"后面）
+    technical_work_list = []
+    
+    tech_work_start_idx = -1
+    for i, row in enumerate(all_rows):
+        if any("专业技术工作" in str(cell) and "C1" in str(cell) for cell in row):
+            tech_work_start_idx = i
+            break
+    
+    if tech_work_start_idx >= 0:
+        # 查找表头行
+        header_row_idx = -1
+        project_name_idx = -1
+        start_time_idx = -1
+        end_time_idx = -1
+        
+        # 从"专业技术工作-C1"后面开始查找表头
+        for i in range(tech_work_start_idx + 1, min(tech_work_start_idx + 20, len(all_rows))):
+            row = all_rows[i]
+            row_str = "".join(str(cell) for cell in row)
+            
+            # 查找包含"工作项目名称"和"起始时间"的表头行
+            if "工作项目名称" in row_str and "起始时间" in row_str:
+                header_row_idx = i
+                # 确定各列的索引
+                for k, cell in enumerate(row):
+                    cell_str = str(cell)
+                    if "工作项目名称" in cell_str:
+                        project_name_idx = k
+                    elif "起始时间" in cell_str:
+                        start_time_idx = k
+                    elif "结束时间" in cell_str:
+                        end_time_idx = k
+                break
+        
+        # 如果找到了表头，开始提取数据
+        if header_row_idx >= 0 and project_name_idx >= 0:
+            # 从表头下一行开始提取数据
+            for i in range(header_row_idx + 1, len(all_rows)):
+                data_row = all_rows[i]
+                row_str = "".join(str(cell) for cell in data_row)
+                
+                # 如果遇到下一个标记，停止
+                if any(marker in row_str for marker in ["工作经历", "发表论文", "取得专利", "其他业绩成果", "继续教育", "学历信息"]):
+                    break
+                
+                # 跳过表头行和空行
+                if ("工作项目名称" in row_str and "起始时间" in row_str) or \
+                   row_str.strip() == "" or row_str.strip() == "无":
+                    continue
+                
+                # 提取数据
+                work_item = {
+                    "年度": current_year,
+                    "工作项目名称": "",
+                    "起始时间": "",
+                    "结束时间": ""
+                }
+                
+                if project_name_idx >= 0 and project_name_idx < len(data_row):
+                    work_item["工作项目名称"] = str(data_row[project_name_idx]).strip()
+                if start_time_idx >= 0 and start_time_idx < len(data_row):
+                    work_item["起始时间"] = str(data_row[start_time_idx]).strip()
+                if end_time_idx >= 0 and end_time_idx < len(data_row):
+                    work_item["结束时间"] = str(data_row[end_time_idx]).strip()
+                
+                # 只要有工作项目名称就添加
+                if work_item["工作项目名称"]:
+                    technical_work_list.append(work_item)
+    
     # 组装结果
     result = {
         "人员基本信息": basic_info,
@@ -921,7 +995,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
         "职称申报基础信息": title_app_info,
         "发表论文专著编著": papers_list,
         "取得专利技术标准": patents_list,
-        "其他业绩成果": achievements_list
+        "其他业绩成果": achievements_list,
+        "专业技术工作": technical_work_list
     }
     
     return result
