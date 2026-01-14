@@ -416,8 +416,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
     for table in tables_data:
         all_rows.extend(table.get("rows", []))
     
-    # 获取当前年份
-    current_year = datetime.now().year
+    # 获取当前年份（固定为2025）
+    current_year = 2025
     
     # 一、人员基本信息（在"基础信息"后面）
     basic_info = {
