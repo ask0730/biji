@@ -976,6 +976,7 @@ def parse_tables_json(json_path="提取的表格数据.json"):
         project_name_idx = -1
         start_time_idx = -1
         end_time_idx = -1
+        witness_idx = -1
         
         # 从"专业技术工作-C1"后面开始查找表头
         for i in range(tech_work_start_idx + 1, min(tech_work_start_idx + 20, len(all_rows))):
@@ -994,6 +995,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                         start_time_idx = k
                     elif "结束时间" in cell_str:
                         end_time_idx = k
+                    elif "证明人" in cell_str:
+                        witness_idx = k
                 break
         
         # 如果找到了表头，开始提取数据
@@ -1023,7 +1026,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                     "年度": current_year,
                     "工作项目名称": "",
                     "起始时间": "",
-                    "结束时间": ""
+                    "结束时间": "",
+                    "证明人": ""
                 }
                 
                 if project_name_idx >= 0 and project_name_idx < len(data_row):
@@ -1032,6 +1036,8 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                     work_item["起始时间"] = str(data_row[start_time_idx]).strip()
                 if end_time_idx >= 0 and end_time_idx < len(data_row):
                     work_item["结束时间"] = str(data_row[end_time_idx]).strip()
+                if witness_idx >= 0 and witness_idx < len(data_row):
+                    work_item["证明人"] = str(data_row[witness_idx]).strip()
                 
                 # 验证数据有效性：起始时间必须是日期格式（YYYY-MM-DD），工作项目名称不能为空
                 # 起始时间列如果包含很长的文本（超过50字符），说明可能是错误分割的跨行文本，应该跳过
