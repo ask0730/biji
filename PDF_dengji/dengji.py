@@ -660,6 +660,49 @@ def parse_tables_json(json_path="提取的表格数据.json"):
     if not basic_info["证件号码"] and title_app_info["证件号码"]:
         basic_info["证件号码"] = title_app_info["证件号码"]
     
+    # 从"专业技术工作"部分提取"答辩代表作名称"（如果基础信息中没有找到）
+    # 注意：在专业技术工作表格中，"代表作名称"可能在"工作项目名称"列，实际值在"起始时间"列
+    if not title_app_info["答辩代表作名称"]:
+        # 先找到专业技术工作的表头位置
+        tech_work_header_idx = -1
+        tech_project_name_idx = -1
+        tech_start_time_idx = -1
+        for i, row in enumerate(all_rows):
+            row_str = "".join(str(cell) for cell in row)
+            if "专业技术工作" in row_str and "C1" in row_str:
+                # 查找表头
+                for j in range(i + 1, min(i + 20, len(all_rows))):
+                    header_row = all_rows[j]
+                    header_str = "".join(str(cell) for cell in header_row)
+                    if "工作项目名称" in header_str and "起始时间" in header_str:
+                        tech_work_header_idx = j
+                        for k, cell in enumerate(header_row):
+                            cell_str = str(cell)
+                            if "工作项目名称" in cell_str:
+                                tech_project_name_idx = k
+                            elif "起始时间" in cell_str:
+                                tech_start_time_idx = k
+                        break
+                break
+        
+        # 如果找到了表头，查找"代表作名称"行
+        if tech_work_header_idx >= 0 and tech_project_name_idx >= 0 and tech_start_time_idx >= 0:
+            for i in range(tech_work_header_idx + 1, len(all_rows)):
+                row = all_rows[i]
+                if len(row) > max(tech_project_name_idx, tech_start_time_idx):
+                    project_name = str(row[tech_project_name_idx]).strip() if tech_project_name_idx < len(row) else ""
+                    start_time = str(row[tech_start_time_idx]).strip() if tech_start_time_idx < len(row) else ""
+                    
+                    # 如果工作项目名称是"代表作名称"，则起始时间列的值就是代表作名称
+                    if project_name == "代表作名称" and start_time and len(start_time) > 5:
+                        title_app_info["答辩代表作名称"] = start_time
+                        break
+                    
+                    # 如果遇到其他标记，停止搜索
+                    row_str = "".join(str(cell) for cell in row)
+                    if any(marker in row_str for marker in ["工作经历", "发表论文", "取得专利", "其他业绩成果", "继续教育", "学历信息"]):
+                        break
+    
     # 四、发表论文专著编著（"发表论文/专著/编著-B4"后面）
     papers_list = []
     
@@ -961,11 +1004,17 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                 row_str = "".join(str(cell) for cell in data_row)
                 
                 # 如果遇到下一个标记，停止
-                if any(marker in row_str for marker in ["工作经历", "发表论文", "取得专利", "其他业绩成果", "继续教育", "学历信息"]):
+                if any(marker in row_str for marker in ["工作经历", "发表论文", "取得专利", "其他业绩成果", "继续教育", "学历信息", "答辩代表作", "个人情况补充说明", "工作单位审核意见"]):
                     break
                 
-                # 跳过表头行和空行
-                if ("工作项目名称" in row_str and "起始时间" in row_str) or \
+                # 跳过表头行、标记行和空行
+                skip_keywords = [
+                    "工作项目名称", "起始时间", "结束时间",  # 表头关键词
+                    "本年度所填信息", "往年所填信息",  # 标记行
+                    "答辩代表作", "代表作类型", "代表作名称", "撰写时间", "代表作主要内容",  # 答辩代表作相关内容
+                    "个人情况补充说明", "工作单位审核意见"  # 其他无关内容
+                ]
+                if any(keyword in row_str for keyword in skip_keywords) or \
                    row_str.strip() == "" or row_str.strip() == "无":
                     continue
                 
@@ -984,8 +1033,19 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                 if end_time_idx >= 0 and end_time_idx < len(data_row):
                     work_item["结束时间"] = str(data_row[end_time_idx]).strip()
                 
-                # 只要有工作项目名称就添加
-                if work_item["工作项目名称"]:
+                # 验证数据有效性：起始时间必须是日期格式（YYYY-MM-DD），工作项目名称不能为空
+                # 起始时间列如果包含很长的文本（超过50字符），说明可能是错误分割的跨行文本，应该跳过
+                if work_item["起始时间"] and len(work_item["起始时间"]) > 50:
+                    continue
+                
+                # 检查起始时间是否是日期格式
+                has_valid_date = False
+                if work_item["起始时间"]:
+                    if re.match(r'^\d{4}-\d{2}-\d{2}$', work_item["起始时间"]):
+                        has_valid_date = True
+                
+                # 只添加有工作项目名称且起始时间是有效日期格式的记录
+                if work_item["工作项目名称"] and has_valid_date:
                     technical_work_list.append(work_item)
     
     # 组装结果
