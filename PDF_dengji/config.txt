@@ -10,7 +10,7 @@ input_folder=D:\Desktop\首图源文件
 output_folder=D:\Desktop\shuchu
 
 # Excel模板文件路径（可选，不填则跳过Excel写入）
-template_path=D:\Desktop\导入模版.xls
+template_path=D:\Desktop\导入文件\导入模板.xls
 
 # 已处理PDF文件夹路径（可选，不填则不移动PDF文件）
 processed_folder=D:\Desktop\已处理
