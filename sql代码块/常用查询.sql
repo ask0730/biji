@@ -49,10 +49,10 @@ select * from bjrq_zy_psn_event where pk_psndoc in(select pk_psndoc from bd_psnd
 
 
 重推竹云：
-SELECT * FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020358')
+SELECT * FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012528')
 DELETE FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020358')
 1、在【用户】节点修改人员的创建日期
-2、等待后台任务定时执行或在【后台任务监控】节点执行【用户新增传竹云】任务
+2、【后台任务监控】节点执行【用户新增传竹云】任务
 3、后台任务执行成功后，在【竹云入调离审批日志】节点查看是否推送成功
 4、若推送成功，则稍等两分钟执行【下拉获取竹云账户】任务
 
