@@ -240,4 +240,15 @@ COMMIT;
 
 
 
+更新人员类别：
+select * from hi_psnjob WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018922') and begindate='2024-10-20'
 
+
+-- select name from BD_PSNCL where PK_PSNCL='10011T10000000004348'
+
+-- select PK_PSNCL from BD_PSNCL where name='辞职'
+
+UPDATE hi_psnjob 
+SET PK_PSNCL = (SELECT PK_PSNCL FROM BD_PSNCL WHERE name = '辞职')
+WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018922') 
+  AND begindate = '2024-10-20';
