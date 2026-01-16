@@ -1,0 +1,70 @@
+Dim bRet,objExcelWorkBook,objExcelWorkBookNew,sRet,iRet,iPID,路径长度=0,excel目录="",excel名称="",excelNew="",sheetName="",arrayRet
+
+//excel路径 = '''D:\RPA_首图\邮件发送相关\20220928.xls'''
+
+路径长度 = Len(excel路径)
+iRet=InStrRev(excel路径,"\\",1,false)
+excel目录 = Left(excel路径,iRet)
+excel名称 = Right(excel路径,路径长度-iRet)
+
+excel名称 = Left(excel名称,Len(excel名称)-4)
+
+objExcelWorkBook = Excel.OpenExcel(excel路径,true,"Excel","","")
+sheetName = Excel.CurrentSheet(objExcelWorkBook,true)
+iAllRows = Excel.GetRowsCount(objExcelWorkBook,sheetName)
+excelNew = excel目录&"所有馆_每日新增_"&excel名称&".xlsx"
+objExcelWorkBookNew = Excel.OpenExcel(excelNew,true,"Excel","","")
+arrayRet = Excel.ReadRange(objExcelWorkBook,sheetName,"A1:F"&iAllRows,true)
+TracePrint(arrayRet)
+Excel.WriteRange(objExcelWorkBookNew,"Sheet1","A1",arrayRet,false)
+
+
+Excel.SetColumnWidth(objExcelWorkBookNew,"Sheet1","B1",30,false)
+Excel.Save(objExcelWorkBookNew)
+Excel.CloseExcel(objExcelWorkBook,true)
+Excel.CloseExcel(objExcelWorkBookNew,true)
+For Each value In array所有馆
+    libCode = value[0]
+    libName = value[1]
+    libData = value[4]
+    excelNew = excel目录&value[1]&"_每日新增_"&excel名称&".xlsx"
+    objExcelWorkBookNew = Excel.OpenExcel(excelNew,true,"Excel","","")
+    Excel.WriteRow(objExcelWorkBookNew,"Sheet1","A1",arrayRet[0],false)
+    Excel.SetColumnWidth(objExcelWorkBookNew,"Sheet1","B1",30,false)
+    For Each value2 In arrayRet
+        dim tmpcode = Left(value2[0],2)
+        //判断第一列的馆字母前缀是否在需要合并的馆字符串内  之前是if(StartsWith(value2[0],libCode))
+        iRet = InStr(libData,tmpcode,1,false)
+        if(iRet>0)
+           iRows = Excel.GetRowsCount(objExcelWorkBookNew,"Sheet1")+1
+           Excel.WriteRow(objExcelWorkBookNew,"Sheet1","A"&iRows,value2,false)
+        end if
+    Next
+    Excel.CloseExcel(objExcelWorkBookNew,true)
+Next
+附件路径 = excel目录
+
+
+
+//excel名称 = Mid(excel路径,路径长度-iRet,21)
+// excel路径=Dialog.OpenFile('''D:\RPA_首图\邮件发送相关''',"任意文件|*.*","Laiye Automation")
+// Excel.SheetRename(objExcelWorkBookNew,"Sheet1",sheetName,false)
+
+// firstRow = 1
+// lastRow = 300
+// Do 
+// If lastRow >= iAllRows
+//     lastRow = iAllRows
+//     arrayRet = Excel.ReadRange(objExcelWorkBook,sheetName,"A"&firstRow&":F"&lastRow,true)
+//     TracePrint(arrayRet)
+//     Excel.WriteRange(objExcelWorkBookNew,"Sheet1","A"&firstRow,arrayRet,false)
+//     TracePrint("excel名称"&excel名称)
+//     Break
+// else  
+//     arrayRet = Excel.ReadRange(objExcelWorkBook,sheetName,"A"&firstRow&":F"&lastRow,true)
+//     TracePrint(arrayRet)
+//     Excel.WriteRange(objExcelWorkBookNew,"Sheet1","A"&firstRow,arrayRet,false)
+//     firstRow = lastRow+1
+//     lastRow = lastRow+300
+// End If
+// Loop

@@ -1,0 +1,38 @@
+Dim bRet
+
+
+alllib_email = INI.Read(config, "base", "所有馆数据email", "")
+alllib_emailcs = INI.Read(config, "base", "所有馆数据email_cs", "")
+当前sendmail = INI.Read(config, "base", "当前sendmail", "")
+
+sendmail = INI.Read(config, 当前sendmail, "email", "")
+pwd = INI.Read(config, 当前sendmail, "pwd", "")
+server = INI.Read(config, 当前sendmail, "server", "")
+port = INI.Read(config, 当前sendmail, "port", "")
+title = INI.Read(config, 当前sendmail, "title", "")
+ssl = INI.Read(config, 当前sendmail, "ssl", "")
+sslb = False
+If ssl="是" 
+    sslb = True
+End If
+附件1 = 附件路径&"所有馆_每日新增_"&myDate&".xlsx"
+TracePrint(附件1)
+TracePrint(config)
+
+bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,alllib_email,alllib_emailcs,title,"",[附件1])
+
+
+
+For Each value In array所有馆
+    libCode = value[0]
+    libName = value[1]
+    email = value[2]
+    email_cs = value[3]
+    附件2 = 附件路径&libName&"_每日新增_"&myDate&".xlsx"
+    TracePrint(email)
+    TracePrint(email_cs)
+
+    bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,email,email_cs,title,"",[附件2])
+
+Next
+// bRet = Mail.SendEx("smtp.163.com",25,false,"shoututest@163.com","XVAdCclyYDa36CLleDxMlM2YA6sVDnWqxuUm1Ydy72U=","shoututest@163.com","150119862@qq.com","","首图测试","",[附件1,附件2])
