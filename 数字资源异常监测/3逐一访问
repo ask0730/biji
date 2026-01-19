@@ -1,0 +1,29 @@
+Dim bRet
+For Each value In arr_最终数据
+    TracePrint("网站："+value[1])
+    TracePrint("网站："+value[0])
+    TracePrint("类型："+value[2])
+    https= sys.Command("Curl -0 //dev/null -s -w %{http_code} https://research.ebsco.com/c/fv5ewz/search?defaultdb=a9h")
+    SYSCOMMAND = "curl -sIL -w \"%{http_code}\" -k --innsecure "&value[0]&" -o /dev/null"
+    http_code = Sys.Command(SYSCOMMAND)
+    If http_code ="404" Or  http_code ="401" OR  http_code ="402" OR  http_code ="403" OR  http_code ="404" OR  http_code ="503" OR http_code ="500"
+       TracePrint("不能访问")
+       value[3] = "不能访问"
+       bRet = Mail.SendExt({"host":"smtp.qq.com","port":25,"ssl":true,"authentication":true,"user":"2376365221@qq.com","password":"fyNYuiIy8ozUmXqiIU/0oc2YA6sVDnWqxuUm1Ydy72U="},str_发送邮箱账号,str_接收邮箱账号,str_抄送人邮箱,"","【"+value[1]+"】,响应异常","",[])
+       Else
+            If value[0] = "网址" 
+                value[3] = "是否可以访问"
+                Else
+                value[4] = "可访问"
+            End If
+    End If      
+Next
+objExcelWorkBook = Excel.Open('''C:\Users\Administrator\Desktop\运行监控结果\'''+Time.Format(Time.Now(),"yyyymmddhh")+'''.xlsx''',true,"Excel","","")
+Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arr_最终数据,false)
+Excel.Close(objExcelWorkBook,true)
+WebBrowser.Close(http_网址,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+
+lujing ='''C:\Users\Administrator\Desktop\运行监控结果\'''+Time.Format(Time.Now(),"yyyymmddhh")+".xlsx"
+TracePrint lujing
+bRet = Mail.SendEx(str_发送邮件服务器,str_发送邮件服务器端口,true,str_发送邮箱账号,str_发送邮箱密码,str_发送邮箱账号,str_接收邮箱账号,str_抄送人邮箱,str_邮件主题,str_邮件内容,[lujing])
+//bRet = Mail.SendExt({"host":"smtp.qq.com","port":25,"ssl":true,"authentication":true,"user":"2376365221@qq.com","password":"MVehd97qYyhqPr6LEbfhOs2YA6sVDnWqxuUm1Ydy72U="},str_发送邮箱账号,str_接收邮箱账号,str_抄送人邮箱,"","网页巡检完毕，具体情况如附件所示",'''''',[lujing])

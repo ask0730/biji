@@ -1,0 +1,3 @@
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"===========================================================\n"+"["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮件开始"+"\n","utf-8")
+bRet = Mail.SendEx(str_发送邮件服务器,str_发送邮件服务器端口,false,str_发送邮箱账号,str_发送邮箱密码,str_发送邮箱账号,str_接收邮箱账号,str_抄送人邮箱,str_邮件主题,str_邮件内容,str_输出文件+"\\"+str_时间+".xlsx")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮件结束"+"\n","utf-8")

@@ -1,0 +1,1123 @@
+//str_数据抓取网站 = "https://www.clcn.net.cn/resources/default/index?mode=external_link#selector-category-key"
+//变量定义
+Dim str_网址,str_名称,str_类型,str_是否存在,str_登录是否成功,str_是否已经登录,arr_第一页数据,arr_第二页数据,arr_第一次合并数据,arr_第三页数据,http_网址1,str_验证码报错存在,bRet,hWeb,temp
+
+//初始化变量
+str_是否存在 = flase
+str_时间 = Time.Format(Time.Now(),"yyyymmddhhmmss")
+
+//str_登录是否成功 = flase
+//str_是否已经登录 = false
+//遍历并处理数据
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"逻辑处理开始\n","utf-8")
+For Each value In arr_最终数据
+    str_网址 = value[0]
+    str_名称 = value[1]
+    str_类型 = value[2]
+    TracePrint("登陆网站："+str_名称)
+TracePrint("登陆网站："+str_网址)
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"===========================================================\n"+"["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"数据 分析： "+"["+str_名称+"]["+str_网址+"]"+str_类型+"\n","utf-8")
+    //第一次类型分支选择（试用、非试用）
+    Select Case str_类型 
+        Case "试用" 
+        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【试用忽略】["+str_名称+"]数据数据结论：本数据为试用数据，可以忽略。\n","utf-8")
+        value[3] = "试用中"
+        Case Else
+            //第二次名称分支选择（名称对应的操作）
+            
+            Select Case str_名称 
+            
+            //不需要登陆
+            //分支1：北京记忆 [http://www.bjmem.com.cn/]
+            
+                Case "北京记忆" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":200})
+                    #icon("@res:a9e279b0-f456-11ed-951a-03819cfded51.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页-北京记忆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"a9e279b0-f456-11ed-951a-03819cfded51.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            Case "读秀学术搜索" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":200})
+                    #icon("@res:ec718ce0-901d-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"读秀学术搜索 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"ec718ce0-901d-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            Case "典藏北京" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":200})
+                    #icon("@res:f34c3790-9e1e-11ee-a9ad-1b0719c07b2b.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"文化资源 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"f34c3790-9e1e-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    
+#icon("@res:f96cab00-9e1e-11ee-a9ad-1b0719c07b2b.png")
+str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"文化资源 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"f96cab00-9e1e-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            Case "E线图情" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":200})
+                    #icon("@res:1b9d3ea0-901f-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"e线图情—北京雷速科技有限公司 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"1b9d3ea0-901f-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    
+Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            Case "古籍珍善本图像数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":200})
+                    #icon("@res:5ce08cf0-901f-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页-首都图书馆古籍珍善本图像数据库 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"5ce08cf0-901f-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    
+Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+
+                    
+            //分支2：大爱北京[https://www.bjmem.com.cn/DABJ/home.html]
+                Case "大爱北京"                      
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:ea8d5df0-f469-11ed-951a-03819cfded51.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页-北京记忆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"ea8d5df0-f469-11ed-951a-03819cfded51.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支3：奋进新征程 建功新时代[https://www.clcn.net.cn/special/dangjian/]
+                Case "奋进新征程 建功新时代" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:bbb23e20-f521-11ed-be76-4d83fcca4224.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"奋进新征程建功新时代 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"bbb23e20-f521-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false         
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支4：古籍插画库[http://36.112.105.85/zhuantiku/index.asp?xuhao=47]
+                Case "古籍插图库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:3a6b05d0-f883-11ed-a742-6dde5d1b9908.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"古籍插图库 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"3a6b05d0-f883-11ed-a742-6dde5d1b9908.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支5：NSTL开放资源集成获取系统（外文）[http://oar.nstl.gov.cn/]
+                Case "NSTL开放资源集成获取系统（外文）" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    str_是否存在 = UiElement.Exists(@ui"图像<img>6",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false                
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支6：NSTL开放资源集成获取系统（中文）[https://doaj.istic.ac.cn/#/]
+                Case "NSTL国家科技期刊开放平台（中文）" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":2000})
+                    #icon("@res:34c87030-9e1f-11ee-a9ad-1b0719c07b2b.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"国家科技期刊开放平台 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"34c87030-9e1f-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false                
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支7：全景视频[https://360readtree-test.expreader5g.net/shouDuTuShuGuan/html/index.html#/]
+                Case "全景视频" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:3aedb1f0-f523-11ed-be76-4d83fcca4224.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"全景视频 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"3aedb1f0-f523-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                End Select
+            
+            //分支8：童书经典中的党史[http://ls.kanzhanlan.cn/tsjdzdds/pc.html]
+                Case "童书经典中的党史" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    str_是否存在 = UiElement.Exists(@ui"块级元素<div>_ExitVRVRSetup0:00/0:00",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":2000})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支9：NSTL外文现刊数据库[https://cds.nstl.gov.cn/]
+                Case "NSTL外文现刊数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:f2e2b830-8ff8-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"外文现刊数据库 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"f2e2b830-8ff8-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //分支10：NSTL外文现刊数据库[https://cds.nstl.gov.cn/]
+                Case "NSTL外文回溯期刊全文数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:94506a20-f45c-11ed-951a-03819cfded51.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"NSTL回溯数据服务平台 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"94506a20-f45c-11ed-951a-03819cfded51.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+             //分支11：国家知识产权公共服务网[http://ggfw.cnipa.gov.cn:8010/PatentCMS_Center/]
+                Case "国家知识产权公共服务网" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"块级元素<div>_在线服务Onlineservice",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+TracePrint(str_是否存在)
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+                
+                Case "人大复印报刊资料全文数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"图像<img>7",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+TracePrint(str_是否存在)
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+
+                Case "首图动漫在线" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"图像<img>8",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+TracePrint(str_是否存在)
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+
+                Case "首图讲坛资源库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"图像<img>9",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+                Case "习近平新时代中国特色社会主义思想学习文库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"链接<a>_首页",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+                Case "图壤图书馆" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"块级元素<div>_图壤图书馆",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+
+
+                Case "雅乐经典影院数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                            str_是否存在 = UiElement.Exists(@ui"图像<img>10",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            //分支27：北京市知识产权信息公共服务平台[https://www.beijingip.cn/jopm_ww/onlineSearch/index.do]
+                Case "北京市知识产权信息公共服务平台" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:4ae480c0-8ff6-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"在线查找 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"4ae480c0-8ff6-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+                
+                Case "中科多媒体教育资源数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:d25c0620-9025-11ee-a8f4-8ff258c778f0.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中科多媒体 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"d25c0620-9025-11ee-a8f4-8ff258c778f0.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            value[3] = "可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                        Case Else 
+                            str_是否存在 = false
+                            value[3] = "不可用"
+                            File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【直接打开】"+"["+str_名称+"]数据结论：该网页未能正常打开，已记录。\n","utf-8")
+                    End Select
+            
+            //需要使用账号密码登录的网站
+            //分支12：Ebook Central电子书[https://ebookcentral.proquest.com/lib/clcncn]
+                Case "Ebook Central电子书" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:354df6a0-8ff7-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"ProQuest Ebook Central - Home - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"354df6a0-8ff7-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            
+                            Mouse.Action(@ui"链接<a>_登录13","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 1000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                            Keyboard.InputText(@ui"输入控件<input>7",str_测试账号,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                            Mouse.Action(@ui"输入控件<input>_登录2","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 1000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                            #icon("@res:8b44cca0-8ff7-11ee-8a85-9123f13eefcf.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"ProQuest Ebook Central - Home - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"8b44cca0-8ff7-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            Select Case str_登录是否成功 
+                                Case true 
+                                    str_登录是否成功 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                            End Select
+                        Case Else 
+                            str_是否存在 = false       
+                            #icon("@res:9d0a8330-8ff7-11ee-8a85-9123f13eefcf.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"ProQuest Ebook Central - Home - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"9d0a8330-8ff7-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            Select Case str_是否已经登录 
+                                Case true 
+                                    str_是否已经登录 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                            End Select
+                    End Select
+            
+                 Case "红色讲坛新时代中国特色社会主义思想与文化讲坛" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:993fb860-901f-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"红色讲坛 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"993fb860-901f-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            
+                            Mouse.Action(@ui"链接<a>_登录10","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 1000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                            Keyboard.InputText(@ui"输入控件<input>59",str_测试账号,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                            
+Keyboard.InputText(@ui"输入控件<input>60",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+Mouse.Action(@ui"按钮<button>_立即登录","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 1000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                            #icon("@res:ce0abc20-901f-11ee-8a85-9123f13eefcf.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"红色讲坛 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"ce0abc20-901f-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            Select Case str_登录是否成功 
+                                Case true 
+                                    str_登录是否成功 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                            End Select
+                        Case Else 
+                            str_是否存在 = false       
+                            #icon("@res:d325a670-901f-11ee-8a85-9123f13eefcf.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"红色讲坛 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"d325a670-901f-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            Select Case str_是否已经登录 
+                                Case true 
+                                    str_是否已经登录 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                            End Select
+                    End Select
+
+                Case "中国审判案例数据库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:40f2e040-9026-11ee-a8f4-8ff258c778f0.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"北京人大数字科技有限公司审判案例数据库 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"40f2e040-9026-11ee-a8f4-8ff258c778f0.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        TracePrint($PrevResult)
+Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            
+                            Mouse.Action(@ui"链接<a>_登录14","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 1000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                                        
+                            #icon("@res:6f8d6b00-9026-11ee-a8f4-8ff258c778f0.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"北京人大数字科技有限公司审判案例数据库 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"6f8d6b00-9026-11ee-a8f4-8ff258c778f0.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            str_登录是否成功 = true
+Select Case str_登录是否成功 
+                                Case true 
+                                    str_登录是否成功 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                            End Select
+                        Case Else 
+                            str_是否存在 = false       
+                            #icon("@res:d6c58df0-9e1f-11ee-a9ad-1b0719c07b2b.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"北京人大数字科技有限公司审判案例数据库 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"d6c58df0-9e1f-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            TracePrint($PrevResult)
+Select Case str_是否已经登录 
+                                Case true 
+                                    TracePrint(1)
+str_是否已经登录 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                            End Select
+                    End Select
+            
+
+                Case "中文报纸资源库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:55343aa0-9025-11ee-a8f4-8ff258c778f0.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"登录 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"55343aa0-9025-11ee-a8f4-8ff258c778f0.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                        Case true 
+                            str_是否存在 = false
+                            
+                            Keyboard.InputText(@ui"输入控件<input>_000100795976",str_测试账号,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+Keyboard.InputText(@ui"输入控件<input>_123456",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+Mouse.Action(@ui"段落<p>_登录","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 1000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                                        
+                            #icon("@res:91d291f0-9025-11ee-a8f4-8ff258c778f0.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"九星时代报刊在线阅读系统 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"91d291f0-9025-11ee-a8f4-8ff258c778f0.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            Select Case str_登录是否成功 
+                                Case true 
+                                    str_登录是否成功 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                            End Select
+                        Case Else 
+                            str_是否存在 = false       
+                            #icon("@res:97a5f6d0-9025-11ee-a8f4-8ff258c778f0.png")
+                            str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"九星时代报刊在线阅读系统 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"97a5f6d0-9025-11ee-a8f4-8ff258c778f0.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                            Select Case str_是否已经登录 
+                                Case true 
+                                    str_是否已经登录 = false
+                                    value[3] = "可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                Case Else 
+                                    str_登录是否成功 = false
+                                    value[3] = "不可用"
+                                    File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                            End Select
+                    End Select
+            
+            //分支13：库客数字音乐图书馆[http://auth.kuke.com/kuke/st/stAlephLib]
+                Case "库客数字音乐图书馆" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:719583f0-900e-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"登录首页_首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"719583f0-900e-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                Keyboard.InputText(@ui"输入控件<input>8",str_测试账号,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>9",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"输入控件<input>_登录3","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:b0a02100-f526-11ed-be76-4d83fcca4224.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"库客数字音乐图书馆-库客音乐 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"b0a02100-f526-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false               
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                str_登录是否成功 = false
+                                value[3] = "不可用"
+                                File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                    End Select
+            
+            //分支14：龙源电子期刊阅览室 [https://sdtsg.dps.qikan.cn/pc2]
+                Case "龙源电子期刊阅览室" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:55f2a210-8ff8-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"55f2a210-8ff8-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                        Select Case str_是否存在 
+                            Case TRUE 
+                                str_是否存在 = "false"
+                                Mouse.Action(@ui"按钮<button>_登录5","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.InputText(@ui"输入控件<input>10",str_测试账号,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": false})
+                                Keyboard.InputText(@ui"输入控件<input>11",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": false})
+                                Mouse.Action(@ui"输入控件<input>_登录4","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:84df4470-8ff8-11ee-8a85-9123f13eefcf.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"84df4470-8ff8-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false                            
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:8a295510-8ff8-11ee-8a85-9123f13eefcf.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"8a295510-8ff8-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                    End Select
+            
+            //分支15：OverDrive赛阅数字图书馆[https://clcn.overdrivechina.cn/]
+                Case "OverDrive赛阅数字图书馆" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:b8848430-f529-11ed-be76-4d83fcca4224.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"Capital Library - OverDrive - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"b8848430-f529-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                Mouse.Action(@ui"链接<a>_登录2","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 3000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.InputText(@ui"输入控件<input>14",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>15",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"按钮<button>_登录1","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 60000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:28d09ba0-8ffa-11ee-8a85-9123f13eefcf.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"Capital Library - OverDrive - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"28d09ba0-8ffa-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false             
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:211b0940-8ffa-11ee-8a85-9123f13eefcf.png")
+                                str_是否已经登录 =Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"Capital Library - OverDrive - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"211b0940-8ffa-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                    End Select   
+                           
+            //分支16：QQ阅读[http://clcn.jinghecx.com/]
+                Case "QQ阅读" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:51ab97a0-8ffa-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"QQ阅读·机构版 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"51ab97a0-8ffa-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                
+                                Mouse.Action(@ui"块级元素<div>_登录6","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.Input(str_测试账号,{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "message"})
+                                Mouse.Action(@ui"输入控件<input>57","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.Input(str_测试密码,{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "message"})
+                                Mouse.Action(@ui"按钮<button>_登录9","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:a5e75020-8ffa-11ee-8a85-9123f13eefcf.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"QQ阅读·机构版 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"a5e75020-8ffa-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false                                       
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:adf25580-8ffa-11ee-8a85-9123f13eefcf.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"QQ阅读·机构版 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"adf25580-8ffa-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                        End Select
+            
+            //分支17：思政教育学科资源平台[http://sz.gxsentu.net/]
+                Case "思政教育学科资源平台" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                                                                                #icon("@res:e89b6c80-8ffa-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"思政首页 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"e89b6c80-8ffa-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                Mouse.Action(@ui"链接<a>_登录6","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.InputText(@ui"输入控件<input>18",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>19",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"链接<a>_登录7","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:0a9b7eb0-8ffb-11ee-8a85-9123f13eefcf.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"思政首页 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"0a9b7eb0-8ffb-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false          
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:14292c70-8ffb-11ee-8a85-9123f13eefcf.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"思政首页 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"14292c70-8ffb-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                    End Select
+            
+            //分支18：维普考试服务平台[https://vers.cqvip.com/UI/GoToLogin.aspx?organ=www.clcn.net.cn]
+                Case "维普考试服务平台" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:bca799a0-f52c-11ed-be76-4d83fcca4224.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"维普考试服务平台 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"bca799a0-f52c-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = false
+                                Keyboard.InputText(@ui"输入控件<input>20",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>21",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 5000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"按钮<button>_登录2","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:dd06a600-f52c-11ed-be76-4d83fcca4224.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"维普考试服务平台 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"dd06a600-f52c-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                str_登录是否成功 = false   
+                                value[3] = "不可用"
+                                File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                    End Select
+            
+            //分支19：新东方双语阅读[https://reading.koolearn.com/shoutu]
+                Case "新东方双语阅读" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:7eb7b670-9e2d-11ee-a9ad-1b0719c07b2b.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"7eb7b670-9e2d-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = false
+                                Mouse.Action(@ui"块级元素<div>_登录3","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+
+Mouse.Action(@ui"块级元素<div>_读者证账号登录1","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+Keyboard.InputText(@ui"输入控件<input>55",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>56",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 5000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"按钮<button>_登录8","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:8dba7990-845c-11ee-a720-2def7be098ed.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"8dba7990-845c-11ee-a720-2def7be098ed.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false                                       
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                str_登录是否成功 = false
+                                value[3] = "可用"
+                                File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【数据结论：该网页登录未能正常使用，已记录。】\n","utf-8")
+                    End Select
+            
+            //分支20：新东方多媒体学习库[http://library.koolearn.com/shoutu]
+                Case "新东方多媒体学习库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:811e5e90-9e1f-11ee-a9ad-1b0719c07b2b.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首图登录页 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"811e5e90-9e1f-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = false
+                                Keyboard.InputText(@ui"输入控件<input>25",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>26",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 5000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"链接<a>","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 3000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                                                
+                                str_登录是否成功 = true
+Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                str_登录是否成功 = false
+                                value[3] = "可用"
+                                File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                    End Select
+            
+            //分支21：云图数字有声图书馆[https://st.yuntuys.com/]
+                Case "云图数字有声图书馆" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:af4762d0-9e1f-11ee-a9ad-1b0719c07b2b.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"云图有声 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"af4762d0-9e1f-11ee-a9ad-1b0719c07b2b.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sMatchType":"ColorMatch"})
+                    TracePrint(str_是否存在)
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                Mouse.Action(@ui"块级元素<div>_登录2","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.InputText(@ui"输入控件<input>28",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>29",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 5000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"块级元素<div>","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Mouse.Action(@ui"块级元素<div>1","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:4b71fe00-f456-11ed-951a-03819cfded51.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"云图有声 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"4b71fe00-f456-11ed-951a-03819cfded51.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:1cbd00d0-f52f-11ed-be76-4d83fcca4224.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"云图有声 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"1cbd00d0-f52f-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false       
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                    End Select
+            
+            //分支22：中少快乐阅读平台[http://shoutu.61read.com/]
+                Case "中少快乐阅读平台" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:cc2176a0-9007-11ee-8a85-9123f13eefcf.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中少快乐阅读平台 报刊 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"cc2176a0-9007-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = false
+                                Mouse.Action(@ui"链接<a>_[登录]","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.InputText(@ui"输入控件<input>30",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>31",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 5000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"按钮<button>_登录3","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:cf778ce0-f52f-11ed-be76-4d83fcca4224.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中少快乐阅读平台 报刊 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"cf778ce0-f52f-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false                            
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:e7273d90-f52f-11ed-be76-4d83fcca4224.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中少快乐阅读平台 报刊 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"e7273d90-f52f-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false               
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false       
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                    End Select
+                    End Select 
+        
+        //分支23：CNKI知识资源总库[http://cnki.clcn.net.cn/]   
+                Case "CNKI知识资源总库" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":10000})
+                    #icon("@res:f5c6ed70-f078-11ed-af89-773962b26a7f.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"登录页面 - 首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"f5c6ed70-f078-11ed-af89-773962b26a7f.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                Keyboard.InputText(@ui"输入控件<input>32",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>33",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Mouse.Action(@ui"按钮<button>_登录4","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 3000, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:c05a8a70-8ff6-11ee-8a85-9123f13eefcf.png")
+                                str_登录是否成功=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中国知网 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"c05a8a70-8ff6-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 1000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                TracePrint(str_登录是否成功)
+Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:d31f1360-8ff6-11ee-8a85-9123f13eefcf.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中国知网 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"d31f1360-8ff6-11ee-8a85-9123f13eefcf.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 10000, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false                             
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                End Select
+                    End Select
+            
+            //分支24：畅想之星中文电子书[https://cxzxebook.clcn.net.cn/]   
+                Case "畅想之星中文电子书" 
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":2000})
+                    #icon("@res:43379740-f532-11ed-be76-4d83fcca4224.png")
+                    str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页 | 首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"43379740-f532-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"ColorMatch"})
+                    Select Case str_是否存在 
+                            Case true 
+                                str_是否存在 = "false"
+                                Mouse.Action(@ui"链接<a>_登录4","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                Keyboard.InputText(@ui"输入控件<input>35",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                Keyboard.InputText(@ui"输入控件<input>36",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                sRet = UiElement.GetAttribute(@ui"图像<img>","src",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                                str_验证码=Right(sRet,4)
+                                Keyboard.InputText(@ui"输入控件<input>37",str_验证码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": false})
+                                Mouse.Action(@ui"输入控件<input>_登录6","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 2000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                #icon("@res:7e8d41f0-f532-11ed-be76-4d83fcca4224.png")
+                                str_登录是否成功 = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页 | 首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"7e8d41f0-f532-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_登录是否成功 
+                                    Case true 
+                                        str_登录是否成功 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                         File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页登录成功，但是不可以正常使用。\n","utf-8")
+                                End Select
+                            Case Else 
+                                str_是否存在 = false
+                                #icon("@res:903c1520-f532-11ed-be76-4d83fcca4224.png")
+                                str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"首页 | 首都图书馆 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"903c1520-f532-11ed-be76-4d83fcca4224.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                    End Select
+                            End Select
+            
+            //分支25：方正电子书[http://www.apabi.com/clcn]   
+                Case "方正电子书" 
+                    str_验证码报错存在 = true
+                    str_时间 = Time.Format(Time.Now(),"yyyymmddhhmmss")
+                    http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":2000})
+                    Mouse.Action(@ui"链接<a>_登录8","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                    Do While str_验证码报错存在=true
+                        http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":2000})
+                        
+                        Mouse.Action(@ui"链接<a>_登录8","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                        #icon("@res:7a2b2a80-fead-11ed-8f91-d7e0874688be.png")
+                        str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中华数字书苑-中华数字文明精粹-用户登录 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"7a2b2a80-fead-11ed-8f91-d7e0874688be.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"ColorMatch"})
+                        Select Case str_是否存在 
+                                Case true 
+                                    Keyboard.InputText(@ui"输入控件<input>38",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                    Keyboard.InputText(@ui"输入控件<input>39",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                    UiElement.ScreenCapture(str_验证文件+"\\"+str_时间+".png",@ui"图像<img>4",{"x":0,"y":0,"width":0,"height":0},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                                    Clipboard.SetImage(str_验证文件+"\\"+str_时间+".png")
+                                    Keyboard.Press("T", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Keyboard.InputText(@ui"可编辑文本_地址和搜索栏2","https://pearocr.com/#/",true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": false})
+                                    Keyboard.Press("Enter", "press", [],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Mouse.Action(@ui"文本<span>_读剪贴板4","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                    Mouse.Action(@ui"文本<span>_复制3","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                    Keyboard.Press("W", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Mouse.Action(@ui"输入控件<input>40","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                    Keyboard.Press("V", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Mouse.Action(@ui"按钮<button>_登录7","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+File.DeleteFile(str_验证文件+"\\"+str_时间+".png")
+                                                                        #icon("@res:298cbd80-f3ab-11ed-b9be-4d171ee671f6.png")
+                                    str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中华数字书苑-中华数字文明精粹-用户登录 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"298cbd80-f3ab-11ed-b9be-4d171ee671f6.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                    Select Case str_是否已经登录 
+                                            Case true 
+                                                str_验证码报错存在 = false
+                                                value[3] = "可用"
+                                                File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+
+str_是否存在 = false
+                                            Case Else 
+                                    
+str_是否存在 = false
+End Select
+                                Case Else 
+                                    str_是否存在 = false
+                                    #icon("@res:96677010-f3a8-11ed-b9be-4d171ee671f6.png")
+                                    str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中华数字书苑-中华数字文明精粹 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"96677010-f3a8-11ed-b9be-4d171ee671f6.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_验证码报错存在 = false
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        str_验证码报错存在 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                    End Select
+                            End Select
+                    Loop
+            
+            //分支26：中国报纸资源全文数据库[http://www.apabi.com/clcn]   
+                Case "中国报纸资源全文数据库" 
+                    str_验证码报错存在 = true
+                    str_时间 = Time.Format(Time.Now(),"yyyymmddhhmmss")
+                    Do While str_验证码报错存在=true
+                        http_网址1 = WebBrowser.GoURL(http_网址,str_网址,true,{},3000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":2000})
+                        #icon("@res:55db70a0-f2f4-11ed-93af-d729429c17d6.png")
+                        str_是否存在=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中华数字书苑-中华数字文明精粹-用户登录 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"55db70a0-f2f4-11ed-93af-d729429c17d6.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"ColorMatch"})
+                        Select Case str_是否存在 
+                                Case true 
+                                    Keyboard.InputText(@ui"输入控件<input>41",str_测试账号,true,20,10000,{"bContinueOnError": true, "iDelayAfter": 300, "iDelayBefore": 3000, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                    Keyboard.InputText(@ui"输入控件<input>42",str_测试密码,true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+                                    UiElement.ScreenCapture(str_验证文件+"\\"+str_时间+".png",@ui"图像<img>5",{"x":0,"y":0,"width":0,"height":0},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                                    Clipboard.SetImage(str_验证文件+"\\"+str_时间+".png")
+                                    Keyboard.Press("T", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Keyboard.InputText(@ui"可编辑文本_地址和搜索栏1","https://pearocr.com/#/",true,20,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": false})
+                                    Keyboard.Press("Enter", "press", [],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Mouse.Action(@ui"文本<span>_读剪贴板3","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                    Mouse.Action(@ui"文本<span>_复制2","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                    Keyboard.Press("W", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    Mouse.Action(@ui"输入控件<input>43","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+                                    Keyboard.Press("V", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    File.DeleteFile(str_验证文件+"\\"+str_时间+".png")
+                                    Keyboard.Press("Enter", "press", [],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+                                    #icon("@res:298cbd80-f3ab-11ed-b9be-4d171ee671f6.png")
+                                    str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中华数字书苑-中华数字文明精粹-用户登录 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"298cbd80-f3ab-11ed-b9be-4d171ee671f6.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                    Select Case str_是否已经登录 
+                                            Case true 
+                                                str_验证码报错存在 = false
+                                                value[3] = "可用"
+                                                File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页可以正常打开。\n","utf-8")
+                                            Case Else 
+                                    End Select
+                                Case Else 
+                                    str_是否存在 = false
+                                    #icon("@res:96677010-f3a8-11ed-b9be-4d171ee671f6.png")
+                                    str_是否已经登录=Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"中华数字书苑-中华数字文明精粹 - Google Chrome","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"96677010-f3a8-11ed-b9be-4d171ee671f6.png",0.9,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sMatchType":"GrayMatch"})
+                                Select Case str_是否已经登录 
+                                    Case true 
+                                        str_验证码报错存在 = false
+                                        str_是否已经登录 = false
+                                        value[3] = "可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页二次登录成功，可以正常使用。\n","utf-8")
+                                    Case Else 
+                                        str_登录是否成功 = false
+                                        str_验证码报错存在 = false
+                                        value[3] = "不可用"
+                                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：【需要登录】["+str_名称+"]数据结论：该网页未能正常打开。\n","utf-8")
+                                    End Select
+                            End Select
+                    Loop 
+                
+                Case "状态" 
+                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【开始登录各种网址测试】\n","utf-8")
+                Case Else   
+                        value[3] = "初始不可用"  
+                        File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"【初始不可用】\n","utf-8")
+                
+                End Select 
+    End Select
+TracePrint("登陆网站："+value[3])
+Next
+
+Keyboard.Press("W", "press", ["Ctrl"],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"===========================================================\n"+"["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"逻辑处理完毕"+"\n","utf-8")

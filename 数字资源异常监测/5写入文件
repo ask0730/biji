@@ -1,0 +1,8 @@
+Dim objExcelWorkBook,temp
+
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"===========================================================\n"+"["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"写入文件开始"+"\n","utf-8")
+TracePrint(str_输出文件+"\\"+str_时间+".xlsx")
+objExcelWorkBook = Excel.OpenExcel(str_输出文件+"\\"+str_时间+".xlsx",true,"Excel","","")
+Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arr_最终数据,true)
+Excel.CloseExcel(objExcelWorkBook,true)
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"写入文件结束。"+"\n","utf-8")

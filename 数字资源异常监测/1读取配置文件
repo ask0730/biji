@@ -1,0 +1,63 @@
+//定义变量
+Dim arr_配置文件,objExcelWorkBook,bRet
+
+workspace = Replace(@res"","res\\","",false)
+
+config  = workspace+"res"+"\\bin"+"\\首图配置.xlsx"
+//读取文件，转换为数组，关闭文件
+TracePrint(config)
+objExcelWorkBook = Excel.OpenExcel(config,false,"Excel","","")
+arr_配置文件=Excel.ReadRange(objExcelWorkBook,"Sheet1","B2:C15",true)
+Excel.CloseExcel(objExcelWorkBook,true)
+
+//输出变量赋值【流程变量】
+str_日志文件=arr_配置文件[0][1]
+str_验证文件=arr_配置文件[1][1]
+str_输出文件=arr_配置文件[2][1]
+str_测试账号=arr_配置文件[3][1]
+str_测试密码=arr_配置文件[4][1]
+str_发送邮箱账号=arr_配置文件[5][1]
+str_发送邮箱密码=arr_配置文件[6][1]
+str_抄送人邮箱=arr_配置文件[7][1]
+str_接收邮箱账号=arr_配置文件[8][1]
+str_邮件主题=arr_配置文件[9][1]
+str_邮件内容=arr_配置文件[10][1]
+str_数据抓取网站=arr_配置文件[11][1]
+str_发送邮件服务器=arr_配置文件[12][1]
+str_发送邮件服务器端口=arr_配置文件[13][1]
+str_日期=Time.Format(Time.Now(),"yyyymmdd")
+
+//将相关日志写入客户自己的log更加便于查看
+bRet = File.FolderExists(str_验证文件)
+If bRet = false 
+File.CreateFolder(str_验证文件)
+End If
+
+bRet = File.FolderExists(str_日志文件)
+If bRet = false 
+File.CreateFolder(str_日志文件)
+End If
+
+bRet = File.FolderExists(str_输出文件)
+If bRet = false 
+File.CreateFolder(str_输出文件)
+End If
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"★★★★★★★★★★★★★★★★★★★★★★★★\n"+"["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"配置文件读取中……："+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"配置文件结果如下："+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"日志文件夹名称： "+str_日志文件+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"验证文件夹名称： "+str_验证文件+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"输出文件夹名称： "+str_输出文件+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"测试   账号： "+str_测试账号+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"测试   密码： "+str_测试密码+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮箱账号： "+str_发送邮箱账号+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮箱密码： "+str_发送邮箱密码+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"抄送人  邮箱： "+str_抄送人邮箱+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"接收邮箱账号： "+str_接收邮箱账号+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"邮件    主题： "+str_邮件主题+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"邮件    内容： "+str_邮件内容+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"数据抓取网站： "+str_数据抓取网站+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮件服务器： "+str_发送邮件服务器+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮件服务器端口： "+str_发送邮件服务器端口+"\n","utf-8")
+File.Append(str_日志文件+"\\"+str_日期+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"===========================================\n","utf-8")
+
+Return 10000
