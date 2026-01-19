@@ -1,0 +1,210 @@
+Dim bRet,objExcelWorkBook,objExcelWorkBookNew,sRet,iRet,iPID,路径长度=0,excel目录="",excel名称="",excelNew="",sheetName="",arrayRet,dTime,i=0,arrRet,合并后的数组,dtTable,objDatatable,每日数据文件数据表,dtTable1,dtTable2,dtTable3
+Rem 变量初始化
+workspace = Replace(@res"","res\\","",false)
+上月信息 = DigitFromStr(Time.Format(Time.DateAdd("m",-1,Time.Date()),"yyyy-mm"))
+If DigitFromStr(Time.Format(Time.Date(),"dd")) ='01' 
+    上月信息 = DigitFromStr(Time.Format(Time.DateAdd("m",-2,Time.Date()),"yyyy-mm"))
+    Else 
+    上月信息 = DigitFromStr(Time.Format(Time.DateAdd("m",-1,Time.Date()),"yyyy-mm")) 
+End If
+外借人册=Array([1,3],0)
+阅览人次=Array([1,2],0)
+新办证=Array([1,2],0)
+退证量=Array([1,2],0)
+新书入藏量=Array([1,2],0)
+外借人册[0][0]='分馆代码'
+外借人册[0][1]='上月外借总册数'
+外借人册[0][2]='上月外借总人次'
+阅览人次[0][0]='分馆代码'
+阅览人次[0][1]='上月阅览人次'
+新办证[0][0]='分馆代码'
+新办证[0][1]='上月新办证人次'
+退证量[0][0]='分馆代码'
+退证量[0][1]='上月退证人次'
+新书入藏量[0][0]='分馆代码'
+新书入藏量[0][1]='上月新入藏量'
+Rem 读取每日数据读取【1、打开文件，2、读取行数，3、读取数据区域，4、关闭该文件】
+objExcelWorkBook = Excel.OpenExcel(workspace&"待处理文件夹\\每日数据\\"&myDate&"\\"&myDate&".xls",true,"Excel","","")
+date=Time.Format(Time.Now(),"yyyymmdd")
+iRet = Excel.GetRowsCount(objExcelWorkBook,myDate)
+array_每日文件数据 = Excel.ReadRange(objExcelWorkBook,myDate,"A1:F"&iRet,true)
+Excel.CloseExcel(objExcelWorkBook,true)
+Rem 外借人册数据读取处理【1、读取txt文件、2、行符号替换，3、列符号替换，4、对数据进行分割，获取行数据5、循环分割获取列数据，并将数据去除空值后载入数组备用】
+TracePrint(workspace&"待处理文件夹\\上月数据汇总\\"&上月信息&"\\loans_month."&上月信息&".txt")
+sRet = File.Read(workspace&"待处理文件夹\\上月数据汇总\\"&上月信息&"\\loans_month."&上月信息&".txt","auto")
+sRet = Replace(sRet,"\n","FFFFF",false)
+sRet = Replace(sRet,"   ","EEEEE",false)
+一元数组=Split(sRet,"FFFFF")
+For Each value In 一元数组
+        If value="" 
+        Continue
+    Else 
+        临时一元数组=Split(value,"EEEEE")
+        外借人册 = push(外借人册,[临时一元数组[0],临时一元数组[1],临时一元数组[2]])
+    End If
+Next
+Rem 阅览人次数据读取处理 【1、读取txt文件、2、行符号替换，3、列符号替换，4、对数据进行分割，获取行数据5、循环分割获取列数据，并将数据去除空值后载入数组备用】
+sRet = File.Read(workspace&"待处理文件夹\\上月数据汇总\\"&上月信息&"\\reading_month."&上月信息&".txt","auto")
+sRet = Replace(sRet,"\n","FFFFF",false)
+sRet = Replace(sRet,"   ","EEEEE",false)
+一元数组=Split(sRet,"FFFFF")
+For Each value In 一元数组
+        If value=""
+        Continue
+    Else 
+        临时一元数组=Split(value,"EEEEE")
+阅览人次 = push(阅览人次,[临时一元数组[0],临时一元数组[1]])
+    End If
+Next
+Rem 新办证数据读取处理 【1、读取txt文件、2、行符号替换，3、列符号替换，4、对数据进行分割，获取行数据5、循环分割获取列数据，并将数据去除空值后载入数组备用】
+sRet = File.Read(workspace&"待处理文件夹\\上月数据汇总\\"&上月信息&"\\new_patron_month."&上月信息&".txt","auto")
+sRet = Replace(sRet,"\n","FFFFF",false)
+sRet = Replace(sRet,"   ","EEEEE",false)
+一元数组=Split(sRet,"FFFFF")
+For Each value In 一元数组
+        If value="" 
+        Continue
+    Else 
+        临时一元数组=Split(value,"EEEEE")
+新办证 = push(新办证,[临时一元数组[0],临时一元数组[1]])
+    End If
+Next
+Rem 退证量数据读取处理 【1、读取txt文件、2、行符号替换，3、列符号替换，4、对数据进行分割，获取行数据5、循环分割获取列数据，并将数据去除空值后载入数组备用】
+sRet = File.Read(workspace&"待处理文件夹\\上月数据汇总\\"&上月信息&"\\out_patron_month."&上月信息&".txt","auto")
+sRet = Replace(sRet,"\n","FFFFF",false)
+sRet = Replace(sRet,"   ","EEEEE",false)
+一元数组=Split(sRet,"FFFFF")
+For Each value In 一元数组
+        If value="" 
+        Continue
+    Else 
+        临时一元数组=Split(value,"EEEEE")
+
+退证量 = push(退证量,[临时一元数组[0],临时一元数组[1]])
+    End If
+Next
+Rem 新书入藏量数据读取处理 【1、读取txt文件、2、行符号替换，3、列符号替换，4、对数据进行分割，获取行数据5、循环分割获取列数据，并将数据去除空值后载入数组备用】
+sRet = File.Read(workspace&"待处理文件夹\\上月数据汇总\\"&上月信息&"\\new_items_month."&上月信息&".txt","auto")
+sRet = Replace(sRet,"\n","FFFFF",false)
+sRet = Replace(sRet,"   ","EEEEE",false)
+一元数组=Split(sRet,"FFFFF")
+For Each value In 一元数组
+        If value="" 
+        Continue
+    Else 
+        临时一元数组=Split(value,"EEEEE")
+
+新书入藏量 = push(新书入藏量,[临时一元数组[0],临时一元数组[1]])
+    End If
+Next
+Rem 给所有的数据表读取并设置数据库表头 
+每日数据文件数据表 = Datatable.BuildDataTable(array_每日文件数据,["分馆代码","分馆名称","新入藏量","借书册次","借书人次","新办证量"])
+上月外借人册次数据表 = Datatable.BuildDataTable(外借人册,["分馆代码","上月外借总册数","上月外借总人数"])
+上月阅览人次数据表=Datatable.BuildDataTable(阅览人次,["分馆代码","上月阅览人次"])
+上月新办证人次数据表=Datatable.BuildDataTable(新办证,["分馆代码","上月新办证人次"])
+上月退证人次数据表=Datatable.BuildDataTable(退证量,["分馆代码","上月退证人次"])
+上月新书入藏量数据表=Datatable.BuildDataTable(新书入藏量,["分馆代码","上月新书入藏量"])
+Rem 合并所有数据表的数据【1、主表和下一个表合并，合并的表作为主表和下下一个表合并】
+dtTable = Datatable.MergeDataTable(每日数据文件数据表,上月外借人册次数据表,"left","分馆代码","分馆代码",false)
+dtTable1 = Datatable.MergeDataTable(dtTable,上月阅览人次数据表,"left","分馆代码","分馆代码",false)
+dtTable2 = Datatable.MergeDataTable(dtTable1,上月新办证人次数据表,"left","分馆代码","分馆代码",false)
+dtTable3 = Datatable.MergeDataTable(dtTable2,上月退证人次数据表,"left","分馆代码","分馆代码",false)
+dtTable4 = Datatable.MergeDataTable(dtTable3,上月新书入藏量数据表,"left","分馆代码","分馆代码",false)
+Rem 合并数据后的数据表的数据重新数组化 
+objDatatable = Datatable.GetDataTableByArray(dtTable4,false)
+Rem 数组化的数据输出到一个excel中【0、判断文件夹是否存在，不存在新建一个1、打开文件，2、写入区域、3、关闭文件】
+if(File.FolderExists(workspace&"待处理文件夹\\合并数据文件\\") = false)
+    File.CreateFolder(workspace&"待处理文件夹\\合并数据文件\\")
+end if
+if(File.FolderExists(workspace&"最终数据文件夹\\"&myDate) = false)
+    File.CreateFolder(workspace&"最终数据文件夹\\"&myDate&"\\")
+end if
+objExcelWorkBook = Excel.OpenExcel(workspace&"待处理文件夹\\合并数据文件\\"&myDate&".xls",true,"Excel","","")
+Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",objDatatable,false)
+Excel.CloseExcel(objExcelWorkBook,true)
+Rem 读取数据合并后的表【1、打开文件，2、读取行数，3、读取数据区域，4、关闭该文件】
+objExcelWorkBook = Excel.OpenExcel(workspace&"待处理文件夹\\合并数据文件\\"&myDate&".xls",true,"Excel","","")
+sheetName = Excel.CurrentSheet(objExcelWorkBook,true)
+iAllRows = Excel.GetRowsCount(objExcelWorkBook,sheetName)
+arrayRet = Excel.ReadRange(objExcelWorkBook,sheetName,"A1:l"&iAllRows,true)
+TracePrint($PrevResult)
+Excel.CloseExcel(objExcelWorkBook,true)
+File.CopyFile(workspace&"待处理文件夹\\合并数据文件\\"&myDate&".xls",workspace&"最终数据文件夹\\"&myDate&"\\",true)
+File.FileExists(workspace&"最终数据文件夹\\"&myDate&"\\"&"所有馆_每日新增_"&myDate&".xls")
+
+if(File.FileExists(workspace&"最终数据文件夹\\"&myDate&"\\"&"所有馆_每日新增_"&myDate&".xls") = false)
+    File.RenameEx(workspace&"最终数据文件夹\\"&myDate&"\\"&myDate&".xls","所有馆_每日新增_"&myDate&".xls")
+end if
+Rem 读取合并数据表配置信息【1、打开文件，2、读取行数，3、读取数据区域，4、关闭该文件】
+str_分馆信息 = workspace+"res"+"\\分馆信息发送表.xlsx"
+objExcelWorkBook = Excel.OpenExcel(str_分馆信息,true,"Excel","","")
+int_行数 = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+arr_总分馆信息 = Excel.ReadRange(objExcelWorkBook,"Sheet1","A2:C"&int_行数,true)
+Excel.CloseExcel(objExcelWorkBook,true)
+Rem 根据读取到的分馆信息将合并后的数据进行拆分，并保存至不同的文件夹
+For Each value In arr_总分馆信息
+    arr_分馆代码 = Split(value[0],",")
+    //分馆信息接收数组定义并初始化
+    arr_分馆信息 = Array([1,11],0)
+    arr_分馆信息[0][0]="分馆代码"
+    arr_分馆信息[0][1]="分馆名称"
+    arr_分馆信息[0][2]="新入藏量"
+    arr_分馆信息[0][3]="借书册次"
+    arr_分馆信息[0][4]="借书人次"
+    arr_分馆信息[0][5]="新办证量"
+    arr_分馆信息[0][6]="上月外借总册数"
+    arr_分馆信息[0][7]="上月外借总人次"
+    arr_分馆信息[0][8]="上月阅览人次"
+    arr_分馆信息[0][9]="上月新办证人次"
+    arr_分馆信息[0][10]="上月退证人次"
+    arr_分馆信息[0][11]="上月新入藏量"
+    z = 1
+    For Each str_分馆代码 In arr_分馆代码
+        For Each str_行数据 In arrayRet
+            If str_分馆代码 = Left(LetterFromStr(str_行数据[0]),2)
+                    arr_分馆信息=push(arr_分馆信息,[0,0,0,0,0,0,0,0,0,0,0])
+                    arr_分馆信息[z][0]=str_行数据[0]
+                    arr_分馆信息[z][1]=str_行数据[1]
+                    arr_分馆信息[z][2]=str_行数据[2]
+                    arr_分馆信息[z][3]=str_行数据[3]
+                        arr_分馆信息[z][4]=str_行数据[4]
+                        arr_分馆信息[z][5]=str_行数据[5]
+                        If str_行数据[6] = ""
+                                 arr_分馆信息[z][6] = '0' 
+                            Else 
+                                arr_分馆信息[z][6] = str_行数据[6]
+                        End If
+                        If str_行数据[7] = ""
+                                 arr_分馆信息[z][7] = '0' 
+                            Else 
+                                arr_分馆信息[z][7] = str_行数据[7]
+                        End If
+                        If str_行数据[8] = ""
+                                 arr_分馆信息[z][8] = '0' 
+                            Else 
+                                arr_分馆信息[z][8] = str_行数据[8]
+                        End If
+                        If str_行数据[9] = ""
+                                 arr_分馆信息[z][9] = '0' 
+                            Else 
+                                arr_分馆信息[z][9] = str_行数据[9]
+                        End If
+                        If str_行数据[10] = ""
+                                 arr_分馆信息[z][10] = '0' 
+                            Else 
+                                arr_分馆信息[z][10] = str_行数据[10]
+                        End If
+                        If str_行数据[11] = ""
+                                 arr_分馆信息[z][11] = '0' 
+                            Else 
+                                arr_分馆信息[z][11] = str_行数据[11]
+                        End If
+                        z =z+1
+            End If
+        Next
+    Next
+    objExcelWorkBook = Excel.OpenExcel(workspace&"最终数据文件夹\\"+myDate+"\\"+value[1]+"_每日新增_"+myDate+".xlsx",true,"Excel","","")
+    Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arr_分馆信息,true)
+    Delay(1000)
+    App.Kill("EXCEL.EXE")
+Next

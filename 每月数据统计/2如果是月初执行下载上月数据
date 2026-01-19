@@ -1,0 +1,50 @@
+Dim iRet,hWeb,dTime,sRet,sName,bRet,dictRet,url,arrRet,arrayRet=[],目录,i = 0,上月数据url前缀,上月信息="" 
+Log.Info("进入数据下载（上月）")
+/**读取配置信息 */
+workspace = Replace(@res"","res\\","",false)
+config  = workspace+"res"+"\\首图配置.ini"
+libRet = INI.EnumSection(config)
+/**读取的配置信息输出 */
+待处理文件目录 = INI.Read(config, "base", "待处理文件", "")
+上月数据url前缀 = INI.Read(config, "base", "上月数据url前缀", "")
+上月文件名称前缀=INI.Read(config, "base", "上月文件名称前缀", "")
+/**获取时间信息 */
+上月时间=Time.DateAdd("m",-1,Time.Date())
+上月信息 = DigitFromStr(Time.Format(Time.DateAdd("m",-1,Time.Date()),"yyyy-mm"))
+/**创建相关数据文件 */
+if(File.FolderExists(workspace&待处理文件目录&上月信息&'''\''') = false)
+    File.CreateFolder(workspace&待处理文件目录&上月信息&'''\''')
+end if
+/**循环下载上月数据文件 */
+For i = 0 To 4 step 1
+    url=上月数据url前缀&上月文件名称前缀[i]&上月信息&'.txt'
+        /**测试是链接状态 */
+        syscommand = "curl -sIL -w \"%{http_code}\" -k --insecure "&url&" -o /dev/null"
+        http_code = Sys.Command(syscommand)
+        /**访问状态分支：不可访问发错误邮件 */
+        If http_code = '404' 
+            haveURL = '否'
+            提示email = INI.Read(config, "base", "错误提示email", "")
+            提示emailcs = INI.Read(config, "base", "错误提示email_cs", "")
+            当前sendmail = INI.Read(config, "base", "当前sendmail", "")
+            sendmail = INI.Read(config, 当前sendmail, "email", "")
+            pwd = INI.Read(config, 当前sendmail, "pwd", "")
+            server = INI.Read(config, 当前sendmail, "server", "")
+            port = INI.Read(config, 当前sendmail, "port", "")
+            title = "首都图书馆RPA报错提示"
+            info = "RPA流程运行错误，原因：下载文件错误，未能成功下载上月数据，下载url："&url
+            ssl = INI.Read(config, 当前sendmail, "ssl", "")
+            sslb = False
+            If ssl="是" 
+                sslb = True
+            End If
+            bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,提示email,提示emailcs,title,info,"")
+            return false
+        End If
+        /**访问网页并下载数据 */
+        haveURL = '是'
+        Web = WebBrowser.Create("innerbrowser",url,30000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+        WebBrowser.Download(Web,url,workspace&待处理文件目录&上月信息&'''\'''&上月文件名称前缀[i]&上月信息&'.txt',true,300000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        WebBrowser.Close(Web,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+Next
+Log.Info("数据下载（上月）完毕")

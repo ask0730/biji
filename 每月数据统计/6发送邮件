@@ -1,0 +1,73 @@
+Dim bRet,objExcelWorkBook,arrayRet,iRet
+Rem 发送全量文件
+// workspace = Replace(@res"","res\\","",false)
+// config  = workspace+"res"+"\\首图配置.ini"
+
+workspace = Replace(@res"","res\\","",false)
+alllib_email = INI.Read(config, "base", "所有馆数据email", "")
+alllib_emailcs = INI.Read(config, "base", "所有馆数据email_cs", "")
+
+// 当前sendmail = INI.Read(config, "base", "当前sendmail", "")
+// sendmail = INI.Read(config, 当前sendmail, "email", "")
+// sRet = INI.Read('''C:\Users''', "", "", "")
+// pwd = INI.Read(config, 当前sendmail, "pwd", "")
+// server = INI.Read(config, 当前sendmail, "server", "")
+// port = INI.Read(config, 当前sendmail, "port", "")
+// title = INI.Read(config, 当前sendmail, "title", "")
+// ssl = INI.Read(config, 当前sendmail, "ssl", "")
+
+sendmail = INI.Read(config, "sendmail1", "email", "")
+pwd = INI.Read(config, "sendmail1", "pwd", "")
+server = INI.Read(config, "sendmail1", "server", "")
+port = INI.Read(config, "sendmail1", "port", "")
+title = INI.Read(config, "sendmail1", "title", "")
+ssl = INI.Read(config, "sendmail1", "ssl", "")
+
+sslb = False
+If ssl="是" 
+    sslb = true
+End If
+/*
+附件1 = workspace&"最终数据文件"&'\\'&""&myDate&"\\所有馆_每日新增_"&myDate&".xls"
+TracePrint(附件1)
+TracePrint(config)
+bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,alllib_email,alllib_emailcs,title,"",[附件1])
+For Each value In array所有馆
+    libCode = value[0]
+    libName = value[1]
+    email = value[2]
+    email_cs = value[3]
+    附件2 = 附件路径&libName&"_每日新增_"&myDate&".xlsx"
+    TracePrint(email)
+    TracePrint(email_cs)
+
+    bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,email,email_cs,title,"",[附件2])
+
+Next
+// bRet = Mail.SendEx("smtp.163.com",25,false,"shoututest@163.com","XVAdCclyYDa36CLleDxMlM2YA6sVDnWqxuUm1Ydy72U=","shoututest@163.com","150119862@qq.com","","首图测试","",[附件1,附件2])
+*/
+Rem  发送指定的分馆邮件
+objExcelWorkBook = Excel.OpenExcel(workspace&"res"&"\\分馆信息发送表.xlsx",true,"Excel","","")
+iRet = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+arrayRet = Excel.ReadRange(objExcelWorkBook,"Sheet1","A1:C"&iRet,true)
+Excel.CloseExcel(objExcelWorkBook,true)
+For Each value In arrayRet
+    图书馆编码 = value[0]
+    图书馆名称 = value[1]
+    图书馆收件人 = value[2]
+If 图书馆收件人="" 
+        Continue
+    Else 
+        If 图书馆收件人='收件人'
+            Continue
+        Else 
+            附件=(workspace&"最终数据文件夹"&'\\'&""&myDate&"\\"&图书馆名称&"_每日新增_"&myDate&".xlsx")
+        // bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,图书馆收件人,"",图书馆名称&"数据统计","",附件)      
+                bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,图书馆收件人,"",图书馆名称&"数据统计","",附件)      
+                // bRet = Mail.SendEx("smtp.qq.com", 465, true, "2137576215@qq.com", "svlrgzjbldrzdfec", "2137576215@qq.com",图书馆收件人, "", 图书馆名称&"数据统计", "", 附件)
+                // bRet = Mail.SendEx("smtp.qq.com", 465, true, "2137576215@qq.com", "svlrgzjbldrzdfec", "2137576215@qq.com","2137576215@qq.com", "","cehi", "","")
+// bRet = Mail.SendEx("smtp.qq.com", 465, true, "2137576215@qq.com", "svlrgzjbldrzdfec", "2137576215@qq.com", "2137576215@qq.com", "", "年报下载、服务通知查询、项目申报、学术研究", "详情请见附件", ['''C:\Users\Administrator\Desktop\年报下载、服务通知查询、项目申报、学术研究.zip'''])
+
+        End If
+    End If
+Next

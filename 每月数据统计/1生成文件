@@ -1,0 +1,21 @@
+Dim str_标准目录,str配置目录,str_读取参数,str_输入参数,iRet,objFTP,bRet,str_输入命令,iPID,sRet
+/*
+Rem 屏幕解锁
+解锁屏幕=RDP.UnlockScreen("administrator","o1vCrst9v2q6LkUNoUMciw==")
+Log.Info(解锁屏幕)
+Rem 打开xshell对话，并等待执行完毕【1、代开，2、获取对应的PID，3、等待文件执行，4、根据pid关闭应用】
+Log.Info("打开xshell")
+iPID = App.Start('''C:\Users\Administrator\Documents\NetSarang Computer\7\Xshell\Sessions\192.169.100.60.xsh''', 0, 1)
+Log.Info("系统生成文件中，等待10分钟")
+Delay(650000)
+App.Kill(iPID)
+Log.Info("关闭xshell")
+Log.Info("系统生成文件完毕")
+Rem 判断程序运行日期是否是月初
+*/
+str_是否月初 = "否"
+If DigitFromStr(Time.Format(Time.Date(),"dd")) ='07'
+    str_是否月初 = "是"
+End If 
+
+TracePrint(str_是否月初)

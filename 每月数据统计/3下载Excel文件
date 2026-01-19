@@ -1,0 +1,65 @@
+Dim iRet,hWeb,dTime,sRet,sName,bRet,dictRet,url,arrRet,arrayRet=[],i = 0 
+Rem 获取本日下载的配置信息
+TracePrint("下载本日数据")
+workspace = Replace(@res"","res\\","",false)
+config  = workspace+"res"+"\\首图配置.ini"
+libRet = INI.EnumSection(config)
+For Each section In libRet 
+    If StartsWith(section,"lib_") 
+        code = LTrim(section,"lib_")
+        name = INI.Read(config, section, "name", "")
+        email = INI.Read(config, section, "email", "")
+        email_cs = INI.Read(config, section, "email_cs", "")
+        libdata = INI.Read(config, section, "data", "")
+        arrRet = insert([],0,code)
+        arrRet = insert(arrRet,1,name)
+        arrRet = insert(arrRet,2,email)
+        arrRet = insert(arrRet,3,email_cs)
+        arrRet = insert(arrRet,4,libdata)
+        arrayRet = insert(arrayRet,i,arrRet)
+        i = i+1
+    End If
+Next
+目录 = INI.Read(config, "base", "文件目录", "")
+url = INI.Read(config, "base", "url前缀", "")
+myDate = DigitFromStr(Time.Format(Time.Date(),"yyyy-mm-dd"))
+myDate = '20231202'
+目录 = workspace&目录&myDate&'''\'''
+TracePrint(目录)
+Rem 根据配置信息创建文件夹
+if(File.FolderExists(目录) = false)
+    File.CreateFolder(目录)
+end if
+Rem 对各个链接进行测试
+url=url&myDate&".xls"
+//url=url&20231107&".xls"
+syscommand = "curl -sIL -w \"%{http_code}\" -k --insecure "&url&" -o /dev/null"
+http_code = Sys.Command(syscommand)
+TracePrint(url)
+TracePrint(http_code)
+If http_code = '404' 
+    haveURL = '否'
+    提示email = INI.Read(config, "base", "错误提示email", "")
+    提示emailcs = INI.Read(config, "base", "错误提示email_cs", "")
+    当前sendmail = INI.Read(config, "base", "当前sendmail", "")
+    sendmail = INI.Read(config, 当前sendmail, "email", "")
+    pwd = INI.Read(config, 当前sendmail, "pwd", "")
+    server = INI.Read(config, 当前sendmail, "server", "")
+    port = INI.Read(config, 当前sendmail, "port", "")
+    title = "首都图书馆RPA报错提示"
+    info = "RPA流程运行错误，原因：下载文件错误，目前并未生成当天图书馆数据，下载url："&url
+    ssl = INI.Read(config, 当前sendmail, "ssl", "")
+    sslb = False
+    If ssl="是" 
+        sslb = True
+    End If
+    bRet = Mail.SendEx(server,port,sslb,sendmail,pwd,sendmail,提示email,提示emailcs,title,info,"") 
+    return false
+End If
+/**打开浏览器开始下载每日文件 */
+haveURL = '是'
+excel路径 = 目录&myDate&".xls"
+hWeb = WebBrowser.Create("innerbrowser","",30000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+WebBrowser.Download(hWeb,url,excel路径,true,300000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+WebBrowser.Close(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+TracePrint("本日数据下载完毕")
