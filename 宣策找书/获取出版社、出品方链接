@@ -1,0 +1,229 @@
+1读取配置
+/**读取配置文件前准备 */
+Dim bo_判断文件夹是否存在,temp,iRet,bRet,arrRet
+/** 
+解锁屏幕=RDP.UnlockScreen("administrator","o1vCrst9v2q6LkUNoUMciw==")*/
+/**Log.Info(解锁屏幕)*/
+
+/**创建日志文件夹、运行中间文件夹(出版社连接文件夹，图书连接文件夹) */
+
+str_时间 = Time.Format(Time.Now(),"yyyy-mm-dd")
+workspace = Replace(@res"","res\\","",false)
+workspace1 = '''C:\Users\Administrator\Desktop\'''
+
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunLog")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunLog")
+            TracePrint("文件夹创建完毕")
+End Select
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunFile")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunFile")
+            TracePrint("文件夹创建完毕")
+End Select
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunFile\\Publisher Connection")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunFile\\Publisher Connection")
+            TracePrint("文件夹创建完毕")
+End Select
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunFile\\Book Connection")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunFile\\Book Connection")
+            TracePrint("文件夹创建完毕")
+End Select
+/**开始读取配置文件 */
+
+bo_判断文件夹是否存在=File.FolderExists(workspace+"RunFile\\BookInfo")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace+"RunFile\\BookInfo")
+            TracePrint("文件夹创建完毕")
+End Select
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"文件夹准备完毕，开始读取配置文件....\n","gbk")
+config  = workspace1+"图书管理配置.xlsx"
+objExcelWorkBook = Excel.OpenExcel(config,true,"Excel","","")
+int_数据量 = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+arr_配置=Excel.ReadRange(objExcelWorkBook,"Sheet1","E3:G"+int_数据量,true)
+
+TracePrint(arr_配置)
+Excel.CloseExcel(objExcelWorkBook,false)
+str_查询年 = arr_配置[0][1]
+str_查询年月 = arr_配置[1][1]
+str_文件输出路径 = arr_配置[2][1]
+
+
+str_发件人邮箱账号 = arr_配置[3][1]
+str_发件人邮箱密码 = arr_配置[4][1]
+str_收件人邮箱 = arr_配置[5][1]
+str_邮件标题 = arr_配置[6][1]
+str_邮件内容 = arr_配置[7][1]
+str_抄送人邮箱 = arr_配置[8][1]
+str_SMTP服务器 = arr_配置[9][1]
+str_服务器端口  =  arr_配置[10][1]
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：配置读取完毕，开始获取各出版社，出品方连接...\n","gbk"
+
+
+
+2访问网站，获取出版社、出品方链接
+Dim str_初始网址,http_开始网页,objElement,arrElement,iRet,temp,str_页数,int_页数,arr_书名网页,arr_出版社出品方,value,str_书名,str_网址,str_出版社连接,str_出版社名称,str_图书名称,str_出品方是否存在,str_信息块,int_开始下标,str_截止信息点,int_截止下标,arr_出品方,int_出品方个数,str_出品名称,str_出品连接,a,objDatatable,objExcelWorkBook,sRet,arrRet,bRet,arrSet,strJSON,k,str_出版社,str_临时名称,item
+/**
+
+str_时间 = "2023-07-25"
+*/
+workspace = Replace(@res"","res\\","",false) 
+workspace1 = '''C:\Users\Administrator\Desktop\'''
+arr_出版社出品方处理后 = Array([1,3],null)
+
+For Each value In arr_出版社出品方处理后
+        value[0] = "书名"
+        value[1] = "连接"
+        value[2] = "类型"
+Next
+arr_书名网址 = Array([1,2],null)
+For Each value In arr_书名网址
+        value[0] = "书名"
+        value[1] = "连接"
+Next
+/**打开网页，并访问【https://book.douban.com/】，获取新书速递全部连接*/
+http_开始网页=WebBrowser.Create("chrome","https://book.douban.com/latest?subcat=全部",30000,{"bContinueOnError":false,"iDelayAfter":500,"iDelayBefore":200,"sBrowserPath":'''C:\Program Files\Google\Chrome\Application\chrome.exe''',"sStartArgs":""})
+/**获取新书速递全部连接的总页数 */
+bRet = UiElement.Exists(@ui"链接<a>_2",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bWaitDOMReady":true})
+If   bRet = true
+       objElement = UiElement.GetParent(@ui"链接<a>_2",1,{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":2000})
+        arrElement = UiElement.GetChildren(objElement,1, {"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        /**获取的数组减前页1，后页1 */
+        result = UBound(arrElement)-2
+Else
+        result = 1
+End If
+
+
+/**循环读取每一页的数据 */
+//result = 1
+TracePrint('''开始抓取图书连接...''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：获取数据共计"+result+"页：开始抓取图书连接...\n","gbk")
+For i = 1 To result Step 1
+        Keyboard.InputText(@ui"可编辑文本_book.douban.com/latest?subcat=全部1",'''https://book.douban.com/latest?subcat=%E5%85%A8%E9%83%A8&p='''+i,true,30,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+        Keyboard.Press("Enter", "press", [],{"iDelayAfter": 300, "iDelayBefore": 200, "sSimulate": "simulate"})
+        TracePrint('''当前抓取页数：'''+ i+'''/'''+result)
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：当前抓取页数："+ i+"/"+result+"\n","gbk")
+        /**开始当前页数据抓取 */
+        objElement = UiElement.GetParent(@ui"列表项<li>_女士品茶：统计学如何变革科学和生活[美]戴维·萨尔斯伯格/2025-2/九州出版社/",1,{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":2000})
+        arrElement = UiElement.GetChildren(objElement,1, {"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        For Each value In arrElement
+                arrElement1 = UiElement.GetChildren(value,3, {"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                sRet_书名 = UiElement.GetValue(arrElement1[5],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                sRet_网页 = UiElement.GetAttribute(@ui"链接<a>_卢布：一部政治史：1769—1924","href",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                TracePrint('''抓取到的书名【'''+sRet_书名+ '''】''' )
+                TracePrint('''抓取到的网站【'''+sRet_网页+ '''】''' )
+                Push(arr_书名网址, [sRet_书名,sRet_网页])
+                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：书名：【"+sRet_书名+ '''】'''+"\n","gbk")
+                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：网站：【"+sRet_网页+ '''】'''+"\n","gbk")
+        Next
+Next
+TracePrint('''图书连接抓取完毕...''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：图书连接抓取完毕...\n","gbk")
+WebBrowser.Close(http_开始网页,{"bContinueOnError":false,"iDelayAfter":30000,"iDelayBefore":200})
+http_开始网页 = WebBrowser.Create("chrome","",30000,{"bContinueOnError":false,"iDelayAfter":5000,"iDelayBefore":200,"sBrowserPath":'''C:\Program Files\Google\Chrome\Application\chrome.exe''',"sStartArgs":""})
+
+/**依次访问书名网址列表，获取出版社、出版社连接（出品方） */
+Mouse.Action(@ui"窗口_about:blank","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+arr_出版社出品方 = Array([1,3],null)
+For Each value In arr_出版社出品方
+        value[0] = "名称"
+        value[1] = "连接"
+        value[2] = "类型"
+Next
+TracePrint('''开始抓取各图书的出版社、出品方...''')
+For Each value In arr_书名网址
+        If value[1] = "连接" 
+
+        Else  
+        TracePrint('''访问网站，抓取出品方、出版社：'''+value[1])
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：访问网站，抓取出品方、出版社："+value[1]+"\n","gbk")
+        Keyboard.InputText(@ui"可编辑文本_about:blank1",value[1],true,30,10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 500, "bSetForeground": true, "sSimulate": "message", "bValidate": false, "bClickBeforeInput": true})
+        Keyboard.Press("Enter", "press", [],{"iDelayAfter": 5000, "iDelayBefore": 5000, "sSimulate": "message"})
+        /**开始获取出品方、出版社的名称，连接 */
+        str_信息块 = UiElement.GetValue(@ui"块级元素<div>_作者:[丹麦]托芙·迪特莱弗森出版社:广西师范大学出版社出品方:野spring译",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        int_开始下标 = InStr(str_信息块,"出版社",1,false)
+        str_截止信息点 = UiElement.GetValue({"html":[{"css-selector":"body>div>div>div>div>div>div>div>div>span","tag":"SPAN","idx":2}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},{"bContinueOnError":false,"iDelayAfter":10,"iDelayBefore":10})
+        int_截止下标 = InStr(str_信息块,str_截止信息点,1,false)
+        str_出版社=SubString(str_信息块,int_开始下标-1,int_截止下标-1)
+        str_出版社=Replace(str_出版社," ","",false)
+        str_出版社=Replace(str_出版社,"\n","",false)
+        str_出版社名称=Replace(str_出版社,"出版社:","",false)
+        arr_出版社名称 = Split($PrevResult, "/")
+        For Each value In arr_出版社名称
+                str_出版社连接 = UiElement.GetAttribute({"html":[{"tag":"A","parentid":"info","aaname":value}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},"href",{"bContinueOnError":true,"iDelayAfter":1000,"iDelayBefore":1000})
+                Push(arr_出版社出品方,[value,str_出版社连接,"出版社"])
+        Next
+        TracePrint('''出版社：'''+str_出版社名称)
+        TracePrint('''出版社网址：'''+str_出版社连接)
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社："+str_出版社名称+"\n","gbk")
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社网址："+str_出版社连接+"\n","gbk")  
+        str_出品方是否存在 = UiElement.Exists({"html":[{"tag":"SPAN","parentid":"info","aaname":"出品方:"}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},{"bContinueOnError":false,"iDelayAfter":10,"iDelayBefore":10})
+        If str_出品方是否存在  
+                str_信息块 = UiElement.GetValue(@ui"块级元素<div>_作者:[丹麦]托芙·迪特莱弗森出版社:广西师范大学出版社出品方:野spring译",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                int_开始下标 = InStr(str_信息块,"出品方",1,false)
+                str_截止信息点 = UiElement.GetValue({"html":[{"css-selector":"body>div>div>div>div>div>div>div>div>span","tag":"SPAN","idx":3}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},{"bContinueOnError":false,"iDelayAfter":10,"iDelayBefore":10})
+                int_截止下标 = InStr(str_信息块,str_截止信息点,1,false)
+                str_信息块=SubString(str_信息块,int_开始下标-1,int_截止下标-1)
+                str_信息块=Replace(str_信息块," ","",false)
+                str_信息块=Replace(str_信息块,"\n","",false)
+                str_信息块=Replace(str_信息块,"出品方:","",false)
+                arr_出品方 = Split(str_信息块,"/")
+                int_首个出品方的长度 = LenB(arr_出品方[0])
+                If int_首个出品方的长度 = 0 
+                        
+                Else 
+                        For Each value In arr_出品方
+                                str_出品名称 = value
+                                str_出品连接 = UiElement.GetAttribute({"html":[{"tag":"A","parentid":"info","aaname":str_出品名称}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},"href",{"bContinueOnError":true,"iDelayAfter":10,"iDelayBefore":10})                             
+                                arr_出版社出品方 = push(arr_出版社出品方,[str_出品名称,str_出品连接,"出品方"])
+                                TracePrint('''出品方：'''+str_出品名称)
+                                TracePrint('''出品方网址：'''+str_出品连接)
+                                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出品方："+str_出品名称+"\n","gbk")  
+                                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出品方网址："+str_出品连接+"\n","gbk")  
+                        Next
+                End If
+                TracePrint('''出品方：'''+str_出品名称)
+                TracePrint('''出品方网址：'''+str_出品连接)
+                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出品方："+str_出品名称+"\n","gbk")  
+                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出品方网址："+str_出品连接+"\n","gbk")  
+        
+        Else          
+        End If
+        End If
+Next
+TracePrint('''各图书出版社、出品方连接抓取完毕。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：各图书出版社、出品方连接抓取完毕。\n","gbk")  
+/*对获取的出版社、出品方连接去重处理 */
+TracePrint('''出版社、出品方连接开始去重。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社、出品方连接开始去重。\n","gbk")  
+objDatatable = Datatable.BuildDataTable(arr_出版社出品方,["名称","连接","类型"])
+objDatatable = Datatable.DropDuplicatesDataTable(objDatatable,["名称","连接"],"first")
+arr_出版社出品方处理后 = Datatable.GetDataTableByArray(objDatatable,true)
+TracePrint('''出版社、出品方连接去重完毕。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社、出品方连接去重完毕。\n","gbk")  
+/*输出出版社、出品方连接到结果文件 */
+TracePrint('''出版社、出品方连接去重结果开始输出到文件。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社、出品方连接去重结果开始输出到文件。\n","gbk")  
+obj_写入出版社连接 = Excel.OpenExcel(workspace1+"RunFile\\Publisher Connection\\"+Time.Format(Time.Now(),"yyyy-mm")+"-出版社连接.xlsx",true,"Excel","","")
+Excel.WriteRange(obj_写入出版社连接,"Sheet1","A1",arr_出版社出品方处理后,false)
+Excel.CloseExcel(obj_写入出版社连接,true)
+TracePrint('''出版社、出品方连接去重结果输出到文件完毕。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社、出品方连接去重结果输出到文件完毕。\n","gbk")  
+/*输出出版社、出品方连接到文件夹 */
+TracePrint('''出版社、出品方连接未去重结果开始输出到文件。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社、出品方连接未去重结果开始输出到文件。\n","gbk")  
+
+obj_写入出版社连接 = Excel.OpenExcel(workspace1+"RunFile\\Publisher Connection\\"+Time.Format(Time.Now(),"yyyy-mm")+"-出版社连接（未去重）.xlsx",true,"Excel","","")
+Excel.WriteRange(obj_写入出版社连接,"Sheet1","A1",arr_出版社出品方,false)
+Excel.CloseExcel(obj_写入出版社连接,true)
+TracePrint('''出版社、出品方连接未去重结果输出到文件完毕。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：出版社、出版社、出品方连接未去重结果输出到文件完毕。\n","gbk")  
+WebBrowser.Close(http_开始网页,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
