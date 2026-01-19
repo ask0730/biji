@@ -1,0 +1,330 @@
+
+
+1读取配置
+/**读取配置文件前准备 */
+Dim bo_判断文件夹是否存在,temp,iRet,bRet,arrRet
+/** 
+解锁屏幕=RDP.UnlockScreen("administrator","o1vCrst9v2q6LkUNoUMciw==")*/
+/**Log.Info(解锁屏幕)*/
+
+/**创建日志文件夹、运行中间文件夹(出版社连接文件夹，图书连接文件夹) */
+
+str_时间 = Time.Format(Time.Now(),"yyyy-mm-dd")
+str_月 = Time.Format(Time.Now(),"yyyy-mm")
+workspace = Replace(@res"","res\\","",false)
+workspace1 = '''C:\Users\Administrator\Desktop\'''
+
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunLog")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunLog")
+            TracePrint("文件夹创建完毕")
+End Select
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunFile")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunFile")
+            TracePrint("文件夹创建完毕")
+End Select
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunFile\\Publisher Connection")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunFile\\Publisher Connection")
+            TracePrint("文件夹创建完毕")
+End Select
+bo_判断文件夹是否存在=File.FolderExists(workspace1+"RunFile\\Book Connection")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace1+"RunFile\\Book Connection")
+            TracePrint("文件夹创建完毕")
+End Select
+/**开始读取配置文件 */
+
+bo_判断文件夹是否存在=File.FolderExists(workspace+"RunFile\\BookInfo")
+Select Case bo_判断文件夹是否存在 
+       Case false 
+            File.CreateFolder(workspace+"RunFile\\BookInfo")
+            TracePrint("文件夹创建完毕")
+End Select
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"文件夹准备完毕，开始读取配置文件....\n","gbk")
+config  = workspace1+"图书管理配置.xlsx"
+objExcelWorkBook = Excel.OpenExcel(config,true,"Excel","","")
+int_数据量 = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+arr_配置=Excel.ReadRange(objExcelWorkBook,"Sheet1","E3:G"+int_数据量,true)
+
+TracePrint(arr_配置)
+Excel.CloseExcel(objExcelWorkBook,false)
+str_查询年 = arr_配置[0][1]
+str_查询年月 = arr_配置[1][1]
+str_文件输出路径 = arr_配置[2][1]
+
+
+str_发件人邮箱账号 = arr_配置[3][1]
+str_发件人邮箱密码 = arr_配置[4][1]
+str_收件人邮箱 = arr_配置[5][1]
+str_邮件标题 = arr_配置[6][1]
+str_邮件内容 = arr_配置[7][1]
+str_抄送人邮箱 = arr_配置[8][1]
+str_SMTP服务器 = arr_配置[9][1]
+str_服务器端口  =  arr_配置[10][1]
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：配置读取完毕，开始获取各出版社，出品方连接...\n","gbk")
+
+
+2访问每一个出版社获取图书馆链接
+Dim arrayData,str_过滤年,objExcelWorkBook,int_数据总量,arr_出版社出品方,arr_图书连接,arr_图书不去重连接,str_名称,str_出版社连接,str_连接类型,str_书名,str_网页,iRet,sRet,arrRet,str_条件,int_开始下标,str_年信息,bRet,bo_简介是否存在,objDatatable,obj_页数的父级定义,arr_页数子集内容,int_页数的最大下标,str_最后一页,str_页数,int_页数,arr_年月日,int_月长度,arr_条件,str_是否跳出循环,hWeb
+
+/**数赋值 */
+
+workspace = Replace(@res"","res\\","",false) 
+//str_过滤年 = "2025"
+//str_过滤月 = "2025-04,2025-03"
+str_过滤年 = str_查询年
+str_过滤月 = str_查询年月
+arr_过滤月 = Split(str_过滤月,",")
+str_查询年个数 = UBound(arr_过滤月)
+str_月="2025-07"
+/*
+str_过滤年 = str_查询年
+arr_过滤年 = Split(str_查询年,",")
+str_查询年个数 = UBound(arr_过滤年)
+str_过滤月 = str_查询年月
+*/
+/**创建本模块使用参数 */
+workspace1 = '''C:\Users\Administrator\Desktop\'''
+j = 60
+arr_条件 = Split(str_过滤月,",")
+arr_图书连接 = Array([1,4],null)
+arr_图书不去重连接 = Array([1,4],null)
+/**读取出版社连接文件 1、打开文件。2、读取数据总量。3、读取数据总量的详细信息 4、关闭文件*/
+TracePrint('''开始读取出版社连接数据。。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：开始读取出版社连接数据。。\n","gbk")
+objExcelWorkBook = Excel.OpenExcel(workspace1+"RunFile\\Publisher Connection\\"+str_月+"-出版社连接.xlsx",true,"Excel","","")
+int_数据总量 = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+arr_出版社出品方 = Excel.ReadRange(objExcelWorkBook,"Sheet1","A3:C"+int_数据总量,true)
+Excel.CloseExcel(objExcelWorkBook,false)
+TracePrint('''读取出版社连接数据完毕，数据量：'''+int_数据总量)
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]：读取出版社连接数据完毕，数据量："+int_数据总量+"\n","gbk")
+/**遍历访问连接获取图书连接 */
+For Each value In arr_出版社出品方
+    str_名称 = value[0]
+    str_出版社连接 = value[1]
+    str_连接类型 = value[2]
+    If str_出版社连接 = ""
+        else
+    /**创建一个新的页签，并录入网站，等待网页加载完毕 */
+    TracePrint('''打开出版社、出品方连接：'''+value[1])
+    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:打开出版社、出品方连接："+value[1]+"\n","gbk")
+    hWeb = WebBrowser.Create("chrome",str_出版社连接+"?order=time",30000,{"bContinueOnError":false,"iDelayAfter":10000,"iDelayBefore":200,"sBrowserPath":'''C:\Program Files\Google\Chrome\Application\chrome.exe''',"sStartArgs":""})
+    TracePrint('''相关连接打开完毕。''')
+    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:相关连接打开完毕。\n","gbk")
+    /**循环翻页抓取数据，判断翻页元素是否存在，存在则获取页数，否则仅抓取当前页面元素*/
+    TracePrint('''开始获取数据页存在多少''')
+    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:开始获取数据页存在多少\n","gbk")
+    bRet = UiElement.Exists({"html":[{"tag":"SPAN","parentid":"content","aaname":"             <前页         "}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},{"bContinueOnError":false,"iDelayAfter":3,"iDelayBefore":2})
+    If bRet = True
+        obj_页数的父级定义 = UiElement.GetParent({"html":[{"tag":"SPAN","parentid":"content","aaname":"             <前页         "}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},1,{"bContinueOnError":false,"iDelayAfter":3,"iDelayBefore":2})
+        arr_页数子集内容 = UiElement.GetChildren(obj_页数的父级定义,1, {"bContinueOnError":false,"iDelayAfter":3,"iDelayBefore":2})
+        int_页数的最大下标 = UBound(arr_页数子集内容)
+        str_最后一页 = arr_页数子集内容[int_页数的最大下标-1]
+        str_页数 = UiElement.GetValue(str_最后一页,{"bContinueOnError":false,"iDelayAfter":3,"iDelayBefore":2})
+        int_页数 =CInt(str_页数)
+         TracePrint('''共计：'''+int_页数)
+        Else
+        int_页数 = 0
+    End If
+    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:共计："+int_页数+"\n","gbk")
+    /**循环翻页，目前设定的最大值为循环60*/
+    if int_页数 = 0
+
+        else
+         
+    For i = 1 To j step 1
+    /**判断连接的类型，判断数据的抓取方式，出版社直接连接，出品方，判断是否有简介 */
+        TracePrint('''获取第'''+i+'''页数据。。。''')
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:获取第"+i+"页数据。。。\n","gbk")
+        bo_简介是否存在 = UiElement.Exists({"html":[{"tag":"H2","isleaf":"1"}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},{"bContinueOnError":false,"iDelayAfter":3,"iDelayBefore":2})
+        If str_连接类型 ="出版社" 
+            TracePrint('''抓取出版社数据''')
+            File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:抓取出版社数据\n","gbk")
+            arr_抓取到的数据 = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"DIV","id":"content"}]},{"ExtractTable":0,"Columns":[{"selecors":[{"tag":"div","index":0,"className":"grid-16-8 clearfix","value":"div.grid-16-8.clearfix","prefix":""},{"tag":"div","index":0,"className":"article","value":"div.article","prefix":">"},{"tag":"div","index":2,"className":"","value":"div:nth-child(2)","prefix":">"},{"tag":"ul","index":0,"className":"subject-list","value":"ul.subject-list","prefix":">"},{"tag":"li","value":"li","index":0,"prefix":">"},{"tag":"div","index":0,"className":"info","value":"div.info","prefix":">"},{"tag":"h2","index":0,"className":"","value":"h2","prefix":">"},{"tag":"a","index":0,"className":"","value":"a","prefix":">"}],"props":["text","url"]},{"selecors":[{"tag":"div","index":0,"className":"grid-16-8 clearfix","value":"div.grid-16-8.clearfix","prefix":""},{"tag":"div","index":0,"className":"article","value":"div.article","prefix":">"},{"tag":"div","index":2,"className":"","value":"div:nth-child(2)","prefix":">"},{"tag":"ul","index":0,"className":"subject-list","value":"ul.subject-list","prefix":">"},{"tag":"li","value":"li","index":0,"prefix":">"},{"tag":"div","index":0,"className":"info","value":"div.info","prefix":">"},{"tag":"div","index":0,"className":"pub","value":"div.pub","prefix":">"}],"props":["text"]}]},{"objNextLinkElement":"","iMaxNumberOfPage":1,"iMaxNumberOfResult":-1,"iDelayBetweenMS":10000,"bContinueOnError":False})
+        ElseIf bo_简介是否存在
+            TracePrint('''抓取出品方数据''')
+            File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:抓取出品方数据\n","gbk")
+            arr_抓取到的数据 = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"DIV","id":"content"}]},{"ExtractTable":0,"Columns":[{"selecors":[{"tag":"div","index":0,"className":"grid-16-8 clearfix","value":"div.grid-16-8.clearfix","prefix":""},{"tag":"div","index":0,"className":"article","value":"div.article","prefix":">"},{"tag":"div","index":6,"className":"","value":"div:nth-child(6)","prefix":">"},{"tag":"ul","index":0,"className":"subject-list","value":"ul.subject-list","prefix":">"},{"tag":"li","value":"li","index":0,"prefix":">"},{"tag":"div","index":0,"className":"info","value":"div.info","prefix":">"},{"tag":"h2","index":0,"className":"","value":"h2","prefix":">"},{"tag":"a","index":0,"className":"","value":"a","prefix":">"}],"props":["text","url"]},{"selecors":[{"tag":"div","index":0,"className":"grid-16-8 clearfix","value":"div.grid-16-8.clearfix","prefix":""},{"tag":"div","index":0,"className":"article","value":"div.article","prefix":">"},{"tag":"div","index":6,"className":"","value":"div:nth-child(6)","prefix":">"},{"tag":"ul","index":0,"className":"subject-list","value":"ul.subject-list","prefix":">"},{"tag":"li","value":"li","index":0,"prefix":">"},{"tag":"div","index":0,"className":"info","value":"div.info","prefix":">"},{"tag":"div","index":0,"className":"pub","value":"div.pub","prefix":">"}],"props":["text"]}]},{"objNextLinkElement":"","iMaxNumberOfPage":1,"iMaxNumberOfResult":-1,"iDelayBetweenMS":10000,"bContinueOnError":False})
+        Else 
+            arr_抓取到的数据 = UiElement.DataScrap({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":[{"tag":"DIV","id":"content"}]},{"ExtractTable":0,"Columns":[{"selecors":[{"tag":"div","index":0,"className":"grid-16-8 clearfix","value":"div.grid-16-8.clearfix","prefix":""},{"tag":"div","index":0,"className":"article","value":"div.article","prefix":">"},{"tag":"div","index":4,"className":"","value":"div:nth-child(4)","prefix":">"},{"tag":"ul","index":0,"className":"subject-list","value":"ul.subject-list","prefix":">"},{"tag":"li","value":"li","index":0,"prefix":">"},{"tag":"div","index":0,"className":"info","value":"div.info","prefix":">"},{"tag":"h2","index":0,"className":"","value":"h2","prefix":">"},{"tag":"a","index":0,"className":"","value":"a","prefix":">"}],"props":["text","url"]},{"selecors":[{"tag":"div","index":0,"className":"grid-16-8 clearfix","value":"div.grid-16-8.clearfix","prefix":""},{"tag":"div","index":0,"className":"article","value":"div.article","prefix":">"},{"tag":"div","index":4,"className":"","value":"div:nth-child(4)","prefix":">"},{"tag":"ul","index":0,"className":"subject-list","value":"ul.subject-list","prefix":">"},{"tag":"li","value":"li","index":0,"prefix":">"},{"tag":"div","index":0,"className":"info","value":"div.info","prefix":">"},{"tag":"div","index":0,"className":"pub","value":"div.pub","prefix":">"}],"props":["text"]}]},{"objNextLinkElement":"","iMaxNumberOfPage":1,"iMaxNumberOfResult":-1,"iDelayBetweenMS":10000,"bContinueOnError":False})
+        End If
+/**对抓取数据（1页），并对抓取的数据进行数据处理 */                
+        For Each value In arr_抓取到的数据
+            str_书名 = value[0]
+            str_网页 = value[1]
+            str_截取时间 = value[2]
+            str_条件 = ""
+            TracePrint('''书名'''+str_书名)
+            TracePrint('''网页'''+str_网页)
+            File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:书名"+str_书名+"\n","gbk")
+            File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:网页"+str_网页+"\n","gbk")
+/**处理抓取到的数据，时间*/
+            int_开始下标 = InStr(str_截取时间,"20",1,false)            
+            str_年信息=SubStr(str_截取时间,int_开始下标,10)
+            str_年信息=Replace(str_年信息," ","",false)
+            arrRet = Split(str_年信息,"/")
+            arr_年月日 = Split(arrRet[0],"-")
+            If  UBound(arr_年月日)=0
+                Break
+            Else 
+                int_月长度 =LenB(arr_年月日[1])
+            End If
+/**时间格式标准话处理 【XXXX-MM】*/
+            Select Case int_月长度 
+                    Case 0 
+                        str_年信息 = ""
+                    Case 1 
+                        str_年信息 = arr_年月日[0]+"-0"+arr_年月日[1]
+                    Case 2 
+                        str_年信息 = arr_年月日[0]+"-"+arr_年月日[1]
+            End Select
+            TracePrint('''时间'''+str_年信息)
+            File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:时间"+str_年信息+"\n","gbk")
+/**将抓取的数据全部输入到记录数组 */        
+            arr_图书不去重连接=push(arr_图书不去重连接,[str_书名,str_年信息,str_网页,"否"])
+/**判断图书年是否符合条件，符合输入的一个输出数组 */
+            For Each value In arr_条件
+                If str_年信息 = value
+                arr_图书连接 = push(arr_图书连接,[str_书名,str_年信息,str_网页,"否"])
+                TracePrint('''符合条件''')
+                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:符合条件\n","gbk")
+                Else
+                TracePrint('''不符合当前条件，查询下一个条件''')
+                File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:不符合当前条件，查询下一个条件\n","gbk")           
+                End If
+            Next
+        Next
+/**判断记录数组的最后一个是否为符合年的条件，符合且不是最后一页继续下一页，不符合或是最后一页，跳出循环，访问下一个网页*/
+        int_下标 = UBound(arr_图书不去重连接)
+        str_判断数据=Left(arr_图书不去重连接[int_下标][1],7)
+        k = 1
+        TracePrint('''判断最后一条记录是否符合条件：'''+str_判断数据)
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:判断最后一条记录是否符合条件："+str_判断数据+"\n","gbk")           
+        TracePrint('''页数条件：'''+i+'''/'''+int_页数)
+        File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:页数条件："+i+"/"+int_页数+"\n","gbk")           
+        For Each value In arr_过滤月
+            k=k+1
+            If str_判断数据=value
+                If i = int_页数
+                    str_是否跳出循环 = true
+                    TracePrint('''符合时间要求，是最后一页''')
+                    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:符合时间要求，是最后一页\n","gbk")   
+                    break
+                Else 
+                    TracePrint('''符合时间要求，但是不是最后一页''')
+                    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:符合时间要求，但是不是最后一页\n","gbk")   
+                    Mouse.Action({"html":[{"tag":"A","parentid":"content","aaname":"后页>"}],"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}]},"left","click",10000,{"bContinueOnError": true, "iDelayAfter": 1000, "iDelayBefore": 1000, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "uia", "bMoveSmoothly": false})
+                    #icon("@res:86d9f500-2797-11ee-b7ca-8986a5737f91.png")
+                    bRet = Image.Exists({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"}]},{"x": 0, "y": 0, "width": 0, "height": 0},@res"86d9f500-2797-11ee-b7ca-8986a5737f91.png",0.9,30000,{"bContinueOnError": true, "iDelayAfter": 3, "iDelayBefore": 2, "bSetForeground": false, "sMatchType":"GrayMatch"})
+                    str_是否跳出循环 = False
+                    TracePrint('''进入下一页数据抓取''')
+                    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:进入下一页数据抓取\n","gbk")   
+                    break
+                End If
+            Else
+                If k = str_查询年个数+1
+                    TracePrint('''不符合时间要求''')
+                    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:不符合时间要求\n","gbk")  
+                    str_是否跳出循环 = true
+                else
+                    TracePrint('''进入下一次循环''')
+                    File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:进入下一次循环\n","gbk")  
+                End If
+            End If
+        Next
+
+        If str_是否跳出循环 = true 
+            Break
+        End If
+
+    Next
+    end if
+    Keyboard.Press("W", "press", ["Ctrl"],{"iDelayAfter": 30, "iDelayBefore": 200, "sSimulate": "simulate"})
+    End If
+Next
+/**输出结果去重 */
+TracePrint('''图书连接获取完毕,开始去重''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:图书连接获取完毕,开始去重\n","gbk")  
+objDatatable = Datatable.BuildDataTable(arr_图书连接,["图书名称","图书连接","图书信息","是否查询过"])
+objDatatable = Datatable.DropDuplicatesDataTable(objDatatable,["图书名称","图书连接"],"first")
+arr_图书连接 = Datatable.GetDataTableByArray(objDatatable,false)
+/**输出结果文件 */
+TracePrint('''图书连接去重完毕,开始输出结果''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:图书连接去重完毕,开始输出结果\n","gbk")  
+objExcelWorkBook = Excel.OpenExcel(workspace1+"RunFile\\Book Connection\\"+str_时间+"-图书连接.xlsx",true,"Excel","","")
+Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arr_图书连接,false)
+Excel.CloseExcel(objExcelWorkBook,true)
+/**输出记录文件 */
+TracePrint('''输出去重前结果。''')
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]:输出去重前结果。\n","gbk")  
+objExcelWorkBook = Excel.OpenExcel(workspace1+"RunFile\\Book Connection\\"+str_时间+"-图书不去重连接.xlsx",true,"Excel","","")
+Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arr_图书不去重连接,false)
+Excel.CloseExcel(objExcelWorkBook,true)
+
+
+bRet = File.FileExists(workspace1+"RunFile\\Book Connection\\"+str_月+"-图书连接.xlsx")
+If bRet = true
+    objExcelWorkBook = Excel.OpenExcel(workspace1+"RunFile\\Book Connection\\"+str_月+"-图书连接.xlsx",true,"Excel","","")
+    iRet = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+    arrayRet = Excel.ReadRange(objExcelWorkBook,"Sheet1","A1:D"+iRet,true)
+    b = 0
+    For Each value In arr_图书连接
+        For Each value1 In arrayRet
+           If value[0] = value1[0] 
+               b =1
+               Break
+           End If     
+        Next
+        If b=0
+            Push(arrayRet,[value[0],value[1],value[2],value[3]])
+        else
+            b=0
+        End If
+    Next
+    Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arrayRet,false)
+    Excel.CloseExcel(objExcelWorkBook,true)
+    Else
+       objExcelWorkBook = Excel.OpenExcel(workspace1+"RunFile\\Book Connection\\"+str_月+"-图书连接.xlsx",true,"Excel","","")
+        Excel.WriteRange(objExcelWorkBook,"Sheet1","A1",arr_图书连接,false)
+        Excel.CloseExcel(objExcelWorkBook,true) 
+End If
+
+3流程块
+Dim bRet
+
+
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"===========================================================\n"+"["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮件开始"+"\n","utf-8")
+TracePrint(str_SMTP服务器)
+TracePrint(str_服务器端口)
+TracePrint(str_发件人邮箱账号)
+TracePrint(str_发件人邮箱密码)
+TracePrint(str_发件人邮箱账号)
+TracePrint(str_收件人邮箱)
+TracePrint(str_抄送人邮箱)
+TracePrint(str_时间)
+TracePrint(str_邮件标题)
+TracePrint(workspace1+"RunFile\\Book Connection\\"+str_月+"-图书连接.xlsx")
+a = [workspace1+"RunFile\\Book Connection\\"+str_月+"-图书连接.xlsx"]
+
+arr_收件人邮箱=Split(str_收件人邮箱,",")
+arr_抄送人邮箱=Split(str_抄送人邮箱,",")
+
+bRet = Mail.SendExt({"host":"smtp.qq.com","port":25,"ssl":true,"authentication":true,"user":"2376365221@qq.com","password":"TEBk8krEUBCFBzU99mC5+82YA6sVDnWqxuUm1Ydy72U="},str_发件人邮箱账号,arr_收件人邮箱,arr_抄送人邮箱,"",str_邮件标题,str_邮件内容,a)
+
+
+//bRet = Mail.SendEx(str_SMTP服务器,str_服务器端口,false,str_发件人邮箱账号,str_发件人邮箱密码,str_发件人邮箱账号,arr_收件人邮箱,arr_抄送人邮箱,str_邮件标题+"【"+str_时间+"】运行结果",str_邮件内容,workspace1+"RunFile\\BookInfo\\"+str_时间+"-图书信息.xlsx")
+File.Append(workspace1+"RunLog\\"+str_时间+".log","["+Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")+"]："+"发送邮件结束"+"\n","utf-8")
+App.Kill("chrome.exe")
+
+
+
+
+
+
+
