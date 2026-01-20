@@ -1,0 +1,211 @@
+1读取配置文件
+Dim arrRet,workspaces, objExcelWorkBook, arrayRet,bRet
+Rem 读取配置空间并找到配置文件
+workspace = Replace(@res"", "res\\", "", false)
+配置路径 = workspace & "res\\" & "简历识别配置.xlsx"
+Rem 读取配置信息
+objExcelWorkBook = Excel.OpenExcel(配置路径, false, "Excel", "", "")
+配置数组 = Excel.ReadRange(objExcelWorkBook, "Sheet1", "B2:C12", true)
+Excel.CloseExcel(objExcelWorkBook, false)
+Rem 配置信息载入全局变量
+全局_文件输入路径 = 配置数组[0][1]
+全局_文件处理后的文件存放路径 = 配置数组[1][1]
+全局_生成的文件路径 = 配置数组[2][1]
+全局_发件人邮箱账号 = 配置数组[3][1]
+全局_发件人邮箱密码 = 配置数组[4][1]
+//Mouse.Action(@ui"列表项目","left","click",10000,{"bContinueOnError": false, "iDelayAfter": 300, "iDelayBefore": 200, "bSetForeground": true, "sCursorPosition": "Center", "iCursorOffsetX": 0, "iCursorOffsetY": 0, "sKeyModifiers": [],"sSimulate": "simulate", "bMoveSmoothly": false})
+全局_收件人邮箱 = 配置数组[5][1]
+全局_邮件标题 = 配置数组[6][1]
+全局_邮件内容 = 配置数组[7][1]
+全局_SMTP服务器 = 配置数组[8][1]
+全局_服务器端口 = 配置数组[9][1]
+全局_抄送人邮箱 = 配置数组[10][1]
+Rem 判读需要使用的文件夹是否存在，存在跳过，不存在新建
+bRet = File.FolderExists(全局_文件输入路径)
+TracePrint(bRet)
+    If bRet
+        Else 
+            File.CreateFolder(全局_文件输入路径)
+    End If
+bRet = File.FolderExists(全局_文件处理后的文件存放路径)
+TracePrint(bRet)
+    If bRet
+    
+        Else 
+            File.CreateFolder(全局_文件处理后的文件存放路径)
+End If
+bRet = File.FolderExists(全局_生成的文件路径)
+TracePrint(bRet)
+    If bRet
+        
+        else
+        File.CreateFolder(全局_生成的文件路径)
+    End If
+
+
+
+2数据识别
+Dim arrayRet, iRet, 路径长度, 文件名称, 识别数据, arrRet, objExcelWorkBook, 本人承诺时间, 部门, dTime, sRet
+Rem 定义变量
+dTime = Time.Format(Time.Now(), "yyyymmdd")
+识别数据 = Array([1, 23], null)
+识别数据[0][0] = "姓名"
+识别数据[0][1] = "性别"
+识别数据[0][2] = "民族"
+识别数据[0][3] = "身份证号"
+识别数据[0][4] = "户口所在地"
+识别数据[0][5] = "生源"
+识别数据[0][6] = "毕业时间"
+识别数据[0][7] = "政治面貌"
+识别数据[0][8] = "毕业院校"
+识别数据[0][9] = "所学专业"
+识别数据[0][10] = "学历"
+识别数据[0][11] = "学位"
+识别数据[0][12] = "考生类型"
+识别数据[0][13] = "联系电话（手机）"
+识别数据[0][14] = "报考单位"
+识别数据[0][15] = "部门"
+识别数据[0][16] = "报考岗位"
+识别数据[0][17] = "岗位类别"
+识别数据[0][18] = "何时参加过何种党派"
+识别数据[0][19] = "个人学习及工作经历"
+识别数据[0][20] = "何时何地因何原因受过何种奖励或处分"
+识别数据[0][21] = "其它需要说明的问题"
+识别数据[0][22] = "本人承诺签字承诺时间"
+Rem 获取原始数据的文件夹下的所有文件
+arrayRet = File.DirFileOrFolder(全局_文件输入路径, "fileandfolder", {"hasPath": true})
+temp = 全局_生成的文件路径 & dTime & "识别后的数据.xlsx"
+Rem 输出识别文件
+objExcelWorkBook = Excel.OpenExcel(temp, true, "Excel", "", "")
+iRet = Excel.GetRowsCount(objExcelWorkBook, "Sheet1")
+Excel.WriteRange(objExcelWorkBook, "Sheet1", "A" & iRet+1, 识别数据, true)
+Excel.CloseExcel(objExcelWorkBook, true)
+For Each value In arrayRet
+    TracePrint(value)
+    Rem 依次识别涉及的图片简历中的内容，并将识别的数据加载入输出数据堆中
+        With Mage.NLPDocumentSinglePageExtract(value, {"Pubkey":"xp7Jw5VoBt0OzRzueW8wLX4r","Secret":"h9OdOTbu9VmaW6MV8sp5mQDPDF0NqHrf","Url":"https://cloud.laiye.com/idp","Name":"PDF文档字段抽取-自训练抽取（简体中文、English）"})
+
+    // With Mage.NLPDocumentSinglePageExtract(value, {"Pubkey":"DbZPidgfgaCVzhekRZqKMndp","Secret":"mVAogNiY0QzH7Q6EruDukf0LzoixtfK2","Url":"https://cloud.laiye.com/idp","Name":"PDF文档字段抽取-自训练抽取（简体中文、English）"})
+        本人承诺时间 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "本人承诺签字承诺时间"])
+        本人承诺时间1 = "'" & Join(本人承诺时间, ",")
+
+        其它需要说明的问题 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "其它需要说明的问题"])
+        其它需要说明的问题1 = "'" & 其它需要说明的问题
+
+        何时何地因何原因受过何种奖励或处分 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "何时何地因何原因受过何种奖励或处分"])
+        何时何地因何原因受过何种奖励或处分1 = "'" & 何时何地因何原因受过何种奖励或处分
+
+        何时参加过何种党派 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "何时参加过何种党派"])
+        何时参加过何种党派1 = "'" & 何时参加过何种党派
+
+        个人学习及工作经历 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "个人学习及工作经历"])
+        个人学习及工作经历1 = "'" & 个人学习及工作经历
+
+        岗位类别 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "岗位类别"])
+        岗位类别1 = "'" & Join(岗位类别, ",")
+
+        报考岗位 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "报考岗位"])
+        报考岗位1 = "'" & Join(报考岗位, ",")
+
+        部门 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "部门"])
+        部门1 = "'" & Join(部门, ",")
+
+        报考单位 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "报考单位"])
+        报考单位1 = "'" & Join(报考单位, ",")
+
+        联系电话 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "联系电话（手机）"])
+        联系电话1 = "'" & Join(联系电话, ",")
+
+        考生类型 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "考生类型"])
+        考生类型1 = "'" & 考生类型
+
+        学位 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "学位"])
+        学位1 = "'" & Join(学位, ",")
+
+        学历 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "学历"])
+        学历1 = "'" & Join(学历, ",")
+
+        所学专业 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "所学专业"])
+        所学专业1 = "'" & Join(所学专业, ",")
+
+        毕业院校 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "毕业院校"])
+        毕业院校1 = "'" & Join(毕业院校, ",")
+
+        政治面貌 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "政治面貌"])
+        政治面貌1 = "'" & Join(政治面貌, ",")
+
+        毕业时间 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "毕业时间"])
+        毕业时间1 = "'" & Join(毕业时间, ",")
+
+        生源 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "生源"])
+        生源1 = "'" & Join(生源, ",")
+
+        户口所在地 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "户口所在地"])
+        户口所在地1 = "'" & 户口所在地
+
+        身份证号 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "身份证号"])
+        身份证号1 = "'" & Join(身份证号, ",")
+
+        民族 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "民族"])
+        民族1 = "'" & Join(民族, ",")
+
+        性别 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "性别"])
+        性别1 = "'" & Join(性别, ",")
+
+        姓名 = .ExtractSinglePageInfo(["PDF文档字段抽取-自训练抽取（简体中文、English）", "姓名"])
+        姓名1 = "'" & Join(姓名, ",")
+
+        识别数据[0][0] = 姓名1
+        识别数据[0][1] = 性别1
+        识别数据[0][2] = 民族1
+        识别数据[0][3] = 身份证号1
+        识别数据[0][4] = 户口所在地1
+        识别数据[0][5] = 生源1
+        识别数据[0][6] = 毕业时间1
+        识别数据[0][7] = 政治面貌1
+        识别数据[0][8] = 毕业院校1
+        识别数据[0][9] = 所学专业1
+        识别数据[0][10] = 学历1
+        识别数据[0][11] = 学位1
+        识别数据[0][12] = 考生类型1
+        识别数据[0][13] = 联系电话1
+        识别数据[0][14] = 报考单位1
+        识别数据[0][15] = 部门1
+        识别数据[0][16] = 报考岗位1
+        识别数据[0][17] = 岗位类别1
+        识别数据[0][18] = 何时参加过何种党派1
+        识别数据[0][19] = 个人学习及工作经历1
+        识别数据[0][20] = 何时何地因何原因受过何种奖励或处分1
+        识别数据[0][21] = 其它需要说明的问题1
+        识别数据[0][22] = 本人承诺时间1
+        TracePrint(识别数据)
+        Rem 识别数据文件路径
+        Rem 输出识别文件
+        objExcelWorkBook = Excel.OpenExcel(temp, true, "Excel", "", "")
+        iRet = Excel.GetRowsCount(objExcelWorkBook, "Sheet1")
+        Excel.WriteRange(objExcelWorkBook, "Sheet1", "A" & iRet+1, 识别数据, true)
+        Excel.CloseExcel(objExcelWorkBook, true)
+    End With
+
+    rem 将处理完毕的数据转移到另外一个文件夹
+    File.MoveFile(value, 全局_文件处理后的文件存放路径, true)
+Next 
+
+
+
+
+3发送邮件
+Dim bRet
+Rem 向相关人员发送邮件 
+Log.Info(全局_SMTP服务器)
+Log.Info(全局_服务器端口)
+Log.Info(全局_发件人邮箱账号)
+Log.Info(全局_发件人邮箱密码)
+Log.Info(全局_发件人邮箱账号)
+Log.Info(全局_收件人邮箱)
+Log.Info(全局_抄送人邮箱)
+Log.Info(全局_邮件标题)
+Log.Info(全局_邮件内容)
+Log.Info(temp)
+
+bRet = Mail.SendExt({"host":全局_SMTP服务器,"port":全局_服务器端口,"ssl":true,"authentication":true,"user":全局_发件人邮箱账号,"password":"TLyF6ISL5Yyw9aG3cwYLZ82YA6sVDnWqxuUm1Ydy72U="},全局_发件人邮箱账号,全局_收件人邮箱,全局_抄送人邮箱,"",全局_邮件标题,全局_邮件内容,temp)
