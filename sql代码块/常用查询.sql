@@ -252,3 +252,34 @@ UPDATE hi_psnjob
 SET PK_PSNCL = (SELECT PK_PSNCL FROM BD_PSNCL WHERE name = '辞职')
 WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00018922') 
   AND begindate = '2024-10-20';
+
+
+
+
+
+
+
+查年假额度：
+  SELECT
+    b.*,
+    attend.psncl_name  AS psnclname,
+    attend.staff_code  AS staffcode,
+    attend.staff_name  AS staffname,
+    attend.dept_name   AS deptname,
+    attend.org_name    AS orgname
+FROM ts_leave_balance b
+JOIN ts_attend_staff attend ON attend.staff_id = b.staffid
+    AND attend.last_flag = 1
+    AND attend.attend_type != 2
+    AND b.tenantid = attend.tenantid
+WHERE b.tenantid = '00011T1000000000591O'
+  AND b.leavetype = '00011T1000000000591O0000000001'  -- 年假
+  AND b.periodtype = '0'                               -- 年度
+  AND (attend.staff_code LIKE '%00003952%' OR attend.staff_name LIKE '%00003952%')
+  AND b.year = '2026'
+  AND b.month IS NULL
+  AND attend.last_flag = 1
+  AND attend.attend_type <> 2
+  AND attend.end_flag = 0
+ORDER BY attend.staff_code DESC, attend.staff_name DESC, attend.dept_id DESC
+OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
