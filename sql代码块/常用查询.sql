@@ -155,7 +155,7 @@ AND begindate = '2024-06-20';
 
 
 更新考勤组织：
-select * from hi_psnjob WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005235')
+select * from hi_psnjob WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00003952')
 select glbdef7 from hi_psnjob WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005235') and enddate='2025-05-31'
 
 UPDATE hi_psnjob 
@@ -283,3 +283,11 @@ WHERE b.tenantid = '00011T1000000000591O'
   AND attend.end_flag = 0
 ORDER BY attend.staff_code DESC, attend.staff_name DESC, attend.dept_id DESC
 OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
+
+
+
+
+
+
+财务中间表：
+select * from CUX_NCHR_V_SALARYHISTORY where corpcode = '10000003' and A00Z0 = '2026-01'
