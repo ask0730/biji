@@ -291,3 +291,7 @@ OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
 
 财务中间表：
 select * from CUX_NCHR_V_SALARYHISTORY where corpcode = '10000003' and A00Z0 = '2026-01'
+
+
+
+考勤日报表：ts_daystat
