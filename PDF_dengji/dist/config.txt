@@ -1,0 +1,20 @@
+# 配置文件
+# 格式：key=value
+# 支持使用 # 开头添加注释
+# 支持空行
+
+# 输入文件夹路径（必填）
+input_folder=D:\Desktop\首图源文件
+
+# 输出文件夹路径（必填）
+output_folder=D:\Desktop\shuchu
+
+# Excel模板文件路径（可选，不填则跳过Excel写入）
+template_path=D:\Desktop\导入文件\导入模板.xls
+
+# 已处理PDF文件夹路径（可选，不填则不移动PDF文件）
+processed_folder=D:\Desktop\已处理
+
+# JSON输出文件夹路径（可选，不填则保存到exe同级目录）
+json_output_folder=D:\Desktop\JSON
+
