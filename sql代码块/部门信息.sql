@@ -10,4 +10,5 @@ LEFT JOIN org_dept p
   ON p.pk_dept = d.pk_fatherorg
 LEFT JOIN org_orgs o
   ON o.pk_org = d.pk_org
+WHERE d.enablestate = 2  -- 仅启用部门；如需全部可注释本行
 ORDER BY o.code, ISNULL(p.code, '0'), d.code;
