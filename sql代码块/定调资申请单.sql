@@ -45,16 +45,6 @@ where t1.BILLCODE in ('00011T100000000SW62Z',
 'LYBL202505070001',
 'LYBL202508180007')
 
-
-
-
-
-
-
-
-
-select BILLCODE,wa_psnappaprove_b.* from wa_psnappaprove_b inner join wa_psnappaprove on wa_psnappaprove_b.pk_psnapp = wa_psnappaprove.pk_psnapp where wa_psnappaprove_b.pk_psndoc in ( N'00011T100000000QWP20' , N'00011T100000000QWP23' , N'00011T100000000QWP26' , N'00011T100000000QWWKL' , N'00011T100000000QWWKO' , N'00011T100000000QWWKR' ) and wa_psnappaprove.confirmstate in ( N'-1' , N'2' , N'3' )
-
 SELECT
 	distinct t1.BILLCODE --单据号
     ,t2.confirmstate --审批状态
@@ -65,10 +55,23 @@ FROM
 left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
 left join bd_psnjob t3 on t2.pk_psnjob=t3.pk_psnjob
 left join sm_user a1 on t1.creator=a1.cuserid
-where t1.BILLCODE in ('LYBL202408020004','LYBL202410310009')
+where t1.BILLCODE in ('LYBL202408010031','LYBL202410310009','LYBL202404020008','LYBL202412030005'.'LYBL202412030008','LYBL202406070006')
+
+
+
+
+
+
+
+
+
+
+select BILLCODE,wa_psnappaprove_b.* from wa_psnappaprove_b inner join wa_psnappaprove on wa_psnappaprove_b.pk_psnapp = wa_psnappaprove.pk_psnapp where wa_psnappaprove_b.pk_psndoc in ( N'00011T100000000QWP20' , N'00011T100000000QWP23' , N'00011T100000000QWP26' , N'00011T100000000QWWKL' , N'00011T100000000QWWKO' , N'00011T100000000QWWKR' ) and wa_psnappaprove.confirmstate in ( N'-1' , N'2' , N'3' )
+
+
 
 delete from WA_PSNAPPAPROVE where PK_PSNAPP in (
-'00011T100000000SW62Z',
+'10011T100000001N15BC',
 '10011T100000002DUAKI',
 '00011T1000000019CHWG',
 '10011T1000000028I8I9',
@@ -79,7 +82,7 @@ delete from WA_PSNAPPAPROVE where PK_PSNAPP in (
 '10011T1000000023JPBD')
     
 delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
-'00011T100000000XWV2J',
+'10011T100000001N15BC',
 '10011T100000002DUAKI',
 '00011T1000000019CHWG',
 '10011T1000000028I8I9',
