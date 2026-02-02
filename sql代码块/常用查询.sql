@@ -294,4 +294,20 @@ select * from CUX_NCHR_V_SALARYHISTORY where corpcode = '10000003' and A00Z0 = '
 
 
 
+
 考勤日报表：ts_daystat
+
+删除日报数据：
+select * from ts_daystat where STAFF_ID =(select pk_psndoc from bd_psndoc where code ='00001699');
+
+
+SELECT * 
+FROM ts_daystat 
+WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001699')
+  AND calendar >= '2026-01-01 00:00:00.000'
+  AND calendar < '2026-02-01 00:00:00.000'
+
+  DELETE FROM ts_daystat 
+WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001699')
+  AND calendar >= '2026-01-01 00:00:00.000'
+  AND calendar < '2026-02-01 00:00:00.000';
