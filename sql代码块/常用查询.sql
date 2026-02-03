@@ -311,3 +311,19 @@ WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001699')
 WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001699')
   AND calendar >= '2026-01-01 00:00:00.000'
   AND calendar < '2026-02-01 00:00:00.000';
+
+
+
+
+假勤月报审批单：
+select type_name,type_name2 from ts_leave_type_new
+
+UPDATE ts_leave_type_new
+SET type_name2 = 21
+WHERE type_name = '带薪病假';
+
+
+
+
+查借调单单据号：
+select * from HI_PARTAPPLY where PK_PARTMNG='10011T10000000272DOY'
