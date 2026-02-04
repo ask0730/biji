@@ -303,12 +303,12 @@ select * from ts_daystat where STAFF_ID =(select pk_psndoc from bd_psndoc where 
 
 SELECT * 
 FROM ts_daystat 
-WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001699')
-  AND calendar >= '2026-01-01 00:00:00.000'
-  AND calendar < '2026-02-01 00:00:00.000'
+WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006570')
+  AND calendar >= '2026-09-23 00:00:00.000'
+  AND calendar < '2026-09-24 00:00:00.000'
 
   DELETE FROM ts_daystat 
-WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001699')
+WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005771')
   AND calendar >= '2026-01-01 00:00:00.000'
   AND calendar < '2026-02-01 00:00:00.000';
 
@@ -327,3 +327,21 @@ WHERE type_name = '带薪病假';
 
 查借调单单据号：
 select * from HI_PARTAPPLY where PK_PARTMNG='10011T10000000272DOY'
+
+
+
+select 
+t1.user_code yh_code,t2.code ry_code,t2.name ry_name,t2.id ry_id,t1.cuserid yh_pk, t3.poststat ry_zt,
+t3.BEGINDATE ry_ksdate,t3.pk_psnjob ry_psnjob,t3.glbdef7,t3.LASTFLAG,t3.ISMAINJOB,
+t2.EMAIL ry_yx,
+a1.code org_code,a1.name org_name,
+a2.code dept_code,a2.name dept_name,a2.pk_dept pk_dept,
+a3.postcode post_code,a3.postname post_name,
+a4.name dept_sjname
+from sm_user t1  --用户表
+right join bd_psndoc t2 on t1.pk_psndoc=t2.pk_psndoc  --人员基本信息表
+left join hi_psnjob t3 on t2.pk_psndoc=t3.pk_psndoc --人员任职记录表
+left join org_orgs a1 on t3.pk_org=a1.pk_org --组织档案
+left join org_dept a2 on t3.pk_dept=a2.pk_dept --部门档案
+left join om_post a3 on t3.pk_post=a3.pk_post --岗位档案
+left join org_dept a4 on a2.PK_FATHERORG=a4.pk_dept --上级部门
