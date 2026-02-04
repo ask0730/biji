@@ -345,3 +345,20 @@ left join org_orgs a1 on t3.pk_org=a1.pk_org --组织档案
 left join org_dept a2 on t3.pk_dept=a2.pk_dept --部门档案
 left join om_post a3 on t3.pk_post=a3.pk_post --岗位档案
 left join org_dept a4 on a2.PK_FATHERORG=a4.pk_dept --上级部门
+
+
+
+
+
+修改请假时长：
+--休假主表--休假子表--销假子表
+select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00005315');
+
+请假单：
+select * from ts_leave_apply_detail where id = '84b25e894f9c49518039453ccc805f80'
+update ts_leave_apply_detail set leavebegintime = '2026-01-12 13:30:00.000' where id = '84b25e894f9c49518039453ccc805f80'
+
+调整单：
+select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
+update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
+
