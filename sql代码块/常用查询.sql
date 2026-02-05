@@ -362,3 +362,18 @@ update ts_leave_apply_detail set leavebegintime = '2026-01-12 13:30:00.000' wher
 select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
 update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
 
+
+
+
+
+
+
+
+
+
+员工考核信息：
+select * from hi_psndoc_ass where pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00004126') and lastflag='Y'
+
+DELETE from hi_psndoc_ass 
+where pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00004126') 
+and lastflag='Y';
