@@ -377,3 +377,11 @@ select * from hi_psndoc_ass where pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc W
 DELETE from hi_psndoc_ass 
 where pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00004126') 
 and lastflag='Y';
+
+
+
+人员试用情况：
+select * from hi_psndoc_trial where pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020304') 
+UPDATE hi_psndoc_trial SET enddate = '2025-06-26' WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020304');
+UPDATE hi_psndoc_trial SET regulardate = '2025-06-27' WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020304');
+
