@@ -391,3 +391,8 @@ UPDATE hi_psndoc_trial SET regulardate = '2025-06-27' WHERE pk_psndoc = (SELECT 
 SELECT *  FROM hr_relation_psn WHERE assgid IN ( SELECT assgid FROM hi_psnjob  WHERE pk_psndoc IN ( SELECT pk_psndoc   FROM bd_psndoc  WHERE name = '邹永梅')) AND dr = 1 
 
 delete from hr_relation_psn where assgid in(select assgid from hi_psnjob where pk_psndoc in(select pk_psndoc from bd_psndoc where name='邹永梅')) and dr=1
+
+
+
+专项附加扣除状态查询：
+select * from hrp_special_deduction_log where ts like '%2026-01-01 17%'
