@@ -385,3 +385,9 @@ select * from hi_psndoc_trial where pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc
 UPDATE hi_psndoc_trial SET enddate = '2025-06-26' WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020304');
 UPDATE hi_psndoc_trial SET regulardate = '2025-06-27' WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020304');
 
+
+
+员工管理范围薪酬委托报错：
+SELECT *  FROM hr_relation_psn WHERE assgid IN ( SELECT assgid FROM hi_psnjob  WHERE pk_psndoc IN ( SELECT pk_psndoc   FROM bd_psndoc  WHERE name = '邹永梅')) AND dr = 1 
+
+delete from hr_relation_psn where assgid in(select assgid from hi_psnjob where pk_psndoc in(select pk_psndoc from bd_psndoc where name='邹永梅')) and dr=1
