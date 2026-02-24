@@ -812,6 +812,29 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                 # 只要有论文名称就添加
                 if paper_item["论文/论著/译著名称"]:
                     papers_list.append(paper_item)
+        
+        # 合并被截断的论文行：若"独立撰写/合作撰写/本人排名"为空，说明该行被截断，与下一条合并
+        merged_papers = []
+        i = 0
+        while i < len(papers_list):
+            cur = papers_list[i]
+            role = (cur.get("独立撰写/合作撰写/本人排名") or "").strip()
+            if not role and i + 1 < len(papers_list):
+                next_item = papers_list[i + 1]
+                cur = {
+                    "年度": cur.get("年度"),
+                    "论文/论著/译著名称": (cur.get("论文/论著/译著名称") or "") + (next_item.get("论文/论著/译著名称") or ""),
+                    "发表时间": next_item.get("发表时间") or cur.get("发表时间"),
+                    "刊物名称/期号/出版单位/学术会议名称": next_item.get("刊物名称/期号/出版单位/学术会议名称") or cur.get("刊物名称/期号/出版单位/学术会议名称"),
+                    "总章节数或总字数": next_item.get("总章节数或总字数") or cur.get("总章节数或总字数"),
+                    "独立撰写/合作撰写/本人排名": next_item.get("独立撰写/合作撰写/本人排名") or cur.get("独立撰写/合作撰写/本人排名"),
+                }
+                merged_papers.append(cur)
+                i += 2
+            else:
+                merged_papers.append(cur)
+                i += 1
+        papers_list = merged_papers
     
     # 五、取得专利技术标准（"取得专利/技术标准-B5"后面）
     patents_list = []
