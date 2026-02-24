@@ -713,8 +713,9 @@ def parse_tables_json(json_path="提取的表格数据.json"):
             break
     
     if papers_start_idx >= 0:
-        # 查找"本年度所填信息"后面的表头行
+        # 查找"本年度所填信息"后面的表头行（可能是一行完整表头，或分两行跨页截断）
         header_row_idx = -1
+        header_is_two_rows = False  # 表头是否占两行（分页截断）
         year_idx = -1
         name_idx = -1
         time_idx = -1
@@ -735,10 +736,9 @@ def parse_tables_json(json_path="提取的表格数据.json"):
             
             # 如果找到了"本年度所填信息"，再查找表头行
             if found_current_year:
-                # 简单匹配：包含"论文/论著/译著名称"的行就是表头
+                # 情况1：单行完整表头，包含"论文/论著/译著名称"
                 if "论文/论著/译著名称" in row_str:
                     header_row_idx = i
-                    # 简单匹配各列索引
                     for k, cell in enumerate(row):
                         cell_str = str(cell).strip()
                         if "年度" in cell_str:
@@ -754,11 +754,26 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                         elif "独立撰写/合作撰写/本人排名" in cell_str:
                             role_idx = k
                     break
+                # 情况2：表头分两行（第一行被截断为"论文/论著/译著名"等，下一行是"称"+"发表时间"等）
+                if (header_row_idx < 0 and "论文/论著/译著" in row_str and
+                        i + 1 < len(all_rows)):
+                    next_row = all_rows[i + 1]
+                    next_row_str = "".join(str(cell) for cell in next_row)
+                    next_first = str(next_row[0]).strip() if next_row else ""
+                    if next_first == "称" and "发表时间" in next_row_str:
+                        header_row_idx = i
+                        header_is_two_rows = True
+                        name_idx = 0
+                        time_idx = 1
+                        pub_idx = 2
+                        length_idx = 3
+                        role_idx = 4
+                        break
         
-        # 如果找到了表头，开始提取数据
+        # 如果找到了表头，开始提取数据（两行表头时从第二行表头下一行开始）
+        data_start_idx = (header_row_idx + 2) if (header_row_idx >= 0 and header_is_two_rows) else (header_row_idx + 1)
         if header_row_idx >= 0 and name_idx >= 0:
-            # 从表头下一行开始提取数据
-            for i in range(header_row_idx + 1, len(all_rows)):
+            for i in range(data_start_idx, len(all_rows)):
                 data_row = all_rows[i]
                 row_str = "".join(str(cell) for cell in data_row)
                 
@@ -766,8 +781,11 @@ def parse_tables_json(json_path="提取的表格数据.json"):
                 if any(marker in row_str for marker in ["取得专利", "其他业绩成果", "工作经历", "发表论文"]):
                     break
                 
-                # 只跳过明显的表头行和空行
-                if "论文/论著/译著名称" in row_str or row_str.strip() == "" or row_str.strip() == "无":
+                # 只跳过明显的表头行和空行（含分两行表头的第二行："称"+"发表时间"等）
+                first_cell = str(data_row[0]).strip() if data_row else ""
+                if ("论文/论著/译著名称" in row_str or "论文/论著/译著名" in row_str or
+                        row_str.strip() == "" or row_str.strip() == "无" or
+                        (first_cell == "称" and "发表时间" in row_str)):
                     continue
                 
                 # 提取数据
