@@ -396,3 +396,15 @@ delete from hr_relation_psn where assgid in(select assgid from hi_psnjob where p
 
 专项附加扣除状态查询：
 select * from hrp_special_deduction_log where ts like '%2026-01-01 17%'
+
+
+
+
+nested exception is org.apache.ibatis.exceptions.TooManyResultsException: Expected one result (or null) to be returned by selectOne(), but found: 2：
+请假单重复
+select * from ts_leave_apply where STAFFID=(select pk_psndoc from bd_psndoc where code ='00000658') and leaveremark='肠胃炎发烧'
+
+
+DELETE FROM ts_leave_apply 
+WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00000658') 
+  AND leaveremark = '肠胃炎发烧';
