@@ -39,8 +39,8 @@ UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2026-01-01')  WHERE pk_psndoc 
 
 
 删除合同信息：
-select * from hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006101');
-DELETE FROM hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006101');
+select * from hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020710');
+DELETE FROM hi_psndoc_ctrt WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020710');
 
 
 直接修改的调配记录在这个表里查记录
@@ -408,3 +408,7 @@ select * from ts_leave_apply where STAFFID=(select pk_psndoc from bd_psndoc wher
 DELETE FROM ts_leave_apply 
 WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00000658') 
   AND leaveremark = '肠胃炎发烧';
+
+
+北森日志路径
+服务器1，nchome/nclogs/beisen.log
