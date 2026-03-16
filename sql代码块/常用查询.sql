@@ -32,9 +32,9 @@ select * from wa_classitem where pk_wa_class ='10011T100000000FZXGB' and cyear='
 
 
 更新任职受雇从业日期：
-select * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772');
+select * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012591');
 SELECT * FROM HI_PSNJOB WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005772') AND begindate = '2024-06-20';
-UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2026-01-01')  WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001423')  AND begindate = CONVERT(DATE, '2024-03-01'); 
+UPDATE HI_PSNJOB SET jobglbdef25 = CONVERT(DATE, '2026-03-01')  WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001423')  AND begindate = CONVERT(DATE, '2024-03-01'); 
 
 
 
@@ -355,8 +355,8 @@ left join org_dept a4 on a2.PK_FATHERORG=a4.pk_dept --上级部门
 select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00005315');
 
 请假单：
-select * from ts_leave_apply_detail where id = '84b25e894f9c49518039453ccc805f80'
-update ts_leave_apply_detail set leavebegintime = '2026-01-12 13:30:00.000' where id = '84b25e894f9c49518039453ccc805f80'
+select * from ts_leave_apply_detail where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
+update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
 
 调整单：
 select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
@@ -412,3 +412,17 @@ WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00000658')
 
 北森日志路径
 服务器1，nchome/nclogs/beisen.log
+
+
+
+
+
+更新入职申请单生效日期：
+
+UPDATE hi_psnjob
+SET BEGINDATE = '2026-03-01'
+WHERE PK_PSNJOB IN (
+    SELECT PK_PSNJOB
+    FROM HI_ENTRYAPPLY
+    WHERE BILL_CODE IN ('LYBL202602280001','LYBL202602280002','LYBL202602280003')
+)
