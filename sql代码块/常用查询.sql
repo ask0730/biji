@@ -430,7 +430,7 @@ WHERE PK_PSNJOB IN (
 
 
 
-用元数据名查表明：
+用元数据名查表名：
 select defaulttablename  from md_class where name  ='TransferOrderReviewVO'
 
 
@@ -438,8 +438,20 @@ select defaulttablename  from md_class where name  ='TransferOrderReviewVO'
 
 
 转单复核生效日期：
-select * from hi_transfer_order_review where pk_psndoc= (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020707')  
+select onboarding_date from hi_transfer_order_review where pk_psndoc= (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020707')  
 
 UPDATE hi_transfer_order_review 
 SET def15 = '2026-03-01'  
 WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020707');
+
+
+
+
+
+转单复核入职日期：
+select onboarding_date from hi_transfer_order_review where pk_psndoc= (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020718')  
+
+
+UPDATE hi_transfer_order_review 
+SET onboarding_date = '2026-03-01 00:00:00'  -- 完整的日期时间值，单引号包裹
+WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020718');
