@@ -173,7 +173,7 @@ delete from hrp_special_deduction_b where pk_org='00011T1000000000NGYX' and mont
 
 
 
-审批流调资信息维护：
+审批流定调资信息维护：
 SELECT
     w.pk_org,
     (SELECT name FROM org_orgs o WHERE o.pk_org = w.pk_org) AS oraName,
@@ -418,11 +418,28 @@ WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00000658')
 
 
 更新入职申请单生效日期：
-
 UPDATE hi_psnjob
 SET BEGINDATE = '2026-03-01'
 WHERE PK_PSNJOB IN (
     SELECT PK_PSNJOB
     FROM HI_ENTRYAPPLY
-    WHERE BILL_CODE IN ('LYBL202602280001','LYBL202602280002','LYBL202602280003')
+    WHERE BILL_CODE IN ('LYBL202602120001')
 )
+
+
+
+
+
+用元数据名查表明：
+select defaulttablename  from md_class where name  ='TransferOrderReviewVO'
+
+
+
+
+
+转单复核生效日期：
+select * from hi_transfer_order_review where pk_psndoc= (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020707')  
+
+UPDATE hi_transfer_order_review 
+SET def15 = '2026-03-01'  
+WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020707');
