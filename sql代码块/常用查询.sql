@@ -461,12 +461,13 @@ WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020718');
 
 
 考勤服务返回数据异常：
-select * from ts_staff_rule_cache where staffid in(SELECT pk_psndoc from bd_psndoc WHERE code='00011836')
+select * from ts_staff_rule_cache where staffid in(SELECT pk_psndoc from bd_psndoc WHERE code='00001838')
 
 
 
 
+删除日月报数据：
+select * from ts_daystat where STAFF_ID=(select pk_psndoc from bd_psndoc where code = '00000692') and dept_id='10011T100000001YK73X' and CALENDAR >= CONVERT(DATETIME, '2026-01-01 00:00:00', 120) and CALENDAR <= CONVERT(DATETIME, '2026-01-31 00:00:00', 120);
 
 
-
-
+select * from ts_monthstat where dept_id='10011T100000001YK73X' and STAFF_ID=(select pk_psndoc from bd_psndoc where code = '00000692') and begindate='2026-01-01 00:00:00.000'
