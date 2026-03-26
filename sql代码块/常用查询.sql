@@ -471,3 +471,18 @@ select * from ts_daystat where STAFF_ID=(select pk_psndoc from bd_psndoc where c
 
 
 select * from ts_monthstat where dept_id='10011T100000001YK73X' and STAFF_ID=(select pk_psndoc from bd_psndoc where code = '00000692') and begindate='2026-01-01 00:00:00.000'
+
+
+
+
+select * from HI_PARTAPPLY where PK_PARTMNG='10011T10000000272DOY'
+
+
+
+select * from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where code = '00020236') 
+
+
+
+
+查借调单：
+select * from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where code = '00020236') 
