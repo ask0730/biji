@@ -491,11 +491,6 @@ CREATE TABLE huanghui (
 INSERT INTO huanghui (SourceTable, RawData)
 SELECT 
     'HRKQ_LEAVE',
-    (SELECT * FROM HRKQ_LEAVE WHERE PK_PSNDOC=(SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001013') AND billno='QJSQ202601300078' FOR XML RAW);
-
-INSERT INTO huanghui (SourceTable, RawData)
-SELECT 
-    'HRKQ_LEAVE',
     (SELECT * FROM HRKQ_LEAVE WHERE PK_PSNDOC=(SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001013') AND billno='QJSQ202602090529' FOR XML RAW);
 
 -- 3. 插入 ts_leave_apply_detail 的两条数据
@@ -505,10 +500,6 @@ SELECT
     (SELECT * FROM ts_leave_apply_detail WHERE id = 'f5301c3bfb6244c181e6ce0b18eda612' FOR XML RAW);
 
 INSERT INTO huanghui (SourceTable, RawData)
-SELECT 
-    'ts_leave_apply_detail',
-    (SELECT * FROM ts_leave_apply_detail WHERE id = 'bdc89ec47f4545108f1bc5af09db0486' FOR XML RAW);
-
 
 select * from huanghui;
 
