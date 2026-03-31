@@ -479,4 +479,50 @@ select * from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc wher
 
 
 
+备份表：
+-- 1. 先创建备份表（用一个和所有字段兼容的通用结构）
+CREATE TABLE huanghui (
+    SourceTable NVARCHAR(50), -- 记录数据来源的表名，方便以后区分
+    RawData XML,              -- 用XML格式存原始行数据，兼容不同结构
+    CreateTime DATETIME DEFAULT GETDATE()
+);
+
+-- 2. 插入 HRKQ_LEAVE 的两条数据
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'HRKQ_LEAVE',
+    (SELECT * FROM HRKQ_LEAVE WHERE PK_PSNDOC=(SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001013') AND billno='QJSQ202601300078' FOR XML RAW);
+
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'HRKQ_LEAVE',
+    (SELECT * FROM HRKQ_LEAVE WHERE PK_PSNDOC=(SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001013') AND billno='QJSQ202602090529' FOR XML RAW);
+
+-- 3. 插入 ts_leave_apply_detail 的两条数据
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'ts_leave_apply_detail',
+    (SELECT * FROM ts_leave_apply_detail WHERE id = 'f5301c3bfb6244c181e6ce0b18eda612' FOR XML RAW);
+
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'ts_leave_apply_detail',
+    (SELECT * FROM ts_leave_apply_detail WHERE id = 'bdc89ec47f4545108f1bc5af09db0486' FOR XML RAW);
+
+
+select * from huanghui;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
