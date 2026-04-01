@@ -491,13 +491,13 @@ CREATE TABLE huanghui (
 INSERT INTO huanghui (SourceTable, RawData)
 SELECT 
     'HRKQ_LEAVE',
-    (SELECT * FROM HRKQ_LEAVE WHERE PK_PSNDOC=(SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001013') AND billno='QJSQ202602090529' FOR XML RAW);
+    (SELECT * FROM HRKQ_LEAVE WHERE PK_PSNDOC=(SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001013') AND billno='QJSQ202602090528' FOR XML RAW);
 
 -- 3. 插入 ts_leave_apply_detail 的两条数据
 INSERT INTO huanghui (SourceTable, RawData)
 SELECT 
     'ts_leave_apply_detail',
-    (SELECT * FROM ts_leave_apply_detail WHERE id = 'f5301c3bfb6244c181e6ce0b18eda612' FOR XML RAW);
+    (SELECT * FROM ts_leave_apply_detail WHERE id = 'cb7d5b2a9abf4e54b5a2b231a6cccab3' FOR XML RAW);
 
 INSERT INTO huanghui (SourceTable, RawData)
 
@@ -509,11 +509,11 @@ select * from huanghui;
 
 
 
+取消审批单据：
+select * from HRKQ_OVERTIME where BILLNO='JBSQ202604010001'
 
-
-
-
-
-
+UPDATE HRKQ_OVERTIME 
+SET approvestatus = 2 
+WHERE BILLNO = 'JBSQ202604010001';
 
 
