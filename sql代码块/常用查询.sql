@@ -504,16 +504,16 @@ INSERT INTO huanghui (SourceTable, RawData)
 select * from huanghui;
 
 
-
+ts_leave_apply
 
 
 
 
 取消审批单据：
-select * from HRKQ_OVERTIME where BILLNO='JBSQ202604010001'
+select * from HRKQ_OVERTIME where BILLNO='JBSQ202604010035'
 
 UPDATE HRKQ_OVERTIME 
 SET approvestatus = 2 
-WHERE BILLNO = 'JBSQ202604010001';
+WHERE BILLNO = 'JBSQ202604010035';
 
 
