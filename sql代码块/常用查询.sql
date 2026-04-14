@@ -517,3 +517,56 @@ SET approvestatus = 2
 WHERE BILLNO = 'JBSQ202604010035';
 
 
+
+
+
+
+
+
+
+
+重推竹云：
+SELECT * FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00007540')
+DELETE FROM zy_middle WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020358')
+1、在【用户】节点修改人员的创建日期
+2、【后台任务监控】节点执行【用户新增传竹云】任务
+3、后台任务执行成功后，在【竹云入调离审批日志】节点查看是否推送成功
+4、若推送成功，则稍等两分钟执行【下拉获取竹云账户】任务
+
+select pk_psndoc from sm_user where user_code='10012564'
+正式环境下载下/nclogs/zy/zy.log,服务器1
+
+
+
+
+
+
+
+
+
+
+更新入职申请单生效日期：
+select * from  hi_psnjob WHERE PK_PSNJOB IN (
+    SELECT PK_PSNJOB
+    FROM HI_ENTRYAPPLY
+    WHERE BILL_CODE IN ('LYBL202602120001')
+)
+
+
+
+
+
+
+
+
+
+
+
+- 使用解决方案附件脚本，清除该人员缓存数据，然后再到【考勤规则】节点，点击列表记录上的“手工排班”按钮，重新排班，重新生成日报数据。
+--查询
+select * from ts_staff_calendar_history where STAFF_ID =(select pk_psndoc from bd_psndoc where code = '00004897') and CALENDAR >= CONVERT(DATETIME, '2026-03-01 00:00:00', 120) and CALENDAR <= CONVERT(DATETIME, '2026-03-31 00:00:00', 120);--固定班制排班记录
+select * from ts_staff_rule_cache where STAFFID =(select pk_psndoc from bd_psndoc where code ='00004897');--缓存记录
+
+--删除
+delete from ts_staff_calendar_history where STAFF_ID =(select pk_psndoc from bd_psndoc where code = '00004897') and CALENDAR >= CONVERT(DATETIME, '2026-03-01 00:00:00', 120) and CALENDAR <= CONVERT(DATETIME, '2026-03-31 00:00:00', 120);
+delete from ts_staff_rule_cache where STAFFID =(select pk_psndoc from bd_psndoc where code ='00004897');
