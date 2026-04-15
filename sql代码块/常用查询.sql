@@ -521,6 +521,7 @@ WHERE BILLNO = 'JBSQ202604010035';
 
 
 培训系统：
+先生成用户
 select * from mzjh_bdsynctime--查看时间--code=0 组织 code=1 人员 code=4 岗位 code=5 部门
 select * from mzjh_sync_zxy_data where data_status='2'--表示推送报错--没有记录标识没有推送,删除这个表的推送记录
 select * from mzjh_sync_zxy_data where id in ('00020619','00020618','00020736','00020778','00020777','00020756','00020771','00020779','00020776')
