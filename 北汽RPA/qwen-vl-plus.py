@@ -4,6 +4,7 @@ import base64
 import requests
 from PIL import Image
 import io
+from pathlib import Path
 
 # ====================== 配置 ======================
 BASE_URL = "http://192.168.100.121:9080/v1"
@@ -15,25 +16,29 @@ def image_to_base64(image_path):
     try:
         with Image.open(image_path) as img:
             img = img.convert("RGB")
-            img.thumbnail((128, 128))  # 超级小图
+            img.thumbnail((240, 240))
             buf = io.BytesIO()
-            img.save(buf, format="JPEG", quality=10)  # 画质极低
+            img.save(buf, format="JPEG", quality=30)
             return base64.b64encode(buf.getvalue()).decode("utf8")
     except:
         return ""
 
-# ====================== 仅发图片+极简提示 ======================
-def recognize_image(image_path):
-    b64 = image_to_base64(image_path)
-    if not b64:
-        return "图片读取失败"
-
+# ====================== 插件主函数 ======================
+def 识别文件内容(指令, 文件路径):
     try:
+        文件路径 = str(Path(文件路径).resolve())
+        if not os.path.exists(文件路径):
+            return "错误：文件不存在"
+
+        b64 = image_to_base64(文件路径)
+        if not b64:
+            return "错误：图片处理失败"
+
         messages = [
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "图里有什么"},
+                    {"type": "text", "text": 指令},
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}}
                 ]
             }
@@ -48,20 +53,24 @@ def recognize_image(image_path):
             json={
                 "model": MODEL,
                 "messages": messages,
-                "temperature": 0.01,
+                "temperature": 0.0,
                 "stream": False,
-                "max_tokens": 256  # 输出极短，快速返回
+                "max_tokens": 1024
             },
-            timeout=120
+            timeout=300
         )
-        return resp
-    except Exception as e:
-        return None
 
-# ====================== 测试 ======================
+        if resp.status_code == 200:
+            return resp.json()["choices"][0]["message"]["content"]
+        else:
+            return f"服务异常 {resp.status_code}"
+
+    except Exception as e:
+        return f"执行异常：{str(e)}"
+
+# ====================== 直接 Python 测试 ======================
 if __name__ == "__main__":
-    res = recognize_image(r"D:\Desktop\demo\北汽RPA\test.jpg")
-    if res:
-        print("状态码:", res.status_code)
-        if res.status_code == 200:
-            print(res.json()["choices"][0]["message"]["content"])
+    # 这里直接改你的图片路径即可
+    结果 = 识别文件内容("提取图片里的所有文字", r"D:\Desktop\demo\北汽RPA\test.jpg")
+    print("识别结果：")
+    print(结果)
