@@ -414,7 +414,8 @@ WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00000658')
 服务器1，nchome/nclogs/beisen.log
 
 
-
+用元数据名查表名：
+select defaulttablename  from md_class where name  ='TransferOrderReviewVO'
 
 
 更新入职申请单生效日期：
@@ -425,15 +426,6 @@ WHERE PK_PSNJOB IN (
     FROM HI_ENTRYAPPLY
     WHERE BILL_CODE IN ('LYBL202602120001')
 )
-
-
-
-
-
-用元数据名查表名：
-select defaulttablename  from md_class where name  ='TransferOrderReviewVO'
-
-
 
 
 
@@ -552,3 +544,17 @@ select * from ts_business_trip_revoke_detail where STAFFID =(select pk_psndoc fr
 
 
 select * from CUX_NCHR_V_SALARYHISTORY where corpcode = '10000002' and A00Z0 = '2026-04'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
