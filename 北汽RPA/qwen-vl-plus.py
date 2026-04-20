@@ -9,26 +9,6 @@ import base64
 from PIL import Image
 import io
 
-# ====================== 依赖安装 ======================
-def install_package(package):
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package, "-i", "https://pypi.tuna.tsinghua.edu.cn/simple"])
-    except:
-        pass
-
-try:
-    from pdf2image import convert_from_path
-except ImportError:
-    install_package("pdf2image")
-
-try:
-    from docx2pdf import convert as docx_to_pdf
-except ImportError:
-    install_package("docx2pdf")
-
-from pdf2image import convert_from_path
-from docx2pdf import convert as docx_to_pdf
-
 # ====================== 关键配置（请填写你自己的信息） ======================
 BASE_URL = "http://192.168.100.121:9080"
 API_KEY = "sk-PxldK3SEs3uMLbwd8353AbA99dAd4a30B8Ee7f79C7F075Fc"  # 必须填！
@@ -151,6 +131,6 @@ def 识别文件内容(指令, 文件路径):
 
 # ====================== 本地测试 ======================
 if __name__ == "__main__":
-    test_file = r"test.zip"  # 换成你的测试图片路径
+    test_file = r"test.jpg"  # 换成你的测试图片路径
     test_prompt = "提取图片中的所有文字"
     print(识别文件内容(test_prompt, test_file))
