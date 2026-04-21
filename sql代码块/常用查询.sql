@@ -535,15 +535,18 @@ select * from ts_business_trip_revoke_detail where STAFFID =(select pk_psndoc fr
 
 
 
+出差单：
+
+select * from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00006475');--出差单主表
+
+select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006475');--出差、销差共用的中间表
+
+select * from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006475');--出差单子表
 
 
 
 
 
-
-
-
-select * from CUX_NCHR_V_SALARYHISTORY where corpcode = '10000002' and A00Z0 = '2026-04'
 
 
 
