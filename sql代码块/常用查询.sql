@@ -532,6 +532,11 @@ select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_ps
 
 select * from ts_business_trip_revoke_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006475');--销差单子表
 
+实际目的地：def1
+出行方式：def2
+出差报销天数：def4
+其他出行方式：def5
+实际开始时间：tripoffbegintime
 
 
 
@@ -543,14 +548,11 @@ select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_ps
 
 select * from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006475');--出差单子表
 
-select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000006774'
+select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000000360'
 
 结束时间：tripendtime
 出差报销天数：def1
 出差时长:tripday
-
-
-
 
 
 
