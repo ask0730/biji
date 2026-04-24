@@ -162,6 +162,6 @@ if __name__ == "__main__":
     结果 = 识别多页文件内容("提取所有文字并排版，保留表格和图片信息", r"D:\Desktop\demo\北汽RPA\test.docx")
     
     print("=" * 50)
-    print("完整识别结果：")
+    print("完整识别结果11：")
     print("=" * 50)
     print(结果)
