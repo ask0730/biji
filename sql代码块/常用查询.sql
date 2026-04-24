@@ -542,11 +542,11 @@ select * from ts_business_trip_revoke_detail where STAFFID =(select pk_psndoc fr
 
 出差单：
 
-select * from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00006475');--出差单主表
+select * from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00003439');--出差单主表
 
-select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006475');--出差、销差共用的中间表
+select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00003439');--出差、销差共用的中间表
 
-select * from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006475');--出差单子表
+select * from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00003439');--出差单子表
 
 select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000000360'
 
@@ -556,7 +556,11 @@ select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000000360'
 
 
 
+delete from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00003439');--出差单主表
 
+delete from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00003439');--出差、销差共用的中间表
+
+delete from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00003439');--出差单子表
 
 
 
