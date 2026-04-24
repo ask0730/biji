@@ -2,26 +2,26 @@
 ==================================================
 
 原始文件：D:\Desktop\demo\北汽RPA\test\1111111-111111111-11111111.docx
-长图路径：D:\Desktop\demo\北汽RPA\转换后的长图\1111111-111111111-11111111_long.png
-状态：转换成功
+状态：转换成功（共2页）
+输出目录：D:\Desktop\demo\北汽RPA\转换后的图片
 
 原始文件：D:\Desktop\demo\北汽RPA\test\1111111-111111111-11111111.pdf
-长图路径：D:\Desktop\demo\北汽RPA\转换后的长图\1111111-111111111-11111111_long.png
-状态：转换成功
+状态：转换成功（共2页）
+输出目录：D:\Desktop\demo\北汽RPA\转换后的图片
 
 原始文件：D:\Desktop\demo\北汽RPA\test\temp.pdf
-长图路径：D:\Desktop\demo\北汽RPA\转换后的长图\temp_long.png
-状态：转换成功
+状态：转换成功（共1页）
+输出目录：D:\Desktop\demo\北汽RPA\转换后的图片
 
 原始文件：D:\Desktop\demo\北汽RPA\test\test - 副本.jpg
-长图路径：D:\Desktop\demo\北汽RPA\转换后的长图\test - 副本_long.png
-状态：转换成功
+状态：图片已保存
+输出目录：D:\Desktop\demo\北汽RPA\转换后的图片
 
 原始文件：D:\Desktop\demo\北汽RPA\test\test1.docx
-长图路径：D:\Desktop\demo\北汽RPA\转换后的长图\test1_long.png
-状态：转换成功
+状态：转换成功（共1页）
+输出目录：D:\Desktop\demo\北汽RPA\转换后的图片
 
 原始文件：D:\Desktop\demo\北汽RPA\test\tmp_word_rpa.png
-长图路径：无
-状态：转换失败：cannot identify image file 'D:\\Desktop\\demo\\北汽RPA\\test\\tmp_word_rpa.png'
+状态：图片文件损坏或无法识别：cannot identify image file 'D:\\Desktop\\demo\\北汽RPA\\test\\tmp_word_rpa.png'
+输出目录：D:\Desktop\demo\北汽RPA\转换后的图片
 
