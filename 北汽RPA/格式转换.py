@@ -106,7 +106,7 @@ def word_to_pdf(word_path, pdf_path):
         if word:
             word.Quit()
         pythoncom.CoUninitialize()
-        time.sleep(0.5)
+        time.sleep(0.3)
 
 def word_to_images(word_path, output_dir, file_name):
     temp_pdf = os.path.join(get_exe_dir(), "temp_file.pdf")
@@ -153,7 +153,7 @@ def main(input_folder, output_folder):
         for root, dirs, files in os.walk(input_folder):
             for file in files:
                 file_path = os.path.abspath(os.path.join(root, file))
-                status = process_single_file(file_path, output_folder)
+                status = process_single_file(file_path, output_dir)
                 f.write(f"{file_path} | {status}\n")
                 print(f"{'✅' if '成功' in status or '已保存' in status else '❌'} {file} | {status}")
 
@@ -165,7 +165,4 @@ if __name__ == "__main__":
         input_dir, output_dir = read_config()
         main(input_dir, output_dir)
     except Exception as e:
-        print(f"错误：{e}")
-        write_error_log(f"崩溃：{str(e)}\n{traceback.format_exc()}")
-    finally:
-        input("\n按回车键退出...")
+        write_error_log(f"程序异常：{str(e)}\n{traceback.format_exc()}")

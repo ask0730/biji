@@ -540,6 +540,7 @@ select * from ts_business_trip_revoke_detail where STAFFID =(select pk_psndoc fr
 
 
 
+
 出差单：
 
 select * from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00003439');--出差单主表
@@ -568,3 +569,5 @@ delete from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from 
 
 
 
+select * from ts_leave_balance where leavetype='867fed43603645bba8e0decd9f2ad580' and staffid='00011T1000000000RVHQ'
+clearingstate
