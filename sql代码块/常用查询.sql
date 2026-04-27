@@ -567,7 +567,19 @@ delete from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from 
 
 
 
-
+四分产假取消结算：
 
 select * from ts_leave_balance where leavetype='867fed43603645bba8e0decd9f2ad580' and staffid='00011T1000000000RVHQ'
-clearingstate
+
+UPDATE ts_leave_balance
+SET clearingstate = 1
+WHERE leavetype='867fed43603645bba8e0decd9f2ad580' 
+  AND staffid='00011T1000000000RVHQ' 
+  AND begindatetime='2025-01-01 00:00:00.000';
+
+
+UPDATE ts_leave_balance 
+SET invalidstate = 0 
+WHERE leavetype='867fed43603645bba8e0decd9f2ad580' 
+  AND staffid='00011T1000000000RVHQ' 
+  AND invalidstate=1;
