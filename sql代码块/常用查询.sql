@@ -452,9 +452,8 @@ WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00020718');
 
 
 
-考勤服务返回数据异常：
-select * from ts_staff_rule_cache where staffid in(SELECT pk_psndoc from bd_psndoc WHERE code='00001838')
 
+select * from ts_staff_rule_cache where staffid in(SELECT pk_psndoc from bd_psndoc WHERE code='00001838')
 
 
 
@@ -553,8 +552,7 @@ select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000000360'
 
 结束时间：tripendtime
 出差报销天数：def1
-出差时长:tripday
-
+出差时长:tripda
 
 
 delete from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00003439');--出差单主表
@@ -583,3 +581,17 @@ SET invalidstate = 0
 WHERE leavetype='867fed43603645bba8e0decd9f2ad580' 
   AND staffid='00011T1000000000RVHQ' 
   AND invalidstate=1;
+
+
+
+
+
+
+请假类型：
+select id from TS_LEAVE_TYPE_NEW where TYPE_NAME='育儿假'
+育儿假的主键:54be2247ca7940d3a71c1557b64800c9
+
+
+
+
+
