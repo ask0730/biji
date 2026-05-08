@@ -593,5 +593,32 @@ select id from TS_LEAVE_TYPE_NEW where TYPE_NAME='育儿假'
 
 
 
+select name from TS_LEAVE_TYPE_NEW 
 
 
+
+
+
+
+
+加班转调休，重新转：
+select * from ts_overtime_split where staffid in(select pk_psndoc from bd_Psndoc where code='00002000') 
+找到你要改的记录的id
+
+取消之后，用这个语句更新下状态，然后再转
+
+update ts_overtime_split set billstatus=1,transferflag=0 where  staffid in(select pk_psndoc from bd_Psndoc where code='00002000') and id='09c3ce7a44624cb2922aea2b80aa48b2'
+
+
+
+
+
+
+
+
+薪资档案查不到人：
+员工管理范围dr改成1
+SELECT *  FROM hr_relation_psn WHERE assgid IN ( SELECT assgid FROM hi_psnjob  WHERE pk_psndoc IN ( SELECT pk_psndoc FROM bd_psndoc  WHERE code = '00000248')) and creationtime='2026-05-08 12:46:32'
+
+薪资档案里存的工作记录主键被删了，所以查不出来
+SELECT * FROM wa_data WHERE pk_wa_class = N'10011T100000000L5RG0' AND cyear = N'2026' AND cperiod = N'05'  AND dr = 0
