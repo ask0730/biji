@@ -297,6 +297,7 @@ select * from CUX_NCHR_V_SALARYHISTORY where corpcode = '10000003' and A00Z0 = '
 
 考勤日报表：ts_daystat
 
+
 删除日报数据：
 select * from ts_daystat where STAFF_ID =(select pk_psndoc from bd_psndoc where code ='00001699');
 
@@ -315,7 +316,7 @@ WHERE STAFF_ID = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00005771')
 
 
 
-假勤月报审批单：
+请假类型：
 select type_name,type_name2 from ts_leave_type_new
 
 UPDATE ts_leave_type_new
@@ -361,10 +362,6 @@ update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where 
 调整单：
 select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
 update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
-
-
-
-
 
 
 
