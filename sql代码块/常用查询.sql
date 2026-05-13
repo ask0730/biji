@@ -619,3 +619,23 @@ SELECT *  FROM hr_relation_psn WHERE assgid IN ( SELECT assgid FROM hi_psnjob  W
 
 薪资档案里存的工作记录主键被删了，所以查不出来
 SELECT * FROM wa_data WHERE pk_wa_class = N'10011T100000000L5RG0' AND cyear = N'2026' AND cperiod = N'05'  AND dr = 0
+
+
+
+
+
+
+
+
+
+月报审批单：
+
+select * from bjrq_monthappr where billno='08c423811bc141748603794378bb2977'
+
+
+UPDATE bjrq_monthappr
+SET approvestatus = 2 
+WHERE billno='08c423811bc141748603794378bb2977'
+
+
+
