@@ -734,3 +734,55 @@ UPDATE hi_psnjob
 SET jobglbdef32 = '10011T1000000012WH3U' 
 WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00003952') 
   AND begindate = '2024-02-27';
+
+
+
+
+
+
+
+
+
+
+撤销岗位失败！原因：撤销岗位引起变动的人员，有定调资单据状态为[编写中]、[已提交]、[审核中]的单据：
+  select BILLCODE,wa_psnappaprove_b.* from wa_psnappaprove_b inner join wa_psnappaprove on wa_psnappaprove_b.pk_psnapp = wa_psnappaprove.pk_psnapp where wa_psnappaprove_b.pk_psndoc in ( N'00011T100000000QWP20' , N'00011T100000000QWP23' , N'00011T100000000QWP26' , N'00011T100000000QWWKL' , N'00011T100000000QWWKO' , N'00011T100000000QWWKR' ) and wa_psnappaprove.confirmstate in ( N'-1' , N'2' , N'3' )
+
+SELECT
+	distinct t1.BILLCODE --单据号
+    ,t2.confirmstate --审批状态
+    ,a1.user_name   --创建人
+    ,t1.dr,t1.PK_PSNAPP --定调资申请单主键
+FROM
+	WA_PSNAPPAPROVE t1
+left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
+left join bd_psnjob t3 on t2.pk_psnjob=t3.pk_psnjob
+left join sm_user a1 on t1.creator=a1.cuserid
+where t1.BILLCODE in ('LYBL202508180007'
+,'LYBL202508180007'
+,'LYBL202506240004'
+,'LYBL202506240004')
+
+SELECT
+	distinct t1.BILLCODE --单据号
+    ,t1.PK_PSNAPP
+    ,t2.PK_WA_ITEM
+    ,t3.name --薪资项目
+    ,t2.PK_PSNAPP_B --定调资申请表体pk
+    ,t2.PK_WA_SECLV_APPLY --薪档
+FROM
+	WA_PSNAPPAPROVE t1
+left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
+left join WA_CLASSITEM t3 on t2.PK_WA_ITEM=t3.PK_WA_ITEM
+where t1.BILLCODE in ('LYBL202506240004',
+'LYBL202505070001',
+'LYBL202508180007')
+
+delete from WA_PSNAPPAPROVE where PK_PSNAPP in (
+'00011T1000000019CHWG',
+'10011T1000000023JPBD')
+    
+delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
+'00011T1000000019CHWG',
+'10011T1000000028I8I9',
+'10011T1000000023JPBD',
+'10011T1000000023JPBD')
