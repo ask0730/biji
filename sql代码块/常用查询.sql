@@ -757,10 +757,8 @@ FROM
 left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
 left join bd_psnjob t3 on t2.pk_psnjob=t3.pk_psnjob
 left join sm_user a1 on t1.creator=a1.cuserid
-where t1.BILLCODE in ('LYBL202508180007'
-,'LYBL202508180007'
-,'LYBL202506240004'
-,'LYBL202506240004')
+where t1.BILLCODE in ('LYBL202408050076'
+)
 
 SELECT
 	distinct t1.BILLCODE --单据号
@@ -773,16 +771,51 @@ FROM
 	WA_PSNAPPAPROVE t1
 left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
 left join WA_CLASSITEM t3 on t2.PK_WA_ITEM=t3.PK_WA_ITEM
-where t1.BILLCODE in ('LYBL202506240004',
-'LYBL202505070001',
-'LYBL202508180007')
+where t1.BILLCODE in ('LYBL202408050076')
 
 delete from WA_PSNAPPAPROVE where PK_PSNAPP in (
-'00011T1000000019CHWG',
-'10011T1000000023JPBD')
+'00011T100000000T5ICC')
     
 delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
-'00011T1000000019CHWG',
-'10011T1000000028I8I9',
-'10011T1000000023JPBD',
-'10011T1000000023JPBD')
+'00011T100000000T5ICC')
+
+
+
+
+10020739
+10020740
+10020743
+10020744
+10021116
+10021117
+10021121
+10021122
+
+
+
+10020739
+被撤销的岗位[审计管理]下存在在职人员[贾静涵].
+
+10020740
+被撤销部门[财务部]的人员中存在未完成的单据[兼职单据: [JZBL202408280008]]
+
+10020743
+被撤销的部门[腐蚀防控业务部]下存在[常旭]未结束的任职记录.
+被撤销部门[腐蚀防控业务部]的人员中存在未完成的单据[调配离职单据: [LZBL202603120001]]
+
+10020744
+被撤销的岗位[劳务派遣]下存在在职人员[刘欣宇,王思淼,于欣艺].
+
+10021116
+被撤销的部门[生产运营部]下存在[赵明满,张忠信]未结束的任职记录.
+被撤销部门[生产运营部]的人员中存在未完成的单据[调配离职单据: [LZBL202604020008,LZBL202604020007]]
+
+10021117
+被撤销的岗位[劳务派遣]下存在在职人员[于安].
+
+10021121
+被撤销的岗位[销售服务管理等岗位]下存在在职人员[刘莹].
+
+10021122
+被撤销的岗位[质量控制管理]下存在在职人员[赵永军].
+
