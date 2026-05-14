@@ -704,3 +704,33 @@ WHERE staff_id IN (
     )
   )	
 	and begindate='2026-01-01 00:00:00'
+
+
+
+
+
+
+
+
+
+年度工资收入去重：
+  select * from hi_psndoc_glbdef25 where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00010113') and begindate='2024-12-01' and glbdef3='466666.18'
+
+
+
+
+
+
+
+
+
+
+
+  修改工作记录的党组织：
+select jobglbdef32 from hi_psnjob where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00003952') and begindate='2025-05-01'
+
+
+UPDATE hi_psnjob 
+SET jobglbdef32 = '10011T1000000012WH3U' 
+WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00003952') 
+  AND begindate = '2024-02-27';
