@@ -819,3 +819,9 @@ delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
 10021122
 被撤销的岗位[质量控制管理]下存在在职人员[赵永军].
 
+
+
+
+--流程实例列表
+select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'--列表
+select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresult='Y'--详情
