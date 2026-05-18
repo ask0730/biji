@@ -757,7 +757,7 @@ FROM
 left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
 left join bd_psnjob t3 on t2.pk_psnjob=t3.pk_psnjob
 left join sm_user a1 on t1.creator=a1.cuserid
-where t1.BILLCODE in ('LYBL202408050076'
+where t1.BILLCODE in ('LYBL202308180029'
 )
 
 SELECT
@@ -771,13 +771,13 @@ FROM
 	WA_PSNAPPAPROVE t1
 left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
 left join WA_CLASSITEM t3 on t2.PK_WA_ITEM=t3.PK_WA_ITEM
-where t1.BILLCODE in ('LYBL202408050076')
+where t1.BILLCODE in ('LYBL202308180029')
 
 delete from WA_PSNAPPAPROVE where PK_PSNAPP in (
-'00011T100000000T5ICC')
+'10011T100000000YQ47Q')
     
 delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
-'00011T100000000T5ICC')
+'10011T100000000YQ47Q')
 
 
 
@@ -793,35 +793,78 @@ delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
 
 
 
-10020739
-被撤销的岗位[审计管理]下存在在职人员[贾静涵].
+
 
 10020740
-被撤销部门[财务部]的人员中存在未完成的单据[兼职单据: [JZBL202408280008]]
+被撤销的岗位[总账会计]下存在在职人员[张玥].
+被撤销的岗位[出纳]下存在在职人员[代晓乐,范雅楠].
+被撤销的岗位[会计]下存在在职人员[于凤婷,刘畅].
+被撤销的岗位[财务部副经理]下存在在职人员[赵青].
 
 10020743
+被撤销的岗位[腐蚀防控业务部副经理]下存在在职人员[马汉龙].
+被撤销的岗位[腐蚀防控业务部副经理]下存在在职人员[马汉龙].
 被撤销的部门[腐蚀防控业务部]下存在[常旭]未结束的任职记录.
 被撤销部门[腐蚀防控业务部]的人员中存在未完成的单据[调配离职单据: [LZBL202603120001]]
+被撤销的岗位[阴保运维劳务派遣]下存在在职人员[常旭].
 
 10020744
-被撤销的岗位[劳务派遣]下存在在职人员[刘欣宇,王思淼,于欣艺].
+被撤销的岗位[管培期]下存在在职人员[呼盈杉].
+被撤销的岗位[测量管理]下存在在职人员[谭海松].
 
 10021116
 被撤销的部门[生产运营部]下存在[赵明满,张忠信]未结束的任职记录.
 被撤销部门[生产运营部]的人员中存在未完成的单据[调配离职单据: [LZBL202604020008,LZBL202604020007]]
-
-10021117
-被撤销的岗位[劳务派遣]下存在在职人员[于安].
+被撤销的岗位[应急人员（劳务派遣）]下存在在职人员[赵明满,莫炎,刘丽果,张忠信].
+被撤销的岗位[固定资产管理]下存在在职人员[王爱政].
+被撤销的岗位[核图探测专项小组]下存在在职人员[王飞,王辰]
 
 10021121
-被撤销的岗位[销售服务管理等岗位]下存在在职人员[刘莹].
+被撤销的岗位[工程招投标管理]下存在在职人员[谷雨].
+被撤销的岗位[生产计划]下存在在职人员[赵阳].
+被撤销的岗位[材料管理]下存在在职人员[赵欣静,袁靖文,袁靖文].
+被撤销的岗位[生产计划劳务派遣]下存在在职人员[张钰晗].
 
 10021122
-被撤销的岗位[质量控制管理]下存在在职人员[赵永军].
-
-
-
+被撤销的岗位[生产安全管理]下存在在职人员[郭凯敏].
+被撤销的岗位[车辆管理]下存在在职人员[潘学勇].
+被撤销的岗位[技改修理管理、资产和设备管理]下存在在职人员[张浩].
+被撤销的岗位[环保管理、信息化与数据分析]下存在在职人员[赵晓晴,耿海荣].
 
 --流程实例列表
 select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'--列表
 select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresult='Y'--详情
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+修改请假单：
+select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'--列表
+select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresult='Y'--详情
+select * from ts_leave_apply_detail where id = 'e7faf8de0e9e43429779455cfa8a3a2c'
+select * from HRKQ_LEAVE where BILLNO='QJSQ202605140057'
+
+
+
+
+
+2026-05-14
+
+
+4.20
