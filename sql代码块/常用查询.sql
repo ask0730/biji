@@ -854,17 +854,35 @@ select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresu
 
 
 
-修改请假单：
-select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'--列表
-select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresult='Y'--详情
-select * from ts_leave_apply_detail where id = 'e7faf8de0e9e43429779455cfa8a3a2c'
-select * from HRKQ_LEAVE where BILLNO='QJSQ202605140057'
+修改请假单申请时间：
+select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'。
+select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresult='Y'
+select * from ts_leave_apply_detail where id = 'e7faf8de0e9e43429779455cfa8a3a2c'。
+select * from HRKQ_LEAVE where BILLNO='QJSQ202605140057'。
+
+UPDATE ts_leave_apply_detail
+SET 
+    creationtime = '2026-05-14 10:32:52.257',
+    modifiedtime = '2026-05-14 10:32:52.257'
+WHERE id = 'e7faf8de0e9e43429779455cfa8a3a2c';
 
 
+UPDATE HRKQ_LEAVE
+SET 
+    applydate = '2026-05-14 10:28:12',
+    approvetime = '2026-05-14 10:49:24',
+    creationtime = '2026-05-14 10:28:12'
+WHERE BILLNO = 'QJSQ202605140057';
 
+UPDATE PUB_WF_INSTANCE
+SET 
+    endts = '2026-05-14 10:49:24',
+    startts = '2026-05-14 10:49:24'
+WHERE billno = 'QJSQ202605140057';
 
-
-2026-05-14
-
-
-4.20
+UPDATE pub_workflownote
+SET 
+    dealdate = '2026-05-14 10:49:24',
+    senddate = '2026-05-14 10:32:53'
+WHERE billno = 'QJSQ202605140057' 
+  AND approveresult = 'Y';
