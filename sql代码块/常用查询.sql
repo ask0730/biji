@@ -927,33 +927,6 @@ WHERE BILL_code = 'JZBL202605140005';
 
 
 
-请假单，销假单，以及子表：
-
---休假主表--休假子表--销假子表
-select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00005315');
-
-请假单：
-select * from ts_leave_apply_detail where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
-update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
-
-调整单：
-select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
-update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
-
-
-select * from HRKQ_LEAVE where billno='QJSQ202605190017'
-
-select * from HRKQ_LEAVEOFF where billno='XJSQ202605250005'
-
-UPDATE HRKQ_LEAVE 
-SET leaveday = 7, weekdays = 7
-WHERE BILLNO = 'QJSQ202605210220';
-
-
-
-
-
-
 
 
 修改出差单申请日期：
@@ -1037,4 +1010,41 @@ SET
 WHERE 
     billno = '0000007696' 
     AND approveresult = 'Y';
+
+
+
+
+
+
+
+请假单，销假单，以及子表，修改请假时长：
+
+请假单：
+select * from HRKQ_LEAVE where billno='QJSQ202605190017'
+
+
+调整单：
+select * from HRKQ_LEAVEOFF where billno='XJSQ202605250005'
+
+
+请假单子表：
+select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00001251');
+select * from ts_leave_apply_detail where id = '7eb571992dd8469f9115ad2c2414b9ae'
+update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
+
+调整单子表：
+select * from ts_leave_off_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00001251');
+select * from ts_leave_off_detail where id = '7eb571992dd8469f9115ad2c2414b9ae'
+update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
+
+
+
+UPDATE HRKQ_LEAVE 
+SET leaveday = 7, weekdays = 7
+WHERE BILLNO = 'QJSQ202605210220';
+
+
+
+
+
 
