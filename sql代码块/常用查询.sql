@@ -351,17 +351,6 @@ left join org_dept a4 on a2.PK_FATHERORG=a4.pk_dept --上级部门
 
 
 
-修改请假时长：
---休假主表--休假子表--销假子表
-select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00005315');
-
-请假单：
-select * from ts_leave_apply_detail where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
-update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
-
-调整单：
-select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
-update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
 
 
 
@@ -782,48 +771,6 @@ delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
 
 
 
-10020739
-10020740
-10020743
-10020744
-10021116
-10021117
-10021121
-10021122
-
-
-
-
-
-10020743
-被撤销的岗位[阴保运维劳务派遣]下存在在职人员[常旭].
-
-10021116
-被撤销的岗位[应急人员（劳务派遣）]下存在在职人员[赵明满,张忠信].
-
-
-
---流程实例列表
-select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'--列表
-select * from  pub_workflownote  where billno='QJSQ202605140057' and approveresult='Y'--详情
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 修改请假单申请时间：
@@ -878,7 +825,7 @@ select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000007524'
 
 
 
-备份：
+备份表：
 delete from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00006575') and BILLNO='0000007524'
 
 delete  from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006575') and id='ccc821018a884b09b95af2d746760927'
@@ -902,54 +849,6 @@ SELECT
 FROM HRKQ_TRIP t1
 WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006575') 
   AND BILLNO='0000007524';
-
--- 备份 ts_business_trip_apply 表数据
-INSERT INTO huanghui (SourceTable, RawData)
-SELECT 
-    'ts_business_trip_apply' AS SourceTable,
-    (SELECT * FROM ts_business_trip_apply t2 WHERE t2.STAFFID = t1.STAFFID AND t1.id = t2.id FOR XML RAW, ELEMENTS) AS RawData
-FROM ts_business_trip_apply t1
-WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code ='00006575') 
-  AND id='ccc821018a884b09b95af2d746760927';
-
--- 备份 ts_business_trip_apply_detail 表数据
-INSERT INTO huanghui (SourceTable, RawData)
-SELECT 
-    'ts_business_trip_apply_detail' AS SourceTable,
-    (SELECT * FROM ts_business_trip_apply_detail t2 WHERE t2.STAFFID = t1.STAFFID AND t1.id = t2.id FOR XML RAW, ELEMENTS) AS RawData
-FROM ts_business_trip_apply_detail t1
-WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code ='00006575') 
-  AND id='288a6b44896246468f5a396cc327560f';
-
-
-
-
-
-
-
-
-
-
-
-
-修改请假时长：
---休假主表--休假子表--销假子表
-select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00007560');
-
-请假单：
-select * from ts_leave_apply_detail where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
-update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
-
-
-
-UPDATE HRKQ_LEAVE 
-SET leaveday = 7, weekdays = 7
-WHERE BILLNO = 'QJSQ202605210220';
-
-
-
-
-
 
 
 
@@ -1012,7 +911,7 @@ SET pk_job_type ='10011T100000000007Q2'
 WHERE BILL_code = 'JZBL202605140003';
 
 
-改兼职单：
+改兼职单的流程类型：
 select * from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where id = '110106199803180632') 
 
 select transtypeid from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where id = '110106199803180632') 
@@ -1027,3 +926,80 @@ WHERE BILL_code = 'JZBL202605140005';
 
 
 
+
+
+
+修改出差单申请日期：
+
+select * from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00001747');--出差单主表
+
+select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00001747');--出差、销差共用的中间表
+
+select * from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00001747');--出差单子表
+
+UPDATE HRKQ_TRIP 
+SET 
+    applydate = '2026-05-18 15:38:40',
+    creationtime = '2026-05-28 15:38:40'
+WHERE 
+    pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00001747');
+
+
+UPDATE ts_business_trip_apply 
+SET 
+    applydate = '2026-05-18 15:42:01.273',
+    creationtime = '2026-05-18 15:42:01.273',
+    modifiedtime = '2026-05-18 15:42:01.273'
+WHERE 
+    STAFFID = (select pk_psndoc from bd_psndoc where code ='00001747');
+
+UPDATE ts_business_trip_apply_detail 
+SET 
+    creationtime = '2026-05-18 15:42:01.280',
+    modifiedtime = '2026-05-18 15:42:01.280'
+WHERE 
+    STAFFID = (select pk_psndoc from bd_psndoc where code ='00001747');
+
+  
+--流程实例列表
+select * from PUB_WF_INSTANCE where billno='0000007696'--列表
+select * from  pub_workflownote  where billno='0000007696' and approveresult='Y'--详情
+
+
+UPDATE PUB_WF_INSTANCE 
+SET 
+    startts = '2026-05-18 15:42:01'
+WHERE 
+    billno = '0000007696';
+
+
+UPDATE pub_workflownote 
+SET senddate = '2026-05-18 15:42:01'
+WHERE billno = '0000007696';
+
+
+
+
+
+
+请假单，销假单，以及子表：
+
+--休假主表--休假子表--销假子表
+select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00005315');
+
+请假单：
+select * from ts_leave_apply_detail where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
+update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
+
+调整单：
+select * from ts_leave_off_detail where id = '84b25e894f9c49518039453ccc805f80'
+update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where id = '84b25e894f9c49518039453ccc805f80'
+
+
+select * from HRKQ_LEAVE where billno='QJSQ202605190017'
+
+select * from HRKQ_LEAVEOFF where billno='XJSQ202605250005'
+
+UPDATE HRKQ_LEAVE 
+SET leaveday = 7, weekdays = 7
+WHERE BILLNO = 'QJSQ202605210220';
