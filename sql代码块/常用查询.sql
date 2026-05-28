@@ -795,41 +795,13 @@ delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
 
 
 
-10020740
-被撤销的岗位[总账会计]下存在在职人员[张玥].
-被撤销的岗位[出纳]下存在在职人员[代晓乐,范雅楠].
-被撤销的岗位[会计]下存在在职人员[于凤婷,刘畅].
-被撤销的岗位[财务部副经理]下存在在职人员[赵青].
-
 10020743
-被撤销的岗位[腐蚀防控业务部副经理]下存在在职人员[马汉龙].
-被撤销的岗位[腐蚀防控业务部副经理]下存在在职人员[马汉龙].
-被撤销的部门[腐蚀防控业务部]下存在[常旭]未结束的任职记录.
-被撤销部门[腐蚀防控业务部]的人员中存在未完成的单据[调配离职单据: [LZBL202603120001]]
 被撤销的岗位[阴保运维劳务派遣]下存在在职人员[常旭].
 
-10020744
-被撤销的岗位[管培期]下存在在职人员[呼盈杉].
-被撤销的岗位[测量管理]下存在在职人员[谭海松].
-
 10021116
-被撤销的部门[生产运营部]下存在[赵明满,张忠信]未结束的任职记录.
-被撤销部门[生产运营部]的人员中存在未完成的单据[调配离职单据: [LZBL202604020008,LZBL202604020007]]
-被撤销的岗位[应急人员（劳务派遣）]下存在在职人员[赵明满,莫炎,刘丽果,张忠信].
-被撤销的岗位[固定资产管理]下存在在职人员[王爱政].
-被撤销的岗位[核图探测专项小组]下存在在职人员[王飞,王辰]
+被撤销的岗位[应急人员（劳务派遣）]下存在在职人员[赵明满,张忠信].
 
-10021121
-被撤销的岗位[工程招投标管理]下存在在职人员[谷雨].
-被撤销的岗位[生产计划]下存在在职人员[赵阳].
-被撤销的岗位[材料管理]下存在在职人员[赵欣静,袁靖文,袁靖文].
-被撤销的岗位[生产计划劳务派遣]下存在在职人员[张钰晗].
 
-10021122
-被撤销的岗位[生产安全管理]下存在在职人员[郭凯敏].
-被撤销的岗位[车辆管理]下存在在职人员[潘学勇].
-被撤销的岗位[技改修理管理、资产和设备管理]下存在在职人员[张浩].
-被撤销的岗位[环保管理、信息化与数据分析]下存在在职人员[赵晓晴,耿海荣].
 
 --流程实例列表
 select * from PUB_WF_INSTANCE where billno='QJSQ202605140057'--列表
@@ -886,3 +858,172 @@ SET
     senddate = '2026-05-14 10:32:53'
 WHERE billno = 'QJSQ202605140057' 
   AND approveresult = 'Y';
+
+
+
+
+
+
+
+出差单：
+
+select * from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00006575') and BILLNO='0000007524'
+
+select * from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006575')--出差、销差共用的中间表;
+
+select * from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006575');--出差单子表
+
+select tripendtime,def1,tripday from HRKQ_TRIP where BILLNO='0000007524'
+
+
+
+
+备份：
+delete from HRKQ_TRIP where pk_psndoc = (select pk_psndoc from bd_psndoc where code = '00006575') and BILLNO='0000007524'
+
+delete  from ts_business_trip_apply where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006575') and id='ccc821018a884b09b95af2d746760927'
+
+delete  from ts_business_trip_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00006575') and id='288a6b44896246468f5a396cc327560f'
+
+
+
+CREATE TABLE huanghui (
+    SourceTable NVARCHAR(50), -- 记录数据来源的表名，方便以后区分
+    RawData XML,              -- 用XML格式存原始行数据，兼容不同结构
+    CreateTime DATETIME DEFAULT GETDATE()
+);
+
+
+-- 备份 HRKQ_TRIP 表数据
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'HRKQ_TRIP' AS SourceTable,
+    (SELECT * FROM HRKQ_TRIP t2 WHERE t2.pk_psndoc = t1.pk_psndoc AND t1.BILLNO = t2.BILLNO FOR XML RAW, ELEMENTS) AS RawData
+FROM HRKQ_TRIP t1
+WHERE pk_psndoc = (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00006575') 
+  AND BILLNO='0000007524';
+
+-- 备份 ts_business_trip_apply 表数据
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'ts_business_trip_apply' AS SourceTable,
+    (SELECT * FROM ts_business_trip_apply t2 WHERE t2.STAFFID = t1.STAFFID AND t1.id = t2.id FOR XML RAW, ELEMENTS) AS RawData
+FROM ts_business_trip_apply t1
+WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code ='00006575') 
+  AND id='ccc821018a884b09b95af2d746760927';
+
+-- 备份 ts_business_trip_apply_detail 表数据
+INSERT INTO huanghui (SourceTable, RawData)
+SELECT 
+    'ts_business_trip_apply_detail' AS SourceTable,
+    (SELECT * FROM ts_business_trip_apply_detail t2 WHERE t2.STAFFID = t1.STAFFID AND t1.id = t2.id FOR XML RAW, ELEMENTS) AS RawData
+FROM ts_business_trip_apply_detail t1
+WHERE STAFFID = (SELECT pk_psndoc FROM bd_psndoc WHERE code ='00006575') 
+  AND id='288a6b44896246468f5a396cc327560f';
+
+
+
+
+
+
+
+
+
+
+
+
+修改请假时长：
+--休假主表--休假子表--销假子表
+select * from ts_leave_apply_detail where STAFFID =(select pk_psndoc from bd_psndoc where code ='00007560');
+
+请假单：
+select * from ts_leave_apply_detail where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
+update ts_leave_apply_detail set leaveendtime = '2026-02-14 13:00:00.000' where id = '1eb7ddf7bf1143d1ba0a62d1e2042f43'
+
+
+
+UPDATE HRKQ_LEAVE 
+SET leaveday = 7, weekdays = 7
+WHERE BILLNO = 'QJSQ202605210220';
+
+
+
+
+
+
+
+
+
+
+
+撤销岗位失败！原因：撤销岗位引起变动的人员，有定调资单据状态为[编写中]、[已提交]、[审核中]的单据：
+  select BILLCODE,wa_psnappaprove_b.* from wa_psnappaprove_b inner join wa_psnappaprove on wa_psnappaprove_b.pk_psnapp = wa_psnappaprove.pk_psnapp where wa_psnappaprove_b.pk_psndoc in ( N'00011T100000000QWP20' , N'00011T100000000QWP23' , N'00011T100000000QWP26' , N'00011T100000000QWWKL' , N'00011T100000000QWWKO' , N'00011T100000000QWWKR' ) and wa_psnappaprove.confirmstate in ( N'-1' , N'2' , N'3' )
+
+SELECT
+	distinct t1.BILLCODE --单据号
+    ,t2.confirmstate --审批状态
+    ,a1.user_name   --创建人
+    ,t1.dr,t1.PK_PSNAPP --定调资申请单主键
+FROM
+	WA_PSNAPPAPROVE t1
+left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
+left join bd_psnjob t3 on t2.pk_psnjob=t3.pk_psnjob
+left join sm_user a1 on t1.creator=a1.cuserid
+where t1.BILLCODE in ('DDBL202307260024'
+)
+
+SELECT
+	distinct t1.BILLCODE --单据号
+    ,t1.PK_PSNAPP
+    ,t2.PK_WA_ITEM
+    ,t3.name --薪资项目
+    ,t2.PK_PSNAPP_B --定调资申请表体pk
+    ,t2.PK_WA_SECLV_APPLY --薪档
+FROM
+	WA_PSNAPPAPROVE t1
+left join WA_PSNAPPAPROVE_B t2 on t1.PK_PSNAPP=t2.PK_PSNAPP
+left join WA_CLASSITEM t3 on t2.PK_WA_ITEM=t3.PK_WA_ITEM
+where t1.BILLCODE in ('DDBL202307260024')
+
+delete from WA_PSNAPPAPROVE where PK_PSNAPP in (
+'10011T100000000WTY6Y')
+    
+delete from WA_PSNAPPAPROVE_B where PK_PSNAPP in (
+'10011T100000000WTY6Y')
+
+
+
+
+
+
+改兼职单任职类型：
+select * from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where id = '140225198612034013') 
+
+
+select pk_job_type from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where id = '410782198901290443') 
+
+select name from bd_defdoc where PK_DEFDOC='10011T100000000EU4F4'
+
+select PK_DEFDOC from bd_defdoc where name='外派'--10011T100000000007Q2
+
+
+UPDATE HI_PARTAPPLY
+SET pk_job_type ='10011T100000000007Q2'
+WHERE BILL_code = 'JZBL202605140003';
+
+
+改兼职单：
+select * from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where id = '110106199803180632') 
+
+select transtypeid from HI_PARTAPPLY where PK_PSNDOC=(select pk_psndoc from bd_psndoc where id = '110106199803180632') 
+
+select * from bd_billtype
+
+select PK_BILLTYPEID from bd_billtype where billtypename='培养锻炼'
+
+UPDATE HI_PARTAPPLY
+SET transtypeid ='10011T100000000EU4F5'
+WHERE BILL_code = 'JZBL202605140005';
+
+
+
