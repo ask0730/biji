@@ -106,7 +106,9 @@ WHERE bd_psndoc.code = '00000935'  -- 替换为实际的人员编码
 
 
 北森人员推送：
-SELECT * FROM mzjh_sync_beisen_psn WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '10012328')
+SELECT * FROM mzjh_sync_beisen_psn WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00007114')
+
+SELECT * FROM mzjh_sync_beisen_psn WHERE pk_psndoc IN (SELECT pk_psndoc FROM bd_psndoc WHERE code = '00007114') and flag='N'
 
 UPDATE mzjh_sync_beisen_psn 
 SET 
@@ -1042,9 +1044,5 @@ update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where
 UPDATE HRKQ_LEAVE 
 SET leaveday = 7, weekdays = 7
 WHERE BILLNO = 'QJSQ202605210220';
-
-
-
-
 
 
