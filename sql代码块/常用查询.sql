@@ -1021,6 +1021,9 @@ WHERE
 
 请假单，销假单，以及子表，修改请假时长：
 
+休假统计节点，请假单：
+select * from ts_leave_apply where STAFFID=(select pk_psndoc from bd_psndoc where code ='00001162')
+
 请假单：
 select * from HRKQ_LEAVE where billno='QJSQ202605190017'
 
@@ -1044,5 +1047,33 @@ update ts_leave_off_detail set leaveoffendtime = '2026-01-16 13:00:00.000' where
 UPDATE HRKQ_LEAVE 
 SET leaveday = 7, weekdays = 7
 WHERE BILLNO = 'QJSQ202605210220';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
